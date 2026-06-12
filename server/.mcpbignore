@@ -1,0 +1,20 @@
+# Source & build tooling (only the compiled build/ is needed at runtime)
+src/
+tsconfig.json
+package-lock.json
+README.md
+.mcpbignore
+
+# Local data / scratch
+revit-data.db
+*.log
+
+# Dev-only type packages (not needed at runtime)
+node_modules/@types/
+node_modules/typescript/
+node_modules/rimraf/
+node_modules/.bin/
+
+# VCS / editor noise
+.git/
+.gitignore

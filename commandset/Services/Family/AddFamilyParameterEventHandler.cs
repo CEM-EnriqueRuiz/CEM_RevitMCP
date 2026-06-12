@@ -1,0 +1,97 @@
+using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
+using RevitMCPCommandSet.Models.Common;
+using RevitMCPCommandSet.Models.Family;
+using RevitMCPCommandSet.Utils;
+using RevitMCPSDK.API.Interfaces;
+
+namespace RevitMCPCommandSet.Services.Family
+{
+    /// <summary>
+    ///     Adds a parameter to the family currently being edited (family-editor context only).
+    ///     Guarded by doc.IsFamilyDocument. Uses ForgeTypeId on Revit 2022+, the legacy enums below.
+    /// </summary>
+    public class AddFamilyParameterEventHandler : IExternalEventHandler, IWaitableExternalEventHandler
+    {
+        private UIApplication uiApp;
+        private Document doc => uiApp.ActiveUIDocument.Document;
+
+        private readonly ManualResetEvent _resetEvent = new ManualResetEvent(false);
+
+        public FamilyAddParameterRequest Request { get; set; }
+        public AIResult<FamilyOpResult> Result { get; private set; }
+
+        public void Execute(UIApplication uiapp)
+        {
+            uiApp = uiapp;
+            var res = new FamilyOpResult();
+            try
+            {
+                if (!doc.IsFamilyDocument)
+                {
+                    Result = new AIResult<FamilyOpResult>
+                    {
+                        Success = false,
+                        Message = "family_add_parameter only works inside the Family Editor (open an .rfa first).",
+                        Response = res
+                    };
+                    _resetEvent.Set();
+                    return;
+                }
+
+                FamilyManager fm = doc.FamilyManager;
+                using (var tx = new Transaction(doc, "Add Family Parameter"))
+                {
+                    tx.Start();
+                    FamilyParameter fp;
+#if REVIT2022_OR_GREATER
+                    fp = fm.AddParameter(
+                        Request.Name,
+                        McpParameterUtils.GetGroupTypeId(Request.Group),
+                        McpParameterUtils.GetSpecTypeId(Request.DataType),
+                        Request.IsInstance);
+#else
+                    fp = fm.AddParameter(
+                        Request.Name,
+                        McpParameterUtils.GetParameterGroup(Request.Group),
+                        McpParameterUtils.GetParameterType(Request.DataType),
+                        Request.IsInstance);
+#endif
+                    if (fp != null)
+                    {
+                        if (!string.IsNullOrWhiteSpace(Request.Formula))
+                        {
+                            try { fm.SetFormula(fp, Request.Formula); }
+                            catch (Exception ex) { res.Warnings.Add($"Formula not set: {ex.Message}"); }
+                        }
+                        res.Ids.Add(fp.Id.GetValue());
+                    }
+                    tx.Commit();
+                }
+
+                res.Count = res.Ids.Count;
+                Result = new AIResult<FamilyOpResult>
+                {
+                    Success = res.Count > 0,
+                    Message = res.Count > 0
+                        ? $"Added family parameter '{Request.Name}'" + (res.Warnings.Count > 0 ? $". ⚠ {res.Warnings[0]}" : ".")
+                        : "Parameter was not added.",
+                    Response = res
+                };
+            }
+            catch (Exception ex)
+            {
+                Result = new AIResult<FamilyOpResult> { Success = false, Message = $"Error adding family parameter: {ex.Message}", Response = res };
+            }
+            finally { _resetEvent.Set(); }
+        }
+
+        public bool WaitForCompletion(int timeoutMs = 10000)
+        {
+            _resetEvent.Reset();
+            return _resetEvent.WaitOne(timeoutMs);
+        }
+
+        public string GetName() => "Add Family Parameter";
+    }
+}

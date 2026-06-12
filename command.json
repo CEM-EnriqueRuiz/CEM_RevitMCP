@@ -122,6 +122,183 @@
       "commandName": "create_dimensions",
       "description": "Create dimension annotations between elements or points in the current view",
       "assemblyPath": "RevitMCPCommandSet.dll"
-    }
+    },
+    {
+      "commandName": "create_reference_plane",
+      "description": "Create reference planes by line, by origin+normal, or by three points (mm). Returns created element IDs",
+      "assemblyPath": "RevitMCPCommandSet.dll"
+    },
+    {
+      "commandName": "create_shared_parameter",
+      "description": "Create shared parameter definitions and bind them to categories (instance or type). Reuses existing definitions/bindings",
+      "assemblyPath": "RevitMCPCommandSet.dll"
+    },
+    {
+      "commandName": "set_element_parameters",
+      "description": "Universal parameter writer: set instance/type parameters by name or BuiltInParameter across many elements (mm/deg in). Returns per-element report",
+      "assemblyPath": "RevitMCPCommandSet.dll"
+    },
+    {
+      "commandName": "create_view_filter",
+      "description": "Create a ParameterFilterElement with AND-combined rules and apply it to a view with graphic overrides. Updates existing filter of same name",
+      "assemblyPath": "RevitMCPCommandSet.dll"
+    },
+    {
+      "commandName": "create_global_parameter",
+      "description": "Create global parameters, set values, and associate them to element parameters. Per-association validation and error reporting",
+      "assemblyPath": "RevitMCPCommandSet.dll"
+    },
+    {
+      "commandName": "get_element_parameters",
+      "description": "Read instance and type parameters from elements (names, values, storage types, units). Read-back companion to set_element_parameters",
+      "assemblyPath": "RevitMCPCommandSet.dll"
+    },
+    {
+      "commandName": "transform_elements",
+      "description": "Move, rotate, mirror, copy or array a batch of elements (mm/deg). Returns new element ids for copy/array",
+      "assemblyPath": "RevitMCPCommandSet.dll"
+    },
+    {
+      "commandName": "create_view",
+      "description": "Create a view: FloorPlan, CeilingPlan, AreaPlan, Section, Elevation, 3D, or Drafting. Resolves level/view-family-type by name; optional scale and template",
+      "assemblyPath": "RevitMCPCommandSet.dll"
+    },
+    {
+      "commandName": "create_sheet",
+      "description": "Create a sheet from a title block (resolved by name) and optionally auto-place views as viewports in a grid",
+      "assemblyPath": "RevitMCPCommandSet.dll"
+    },
+    {
+      "commandName": "place_viewport",
+      "description": "Place one or more views as viewports on an existing sheet, at a given center or auto-arranged in a grid",
+      "assemblyPath": "RevitMCPCommandSet.dll"
+    },
+    {
+      "commandName": "tag_elements",
+      "description": "Tag elements in a view by explicit ids or by category (generalizes tag_walls/tag_rooms). Picks a sensible tag type when none given",
+      "assemblyPath": "RevitMCPCommandSet.dll"
+    },
+    {
+      "commandName": "get_warnings",
+      "description": "Return the model's warnings (Document.GetWarnings) grouped by description with counts, severity, and sample affected element ids",
+      "assemblyPath": "RevitMCPCommandSet.dll"
+    },
+    {
+      "commandName": "mep_create_duct",
+      "description": "Create straight ducts from start/end points (mm) with a system type, duct type and level (resolved by name). Sets diameter or width/height per segment",
+      "assemblyPath": "RevitMCPCommandSet.dll"
+    },
+    {
+      "commandName": "mep_create_pipe",
+      "description": "Create straight pipes from start/end points (mm) with a piping system type, pipe type and level (resolved by name). Sets diameter per segment",
+      "assemblyPath": "RevitMCPCommandSet.dll"
+    },
+    {
+      "commandName": "mep_create_conduit",
+      "description": "Create straight conduits from start/end points (mm) with a conduit type and level (resolved by name). Optional diameter",
+      "assemblyPath": "RevitMCPCommandSet.dll"
+    },
+    {
+      "commandName": "mep_create_cable_tray",
+      "description": "Create straight cable trays from start/end points (mm) with a cable tray type and level (resolved by name). Sets width/height",
+      "assemblyPath": "RevitMCPCommandSet.dll"
+    },
+    {
+      "commandName": "mep_place_equipment",
+      "description": "Place a loadable family (MEP equipment/fixture/device, resolved by name) at points (mm) on a level, with optional Z rotation",
+      "assemblyPath": "RevitMCPCommandSet.dll"
+    },
+    {
+      "commandName": "mep_create_space",
+      "description": "Create MEP spaces at points (mm) on a level, or auto-place spaces in all enclosed regions. Optional tagging",
+      "assemblyPath": "RevitMCPCommandSet.dll"
+    },
+    {
+      "commandName": "mep_get_system_info",
+      "description": "Read the MEP system an element belongs to (or is): name, type, member element ids and flow. Read-only review tool",
+      "assemblyPath": "RevitMCPCommandSet.dll"
+    },
+    {
+      "commandName": "arch_create_wall",
+      "description": "Create straight walls from start/end points (mm) with a wall type and level (resolved by name). Per-segment or default height, base offset, flip, structural flag",
+      "assemblyPath": "RevitMCPCommandSet.dll"
+    },
+    {
+      "commandName": "arch_create_floor",
+      "description": "Create a floor from a closed boundary of points (mm) with a floor type and level (resolved by name)",
+      "assemblyPath": "RevitMCPCommandSet.dll"
+    },
+    {
+      "commandName": "arch_create_ceiling",
+      "description": "Create a ceiling from a closed boundary of points (mm) with a ceiling type and level (resolved by name). Requires Revit 2022+",
+      "assemblyPath": "RevitMCPCommandSet.dll"
+    },
+    {
+      "commandName": "arch_create_room",
+      "description": "Create rooms at points (mm) on a level with optional names and tags, or auto-place rooms in all enclosed regions",
+      "assemblyPath": "RevitMCPCommandSet.dll"
+    },
+    {
+      "commandName": "arch_create_opening",
+      "description": "Create an opening in a host: rectangular in a wall (two corners) or a vertical shaft through floors/roofs using the boundary profile (mm)",
+      "assemblyPath": "RevitMCPCommandSet.dll"
+    },
+    {
+      "commandName": "family_load",
+      "description": "Load a family (.rfa) from an absolute path into the project, overwriting if it exists. Returns the family id and its type ids",
+      "assemblyPath": "RevitMCPCommandSet.dll"
+    },
+    {
+      "commandName": "family_place_instance",
+      "description": "Place instances of a loaded family type (resolved by name) at points (mm) on a level or host, with optional Z rotation and structural type",
+      "assemblyPath": "RevitMCPCommandSet.dll"
+    },
+    {
+      "commandName": "family_get_types",
+      "description": "List loaded family types (FamilySymbols), optionally filtered by category and family name, optionally with each type's parameters. Read-only",
+      "assemblyPath": "RevitMCPCommandSet.dll"
+    },
+    {
+      "commandName": "family_create_type",
+      "description": "Duplicate a loaded family type to a new named type and apply parameter overrides (mm/deg). Project context",
+      "assemblyPath": "RevitMCPCommandSet.dll"
+    },
+    {
+      "commandName": "family_add_parameter",
+      "description": "Add a parameter to the family being edited (Family Editor only; guarded by IsFamilyDocument). Optional formula. Multi-version (ForgeTypeId 2022+)",
+      "assemblyPath": "RevitMCPCommandSet.dll"
+    },
+    {
+      "commandName": "family_add_type",
+      "description": "Add a new type to the family being edited (FamilyManager.NewType). Family Editor only",
+      "assemblyPath": "RevitMCPCommandSet.dll"
+    },
+    {
+      "commandName": "family_set_formula",
+      "description": "Set or clear a formula on a family parameter (FamilyManager.SetFormula). Family Editor only",
+      "assemblyPath": "RevitMCPCommandSet.dll"
+    },
+    { "commandName": "delete_elements", "description": "Delete elements by id (and their dependents). Returns count removed", "assemblyPath": "RevitMCPCommandSet.dll" },
+    { "commandName": "duplicate_type", "description": "Duplicate any ElementType (resolved by name) to a new named type and apply parameter overrides (mm/deg)", "assemblyPath": "RevitMCPCommandSet.dll" },
+    { "commandName": "group_elements", "description": "Group elements together into a model group; optional name", "assemblyPath": "RevitMCPCommandSet.dll" },
+    { "commandName": "ungroup_group", "description": "Ungroup one or more groups into their member elements", "assemblyPath": "RevitMCPCommandSet.dll" },
+    { "commandName": "pin_elements", "description": "Pin or unpin elements (lock position)", "assemblyPath": "RevitMCPCommandSet.dll" },
+    { "commandName": "rename_element", "description": "Rename an element or type by id", "assemblyPath": "RevitMCPCommandSet.dll" },
+    { "commandName": "copy_parameter_values", "description": "Copy parameter values from a source element to many targets (named params, or all writable)", "assemblyPath": "RevitMCPCommandSet.dll" },
+    { "commandName": "bulk_set_by_filter", "description": "Set a parameter on all elements matching given categories (optionally active view only). Name or BuiltInParameter; mm/deg", "assemblyPath": "RevitMCPCommandSet.dll" },
+    { "commandName": "list_parameters_for_category", "description": "List the parameters available on a category (sampled from an element): names, storage types, read-only, type-vs-instance", "assemblyPath": "RevitMCPCommandSet.dll" },
+    { "commandName": "create_project_parameter", "description": "Create a project parameter bound to categories (instance or type) without a shared parameter file", "assemblyPath": "RevitMCPCommandSet.dll" },
+    { "commandName": "get_element_info", "description": "Compact identity/placement info for elements: name, category, family, type, level, host", "assemblyPath": "RevitMCPCommandSet.dll" },
+    { "commandName": "get_element_geometry", "description": "Geometry summary per element (mm): location point/curve, length, bounding box, area, volume", "assemblyPath": "RevitMCPCommandSet.dll" },
+    { "commandName": "find_elements", "description": "Find element ids by category and optional parameter value (equals/contains), optionally active view only", "assemblyPath": "RevitMCPCommandSet.dll" },
+    { "commandName": "arch_create_roof", "description": "Create a footprint roof from a closed boundary (mm) with a roof type and level (resolved by name)", "assemblyPath": "RevitMCPCommandSet.dll" },
+    { "commandName": "arch_create_curtain_wall", "description": "Create a curtain wall along a line (mm) using a curtain wall type and level", "assemblyPath": "RevitMCPCommandSet.dll" },
+    { "commandName": "arch_create_area_plan", "description": "Create an area plan view for an area scheme and level (resolved by name)", "assemblyPath": "RevitMCPCommandSet.dll" },
+    { "commandName": "arch_create_area", "description": "Place areas at points (mm) in an area plan view", "assemblyPath": "RevitMCPCommandSet.dll" },
+    { "commandName": "arch_create_separator", "description": "Create room/area/space separation lines from a polyline (mm) in a view", "assemblyPath": "RevitMCPCommandSet.dll" },
+    { "commandName": "arch_join_geometry", "description": "Join geometry between two elements (e.g. wall and floor)", "assemblyPath": "RevitMCPCommandSet.dll" },
+    { "commandName": "arch_unjoin_geometry", "description": "Unjoin geometry between two previously-joined elements", "assemblyPath": "RevitMCPCommandSet.dll" },
+    { "commandName": "arch_create_stairs", "description": "Create a straight-run stair between two levels at a run line (mm) with a stairs type and width, via StairsEditScope", "assemblyPath": "RevitMCPCommandSet.dll" },
+    { "commandName": "arch_create_railing", "description": "Create railings on an existing stairs/ramp host (Treads or Stringer position) with a railing type", "assemblyPath": "RevitMCPCommandSet.dll" }
   ]
 }

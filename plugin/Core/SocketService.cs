@@ -36,6 +36,12 @@ namespace revit_mcp_plugin.Core
             }
         }
 
+        /// <summary>
+        /// True if the singleton has already been created. Lets callers (e.g. shutdown)
+        /// check state without lazily instantiating the service.
+        /// </summary>
+        public static bool HasInstance => _instance != null;
+
         private SocketService()
         {
             _commandRegistry = new RevitCommandRegistry();

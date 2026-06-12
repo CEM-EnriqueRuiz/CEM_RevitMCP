@@ -1,0 +1,21 @@
+{
+  "manifest_version": "0.2",
+  "name": "cem-revit-ai",
+  "display_name": "CEM Revit AI",
+  "version": "1.0.0",
+  "description": "Cemengal Revit MCP server — 54 generic Revit tools (core, MEP, architecture, family) driven by Claude over a socket to the Revit plugin.",
+  "long_description": "Connects Claude to Autodesk Revit through the CEM_RevitAI plugin (socket on localhost:8080). Provides generic, AI-friendly tools across core (parameters, views, sheets, tagging, transforms, warnings), MEP (ducts/pipes/conduit/cable tray/equipment/spaces/systems), architecture (walls/floors/ceilings/rooms/openings) and families (load/place/types/editor parameters). Start the server from the CEM_RevitAI ribbon button in Revit before use.",
+  "author": {
+    "name": "Cemengal"
+  },
+  "server": {
+    "type": "node",
+    "entry_point": "build/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/build/index.js"]
+    }
+  },
+  "keywords": ["revit", "bim", "mcp", "autodesk", "architecture", "mep", "cemengal"],
+  "license": "MIT"
+}

@@ -5,7 +5,11 @@
         <LangVersion>latest</LangVersion>
         <PlatformTarget>x64</PlatformTarget>
         <ImplicitUsings>true</ImplicitUsings>
-        <PublishAddinFiles>true</PublishAddinFiles>
+        <!-- Host (CEM_RibbonUI) owns deployment; don't let Nice3point publish this to the
+             Addins folder when built as a dependency. (Build.Tasks 3.x: DeployRevitAddin
+             replaces the 2.x PublishAddinFiles property.) -->
+        <DeployRevitAddin Condition="'$(CemRibbonHostBuild)' != 'true'">true</DeployRevitAddin>
+        <DeployRevitAddin Condition="'$(CemRibbonHostBuild)' == 'true'">false</DeployRevitAddin>
         <Configurations>Debug R20;Debug R21;Debug R22;Debug R23;Debug R24;Debug R25;Debug R26</Configurations>
         <Configurations>$(Configurations);Release R20;Release R21;Release R22;Release R23;Release R24;Release R25;Release R26</Configurations>
     </PropertyGroup>
@@ -53,7 +57,7 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-        <PackageReference Include="Nice3point.Revit.Build.Tasks" Version="2.*" />
+        <PackageReference Include="Nice3point.Revit.Build.Tasks" Version="3.0.1" />
         <PackageReference Include="Nice3point.Revit.Toolkit" Version="$(RevitVersion).*" />
         <PackageReference Include="Nice3point.Revit.Extensions" Version="$(RevitVersion).*" />
         <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="$(RevitVersion).*" />
@@ -65,7 +69,9 @@
       <Reference Include="System.Net.Http" />
     </ItemGroup>
 
-    <Target Name="DeployCommandSet" AfterTargets="Build">
+    <!-- Skip the fork's own deploy when CEM_RibbonUI is the host: the host stages the
+         command set into its own output under Commands\ and publishes it next to the plugin. -->
+    <Target Name="DeployCommandSet" AfterTargets="Build" Condition="'$(CemRibbonHostBuild)' != 'true'">
         <PropertyGroup>
             <PluginAddInRoot>$(ProjectDir)..\plugin\bin\AddIn $(RevitVersion) $(Configuration)\revit_mcp_plugin\</PluginAddInRoot>
             <CommandSetPluginDir>$(PluginAddInRoot)Commands\RevitMCPCommandSet\</CommandSetPluginDir>

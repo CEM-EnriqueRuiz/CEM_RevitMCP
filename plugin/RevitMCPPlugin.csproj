@@ -72,12 +72,18 @@
     <ItemGroup>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
     </ItemGroup>
-    <ItemGroup>
+    <!-- Only ship the standalone addin manifest in the fork's own build. When CEM_RibbonUI
+         hosts the plugin, the MCP UI is provided by the Cemengal ribbon and this manifest
+         (which would register a now-empty IExternalApplication) must not be deployed. -->
+    <ItemGroup Condition="'$(CemRibbonHostBuild)' != 'true'">
         <None Update="mcp-servers-for-revit.addin">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>
-    <Target Name="CopyFiles" AfterTargets="CoreBuild">
+    <!-- When built as a dependency of CEM_RibbonUI, that host project owns deployment
+         (it stages everything under its own output and Nice3point publishes it). Skip the
+         fork's own copy/deploy logic so files are not scattered to the wrong folders. -->
+    <Target Name="CopyFiles" AfterTargets="CoreBuild" Condition="'$(CemRibbonHostBuild)' != 'true'">
         <ItemGroup>
             <RootItem Include="$(ProjectDir)*.addin"/>
             <AddinItem Include="$(TargetDir)*.dll"/>
