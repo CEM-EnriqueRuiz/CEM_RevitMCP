@@ -1,9 +1,9 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using revit_mcp_plugin.UI;
+using CEM_IAModeler.UI;
 
-namespace revit_mcp_plugin.Core
+namespace CEM_IAModeler.Core
 {
     [Transaction(TransactionMode.Manual)]
     public class Settings : IExternalCommand

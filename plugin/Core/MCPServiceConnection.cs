@@ -1,19 +1,22 @@
-﻿using Autodesk.Revit.Attributes;
-using Autodesk.Revit.DB;
+using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
+using CEM_RevitAuth;
 using System;
 
-namespace revit_mcp_plugin.Core
+namespace CEM_IAModeler.Core
 {
     [Transaction(TransactionMode.Manual)]
-    public class MCPServiceConnection : IExternalCommand
+    public class MCPServiceConnection : AuthenticatedExternalCommand
     {
-        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
+        // Inheriting AuthenticatedExternalCommand seals Execute() to run EnsureAuthorized()
+        // first; ExecuteAuthorized() (below) only runs with a valid CEM license. This ensures
+        // the socket listener — which arms the MCP external-event handlers — never starts for
+        // an unlicensed user, beyond the ribbon button's Enabled flag.
+        protected override void ExecuteAuthorized()
         {
             try
             {
-                // 获取socket服务
-                // Obtain socket service.
+                // 获取socket服务 / Obtain socket service.
                 SocketService service = SocketService.Instance;
 
                 if (service.IsRunning)
@@ -23,17 +26,16 @@ namespace revit_mcp_plugin.Core
                 }
                 else
                 {
-                    service.Initialize(commandData.Application);
+                    // base.Application (the inherited UIApplication) — qualified to avoid the
+                    // sibling CEM_IAModeler.Core.Application IExternalApplication type.
+                    service.Initialize(base.Application);
                     service.Start();
                     TaskDialog.Show("revitMCP", "Open Server");
                 }
-
-                return Result.Succeeded;
             }
             catch (Exception ex)
             {
-                message = ex.Message;
-                return Result.Failed;
+                TaskDialog.Show("revitMCP", $"Error: {ex.Message}");
             }
         }
     }

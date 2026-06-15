@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Newtonsoft.Json;
 using RevitMCPSDK.API.Interfaces;
 
-namespace RevitMCPCommandSet.Commands.ExecuteDynamicCode
+namespace CEM_IAModeler_CommandSet.Commands.ExecuteDynamicCode
 {
     /// <summary>
     /// 处理代码执行的外部事件处理器
@@ -16,6 +16,13 @@ namespace RevitMCPCommandSet.Commands.ExecuteDynamicCode
     {
         public const string TransactionModeAuto = "auto";
         public const string TransactionModeNone = "none";
+
+        // 当AI模型找不到合适的工具而退回到"C#脚本食谱"(send_code_to_revit)时，
+        // 每次执行前都会把收到的代码保存为txt文件，便于日后将这些临时操作
+        // 沉淀为专用工具。
+        // TODO: 将该路径改为可配置项（设置/环境变量）。目前按需求硬编码到MCP仓库目录。
+        private const string RecipesLogDirectory =
+            @"C:\DC\ACCDocs\Cemengal\CMGL-TechnicalOffice\Project Files\01-Shared\02-Software\00-Revit\00-RevitAPI\05-CEMAIModeler\Recipes";
 
         // 代码执行参数
         private string _generatedCode;
@@ -52,6 +59,9 @@ namespace RevitMCPCommandSet.Commands.ExecuteDynamicCode
             {
                 var doc = app.ActiveUIDocument.Document;
                 ResultInfo = new ExecutionResultInfo();
+
+                // 在编译/执行前，把这次AI生成的代码食谱保存为txt文件，留作日后提炼专用工具。
+                SaveRecipeToFile(_generatedCode);
 
                 object result;
                 if (_transactionMode == TransactionModeNone)
@@ -90,6 +100,33 @@ namespace RevitMCPCommandSet.Commands.ExecuteDynamicCode
             {
                 TaskCompleted = true;
                 _resetEvent.Set();
+            }
+        }
+
+        /// <summary>
+        /// 把AI生成的C#代码食谱保存为txt文件。每次退回到send_code_to_revit时调用，
+        /// 用于积累这些临时操作，便于日后封装为专用工具。
+        /// 保存失败不会影响代码的正常执行（仅记录到调试输出）。
+        /// </summary>
+        private void SaveRecipeToFile(string code)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(code))
+                    return;
+
+                if (!Directory.Exists(RecipesLogDirectory))
+                    Directory.CreateDirectory(RecipesLogDirectory);
+
+                // 文件名带时间戳，确保每次执行都是独立文件，且按时间排序。
+                string fileName = $"recipe_{DateTime.Now:yyyyMMdd_HHmmss_fff}.txt";
+                string filePath = Path.Combine(RecipesLogDirectory, fileName);
+
+                File.WriteAllText(filePath, code);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"保存AI代码食谱失败: {ex.Message}");
             }
         }
 

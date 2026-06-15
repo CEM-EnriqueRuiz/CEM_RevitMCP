@@ -57,9 +57,6 @@ Restart Claude Desktop. When you see the hammer icon, the MCP server is connecte
 | `tag_all_walls` | Tag all walls in the current view |
 | `tag_all_rooms` | Tag all rooms in the current view |
 | `export_room_data` | Export all room data from the project |
-| `store_project_data` | Store project metadata in local database |
-| `store_room_data` | Store room metadata in local database |
-| `query_stored_data` | Query stored project and room data |
 | `send_code_to_revit` | Send C# code to Revit to execute |
 | `say_hello` | Display a greeting dialog in Revit (connection test) |
 

@@ -9,10 +9,10 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RevitMCPSDK.API.Models.JsonRPC;
 using RevitMCPSDK.API.Interfaces;
-using revit_mcp_plugin.Configuration;
-using revit_mcp_plugin.Utils;
+using CEM_IAModeler.Configuration;
+using CEM_IAModeler.Utils;
 
-namespace revit_mcp_plugin.Core
+namespace CEM_IAModeler.Core
 {
     public class SocketService
     {

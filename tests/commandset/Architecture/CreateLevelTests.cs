@@ -4,7 +4,7 @@ using Nice3point.TUnit.Revit.Executors;
 using TUnit.Core;
 using TUnit.Core.Executors;
 
-namespace RevitMCPCommandSet.Tests.Architecture;
+namespace CEM_IAModeler_Test.Architecture;
 
 public class CreateLevelTests : RevitApiTest
 {

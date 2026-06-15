@@ -22,9 +22,9 @@
 //
 
 using Newtonsoft.Json;
-using RevitMCPCommandSet.Models.Common;
+using CEM_IAModeler_CommandSet.Models.Common;
 
-namespace RevitMCPCommandSet.Models.Architecture;
+namespace CEM_IAModeler_CommandSet.Models.Architecture;
 
 /// <summary>
 ///     Information about a floor in Revit, used for both creation and retrieval

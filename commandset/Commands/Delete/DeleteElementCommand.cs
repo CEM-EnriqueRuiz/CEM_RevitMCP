@@ -1,9 +1,9 @@
 using Autodesk.Revit.UI;
 using Newtonsoft.Json.Linq;
-using RevitMCPCommandSet.Services;
+using CEM_IAModeler_CommandSet.Services.Delete;
 using RevitMCPSDK.API.Base;
 
-namespace RevitMCPCommandSet.Commands.Delete
+namespace CEM_IAModeler_CommandSet.Commands.Delete
 {
     public class DeleteElementCommand : ExternalEventCommandBase
     {

@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace revit_mcp_plugin.Configuration
+namespace CEM_IAModeler.Configuration
 {
     /// <summary>
     /// <para>开发者信息</para>

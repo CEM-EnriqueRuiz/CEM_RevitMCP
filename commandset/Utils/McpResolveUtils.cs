@@ -1,7 +1,7 @@
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
-namespace RevitMCPCommandSet.Utils;
+namespace CEM_IAModeler_CommandSet.Utils;
 
 /// <summary>
 ///     Generic resolution helpers shared by all command handlers. The AI rarely

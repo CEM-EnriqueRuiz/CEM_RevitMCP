@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace RevitMCPCommandSet.Models.Common;
+namespace CEM_IAModeler_CommandSet.Models.Common;
 
 /// <summary>
 ///     Generic request to tag elements in a view. Either tag explicit elementIds,

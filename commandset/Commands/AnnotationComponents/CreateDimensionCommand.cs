@@ -24,10 +24,10 @@
 using Autodesk.Revit.UI;
 using Newtonsoft.Json.Linq;
 using RevitMCPSDK.API.Base;
-using RevitMCPCommandSet.Models.Annotation;
-using RevitMCPCommandSet.Services.AnnotationComponents;
+using CEM_IAModeler_CommandSet.Models.AnnotationComponents;
+using CEM_IAModeler_CommandSet.Services.AnnotationComponents;
 
-namespace RevitMCPCommandSet.Commands.AnnotationComponents;
+namespace CEM_IAModeler_CommandSet.Commands.AnnotationComponents;
 
 /// <summary>
 ///     Command to create dimensions

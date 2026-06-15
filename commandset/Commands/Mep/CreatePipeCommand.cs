@@ -1,10 +1,10 @@
 using Autodesk.Revit.UI;
 using Newtonsoft.Json.Linq;
 using RevitMCPSDK.API.Base;
-using RevitMCPCommandSet.Models.MEP;
-using RevitMCPCommandSet.Services.Mep;
+using CEM_IAModeler_CommandSet.Models.Mep;
+using CEM_IAModeler_CommandSet.Services.Mep;
 
-namespace RevitMCPCommandSet.Commands.Mep
+namespace CEM_IAModeler_CommandSet.Commands.Mep
 {
     public class CreatePipeCommand : ExternalEventCommandBase
     {

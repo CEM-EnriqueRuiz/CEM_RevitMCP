@@ -1,6 +1,6 @@
 ﻿using Autodesk.Revit.UI;
 
-namespace revit_mcp_plugin.Core
+namespace CEM_IAModeler.Core
 {
     public class Application : IExternalApplication
     {

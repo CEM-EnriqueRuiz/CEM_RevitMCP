@@ -4,7 +4,7 @@ using RevitMCPSDK.API.Interfaces;
 using System;
 using System.Collections.Generic;
 
-namespace revit_mcp_plugin.Core
+namespace CEM_IAModeler.Core
 {
     /// <summary>
     /// 管理外部事件的创建和生命周期

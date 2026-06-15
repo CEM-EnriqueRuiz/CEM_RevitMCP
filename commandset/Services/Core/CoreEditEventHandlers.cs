@@ -1,10 +1,10 @@
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using RevitMCPCommandSet.Models.Common;
-using RevitMCPCommandSet.Utils;
+using CEM_IAModeler_CommandSet.Models.Common;
+using CEM_IAModeler_CommandSet.Utils;
 using RevitMCPSDK.API.Interfaces;
 
-namespace RevitMCPCommandSet.Services.Core
+namespace CEM_IAModeler_CommandSet.Services.Core
 {
     // ----- delete_elements -----
     public class DeleteElementsEventHandler : IExternalEventHandler, IWaitableExternalEventHandler

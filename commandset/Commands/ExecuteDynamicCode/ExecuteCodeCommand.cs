@@ -2,7 +2,7 @@
 using Newtonsoft.Json.Linq;
 using RevitMCPSDK.API.Base;
 
-namespace RevitMCPCommandSet.Commands.ExecuteDynamicCode
+namespace CEM_IAModeler_CommandSet.Commands.ExecuteDynamicCode
 {
     /// <summary>
     /// 处理代码执行的命令类

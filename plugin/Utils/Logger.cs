@@ -2,7 +2,7 @@
 using System;
 using System.IO;
 
-namespace revit_mcp_plugin.Utils
+namespace CEM_IAModeler.Utils
 {
     public class Logger : ILogger
     {

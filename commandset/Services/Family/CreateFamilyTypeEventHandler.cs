@@ -1,11 +1,11 @@
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using RevitMCPCommandSet.Models.Common;
-using RevitMCPCommandSet.Models.Family;
-using RevitMCPCommandSet.Utils;
+using CEM_IAModeler_CommandSet.Models.Common;
+using CEM_IAModeler_CommandSet.Models.Family;
+using CEM_IAModeler_CommandSet.Utils;
 using RevitMCPSDK.API.Interfaces;
 
-namespace RevitMCPCommandSet.Services.Family
+namespace CEM_IAModeler_CommandSet.Services.Family
 {
     /// <summary>
     ///     Duplicates a loaded family type (FamilySymbol.Duplicate) and applies parameter

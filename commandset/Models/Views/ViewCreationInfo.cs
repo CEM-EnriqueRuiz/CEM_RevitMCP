@@ -23,7 +23,7 @@
 
 using Newtonsoft.Json;
 
-namespace RevitMCPCommandSet.Models.Views;
+namespace CEM_IAModeler_CommandSet.Models.Views;
 
 /// <summary>
 ///     Information for view creation

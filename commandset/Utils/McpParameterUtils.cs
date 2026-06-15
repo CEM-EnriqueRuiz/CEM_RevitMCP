@@ -1,6 +1,6 @@
 using Autodesk.Revit.DB;
 
-namespace RevitMCPCommandSet.Utils;
+namespace CEM_IAModeler_CommandSet.Utils;
 
 /// <summary>
 ///     Helpers shared by the generic parameter/filter commands:

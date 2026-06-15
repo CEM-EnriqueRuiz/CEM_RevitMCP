@@ -21,7 +21,7 @@
 // SOFTWARE.
 //
 
-namespace RevitMCPCommandSet.Utils;
+namespace CEM_IAModeler_CommandSet.Utils;
 
 public class HandleDuplicateTypeUtils : IDuplicateTypeNamesHandler
 {

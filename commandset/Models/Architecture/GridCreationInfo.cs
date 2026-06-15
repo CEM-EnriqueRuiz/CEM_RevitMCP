@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace RevitMCPCommandSet.Models.Architecture;
+namespace CEM_IAModeler_CommandSet.Models.Architecture;
 
 /// <summary>
 /// Model for creating grid system with smart spacing generation

@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
-using revit_mcp_plugin.Configuration;
-using revit_mcp_plugin.Utils;
+using CEM_IAModeler.Configuration;
+using CEM_IAModeler.Utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,7 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-namespace revit_mcp_plugin.UI
+namespace CEM_IAModeler.UI
 {
     /// <summary>
     /// Interaction logic for CommandSetSettingsPage.xaml

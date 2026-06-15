@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RevitMCPCommandSet.Models.Common
+namespace CEM_IAModeler_CommandSet.Models.Common
 {
     /// <summary>
     /// 过滤器设置 - 支持组合条件过滤

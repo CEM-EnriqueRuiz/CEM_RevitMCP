@@ -4,7 +4,7 @@ using Nice3point.TUnit.Revit.Executors;
 using TUnit.Core;
 using TUnit.Core.Executors;
 
-namespace RevitMCPCommandSet.Tests.DataExtraction;
+namespace CEM_IAModeler_Test.DataExtraction;
 
 public class GetMaterialQuantitiesTests : RevitApiTest
 {

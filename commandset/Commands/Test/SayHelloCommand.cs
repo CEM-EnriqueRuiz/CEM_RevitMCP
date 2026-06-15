@@ -1,9 +1,9 @@
 using Autodesk.Revit.UI;
 using Newtonsoft.Json.Linq;
 using RevitMCPSDK.API.Base;
-using RevitMCPCommandSet.Services;
+using CEM_IAModeler_CommandSet.Services.Test;
 
-namespace RevitMCPCommandSet.Commands.Test
+namespace CEM_IAModeler_CommandSet.Commands.Test
 {
     public class SayHelloCommand : ExternalEventCommandBase
     {

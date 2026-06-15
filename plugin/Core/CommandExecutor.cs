@@ -1,10 +1,11 @@
 ﻿using Newtonsoft.Json.Linq;
+using CEM_IAModeler.Utils;
 using RevitMCPSDK.API.Interfaces;
 using RevitMCPSDK.API.Models.JsonRPC;
 using RevitMCPSDK.Exceptions;
 using System;
 
-namespace revit_mcp_plugin.Core
+namespace CEM_IAModeler.Core
 {
     public class CommandExecutor
     {
@@ -38,18 +39,24 @@ namespace revit_mcp_plugin.Core
 
                 _logger.Info("执行命令: {0}", request.Method);
 
+                // 取一次输入参数，既用于执行也用于审计日志。
+                // Capture params once — used both for execution and for the audit log.
+                JObject paramsObject = request.GetParamsObject();
+
                 // 执行命令
                 // Execute command
                 try
                 {
-                    object result = command.Execute(request.GetParamsObject(), request.Id);
+                    object result = command.Execute(paramsObject, request.Id);
                     _logger.Info("命令 {0} 执行成功\nCommand {0} executed successfully.", request.Method);
 
+                    ActionLogger.Log(request.Method, paramsObject, true, DescribeResult(result));
                     return CreateSuccessResponse(request.Id, result);
                 }
                 catch (CommandExecutionException ex)
                 {
                     _logger.Error("命令 {0} 执行失败: {1}\nCommand {0} failed to execute: {1}", request.Method, ex.Message);
+                    ActionLogger.Log(request.Method, paramsObject, false, ex.Message);
                     return CreateErrorResponse(request.Id,
                         ex.ErrorCode,
                         ex.Message,
@@ -58,6 +65,7 @@ namespace revit_mcp_plugin.Core
                 catch (Exception ex)
                 {
                     _logger.Error("命令 {0} 执行时发生异常: {1}\nAn exception occurred while executing command {0}: {1}", request.Method, ex.Message);
+                    ActionLogger.Log(request.Method, paramsObject, false, ex.Message);
                     return CreateErrorResponse(request.Id,
                         JsonRPCErrorCodes.InternalError,
                         ex.Message);
@@ -69,6 +77,42 @@ namespace revit_mcp_plugin.Core
                 return CreateErrorResponse(request.Id,
                     JsonRPCErrorCodes.InternalError,
                     $"内部错误: {ex.Message}\nInternal error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 为审计日志提炼一条结果信息：优先取AIResult风格的Message字段，
+        /// 否则退回到紧凑JSON。截图等大base64负载不展开。
+        /// Distill a result message for the audit log: prefer an AIResult-style Message,
+        /// otherwise a compact JSON. Avoid dumping large base64 payloads (e.g. screenshots).
+        /// </summary>
+        private static string DescribeResult(object result)
+        {
+            try
+            {
+                if (result == null)
+                    return "(null)";
+
+                JToken token = result is JToken jt ? jt : JToken.FromObject(result);
+
+                if (token is JObject obj)
+                {
+                    // 不记录大体积字段（截图base64等）。Don't log bulky fields.
+                    foreach (var key in new[] { "imageBase64", "ImageBase64" })
+                        if (obj[key] != null) obj[key] = "<base64 omitted>";
+
+                    var msg = obj["message"] ?? obj["Message"];
+                    if (msg != null && msg.Type == JTokenType.String)
+                        return msg.Value<string>();
+
+                    return obj.ToString(Newtonsoft.Json.Formatting.None);
+                }
+
+                return token.ToString(Newtonsoft.Json.Formatting.None);
+            }
+            catch
+            {
+                return "(unserializable result)";
             }
         }
 

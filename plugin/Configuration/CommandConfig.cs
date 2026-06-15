@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using RevitMCPSDK.API.Interfaces;
 
-namespace revit_mcp_plugin.Configuration
+namespace CEM_IAModeler.Configuration
 {
     /// <summary>
     /// <para>命令配置类</para>

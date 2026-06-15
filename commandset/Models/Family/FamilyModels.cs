@@ -1,7 +1,7 @@
 using Newtonsoft.Json;
-using RevitMCPCommandSet.Models.Common;
+using CEM_IAModeler_CommandSet.Models.Common;
 
-namespace RevitMCPCommandSet.Models.Family;
+namespace CEM_IAModeler_CommandSet.Models.Family;
 
 /// <summary>Load a family file (.rfa) into the project.</summary>
 public class FamilyLoadRequest
@@ -57,7 +57,7 @@ public class CreateFamilyTypeRequest
     /// <summary>New type name.</summary>
     [JsonProperty("newTypeName")] public string NewTypeName { get; set; } = "";
     /// <summary>Parameter overrides (name -> value); mm/deg for length/angle params.</summary>
-    [JsonProperty("parameters")] public List<RevitMCPCommandSet.Models.Common.ParamOverride> Parameters { get; set; } = new();
+    [JsonProperty("parameters")] public List<CEM_IAModeler_CommandSet.Models.Common.ParamOverride> Parameters { get; set; } = new();
 }
 
 /// <summary>Add a parameter to the family being edited (family-editor context).</summary>

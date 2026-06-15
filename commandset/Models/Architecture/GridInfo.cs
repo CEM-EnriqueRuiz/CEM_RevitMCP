@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace RevitMCPCommandSet.Models.Architecture;
+namespace CEM_IAModeler_CommandSet.Models.Architecture;
 
 public class GridInfo
 {

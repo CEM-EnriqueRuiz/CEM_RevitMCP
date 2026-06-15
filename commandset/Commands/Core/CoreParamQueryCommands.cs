@@ -1,10 +1,10 @@
 using Autodesk.Revit.UI;
 using Newtonsoft.Json.Linq;
 using RevitMCPSDK.API.Base;
-using RevitMCPCommandSet.Models.Common;
-using RevitMCPCommandSet.Services.Core;
+using CEM_IAModeler_CommandSet.Models.Common;
+using CEM_IAModeler_CommandSet.Services.Core;
 
-namespace RevitMCPCommandSet.Commands.Core
+namespace CEM_IAModeler_CommandSet.Commands.Core
 {
     public class CopyParameterValuesCommand : ExternalEventCommandBase
     {

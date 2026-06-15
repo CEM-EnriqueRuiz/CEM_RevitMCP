@@ -1,13 +1,13 @@
 ﻿using Autodesk.Revit.UI;
 using RevitMCPSDK.API.Interfaces;
 using RevitMCPSDK.API.Utils;
-using revit_mcp_plugin.Configuration;
-using revit_mcp_plugin.Utils;
+using CEM_IAModeler.Configuration;
+using CEM_IAModeler.Utils;
 using System;
 using System.IO;
 using System.Reflection;
 
-namespace revit_mcp_plugin.Core
+namespace CEM_IAModeler.Core
 {
     /// <summary>
     /// <para>命令管理器，负责加载和管理命令</para>

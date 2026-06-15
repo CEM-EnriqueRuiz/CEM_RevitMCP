@@ -1,6 +1,6 @@
 using Autodesk.Revit.DB;
 
-namespace RevitMCPCommandSet.Utils
+namespace CEM_IAModeler_CommandSet.Utils
 {
     /// <summary>
     /// Extension methods for ElementId to handle API differences between Revit versions.

@@ -3,7 +3,7 @@ using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.DB.Electrical;
 
-namespace RevitMCPCommandSet.Utils;
+namespace CEM_IAModeler_CommandSet.Utils;
 
 /// <summary>
 ///     Shared MEP helpers: resolve system types and curve types by name/id, and

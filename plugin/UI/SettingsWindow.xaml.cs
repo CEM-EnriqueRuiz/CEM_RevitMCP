@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 
-namespace revit_mcp_plugin.UI
+namespace CEM_IAModeler.UI
 {
     /// <summary>
     /// Settings.xaml 的交互逻辑

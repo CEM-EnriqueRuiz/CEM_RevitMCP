@@ -1,7 +1,7 @@
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
 
-namespace RevitMCPCommandSet.Utils;
+namespace CEM_IAModeler_CommandSet.Utils;
 
 /// <summary>
 ///     Family-domain helpers: an overwriting family load option and structural-type parsing.

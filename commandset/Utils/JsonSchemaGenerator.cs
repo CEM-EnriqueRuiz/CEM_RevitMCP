@@ -8,7 +8,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RevitMCPCommandSet.Utils
+namespace CEM_IAModeler_CommandSet.Utils
 {
     public static class JsonSchemaGenerator
     {

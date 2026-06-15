@@ -5,7 +5,7 @@ using Nice3point.TUnit.Revit.Executors;
 using TUnit.Core;
 using TUnit.Core.Executors;
 
-namespace RevitMCPCommandSet.Tests;
+namespace CEM_IAModeler_Test;
 
 public class TagRoomsTests : RevitApiTest
 {

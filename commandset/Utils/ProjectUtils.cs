@@ -1,11 +1,11 @@
 ﻿using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
-using RevitMCPCommandSet.Commands;
-using RevitMCPCommandSet.Models.Common;
+using CEM_IAModeler_CommandSet.Commands;
+using CEM_IAModeler_CommandSet.Models.Common;
 using System.IO;
 using System.Reflection;
 
-namespace RevitMCPCommandSet.Utils
+namespace CEM_IAModeler_CommandSet.Utils
 {
     public static class ProjectUtils
     {

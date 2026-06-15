@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace RevitMCPCommandSet.Models.DataExtraction
+namespace CEM_IAModeler_CommandSet.Models.DataExtraction
 {
     /// <summary>
     /// Statistics for a category

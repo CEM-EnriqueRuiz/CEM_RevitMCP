@@ -21,7 +21,7 @@
 // SOFTWARE.
 //
 
-namespace RevitMCPCommandSet.Utils;
+namespace CEM_IAModeler_CommandSet.Utils;
 
 /// <summary>
 ///     Utilities for handling transactions in Revit

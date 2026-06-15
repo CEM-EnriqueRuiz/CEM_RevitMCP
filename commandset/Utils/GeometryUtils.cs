@@ -21,9 +21,9 @@
 // SOFTWARE.
 //
 
-using RevitMCPCommandSet.Models.Common;
+using CEM_IAModeler_CommandSet.Models.Common;
 
-namespace RevitMCPCommandSet.Utils;
+namespace CEM_IAModeler_CommandSet.Utils;
 
 /// <summary>
 ///     Utilities for geometry processing in Revit

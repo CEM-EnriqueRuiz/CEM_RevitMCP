@@ -23,7 +23,7 @@
 
 using Newtonsoft.Json;
 
-namespace RevitMCPCommandSet.Models.Architecture;
+namespace CEM_IAModeler_CommandSet.Models.Architecture;
 
 /// <summary>
 ///     Information about the building roof

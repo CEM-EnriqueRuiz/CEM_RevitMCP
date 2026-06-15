@@ -1,7 +1,7 @@
 ﻿using RevitMCPSDK.API.Interfaces;
 using System.Collections.Generic;
 
-namespace revit_mcp_plugin.Core
+namespace CEM_IAModeler.Core
 {
     public class RevitCommandRegistry : ICommandRegistry
     {

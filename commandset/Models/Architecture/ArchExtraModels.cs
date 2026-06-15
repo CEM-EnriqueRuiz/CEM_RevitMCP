@@ -1,7 +1,7 @@
 using Newtonsoft.Json;
-using RevitMCPCommandSet.Models.Common;
+using CEM_IAModeler_CommandSet.Models.Common;
 
-namespace RevitMCPCommandSet.Models.Architecture;
+namespace CEM_IAModeler_CommandSet.Models.Architecture;
 
 /// <summary>Footprint roof from a closed boundary (mm).</summary>
 public class CreateRoofRequest

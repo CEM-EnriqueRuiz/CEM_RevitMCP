@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace revit_mcp_plugin.Configuration
+namespace CEM_IAModeler.Configuration
 {
     /// <summary>
     /// <para>框架配置类</para>

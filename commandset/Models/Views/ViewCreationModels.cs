@@ -1,7 +1,7 @@
 using Newtonsoft.Json;
-using RevitMCPCommandSet.Models.Common;
+using CEM_IAModeler_CommandSet.Models.Common;
 
-namespace RevitMCPCommandSet.Models.Views;
+namespace CEM_IAModeler_CommandSet.Models.Views;
 
 /// <summary>
 ///     Generic view creation request. One tool, many view kinds.

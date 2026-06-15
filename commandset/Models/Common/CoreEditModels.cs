@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace RevitMCPCommandSet.Models.Common;
+namespace CEM_IAModeler_CommandSet.Models.Common;
 
 /// <summary>A parameter name/value override, shared by type-duplication tools.</summary>
 public class ParamOverride

@@ -1,304 +1,612 @@
 {
-  "name": "RevitMCPCommandSet",
+  "name": "CEM_IAModeler_CommandSet",
   "description": "Basic command collection for Revit AI assistance",
   "developer": {
-    "name": "mcp-servers-for-revit",
+    "name": "Cemengal",
     "email": "",
     "website": "",
-    "organization": "mcp-servers-for-revit"
+    "organization": "Cemengal"
   },
   "commands": [
     {
       "commandName": "say_hello",
       "description": "Displays a greeting dialog",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "get_available_family_types",
       "description": "get available family types",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "get_current_view_elements",
       "description": "get current view elements",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "get_current_view_info",
       "description": "get current view info",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "get_selected_elements",
       "description": "get selected elements",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "create_point_based_element",
       "description": "Create point-based elements like furniture",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "create_line_based_element",
       "description": "Create line based element such as wall",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "create_surface_based_element",
       "description": "Create surface-based elements like floors",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "color_splash",
       "description": "Color elements by parameter value",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "tag_walls",
       "description": "Tag all the walls in the model",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "delete_element",
       "description": "Deletes elements using ElementId",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "ai_element_filter",
       "description": "AI element filter for querying elements by criteria",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "operate_element",
       "description": "Operate on elements (select, color, hide, isolate, etc)",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "export_room_data",
       "description": "Extract all rooms with detailed properties including area, volume, perimeter, and parameters",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "get_material_quantities",
       "description": "Calculate material quantities and takeoffs with area and volume calculations per material",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "analyze_model_statistics",
       "description": "Analyze model complexity with element counts by category, type, family, and level",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "create_grid",
       "description": "Create grid system with smart spacing generation for project layout (alphabetic/numeric naming)",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "create_structural_framing_system",
       "description": "Create structural beam framing system with configurable spacing and direction",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "create_room",
       "description": "Create and place rooms at specified locations with custom names, numbers, and properties",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "tag_rooms",
       "description": "Create tags for all rooms in the current view displaying room name and number",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "create_level",
       "description": "Create levels at specified elevations with automatic floor plan view generation",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "send_code_to_revit",
       "description": "Execute dynamic C# code in Revit with access to the Document and Revit API",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "take_screenshot",
+      "description": "Capture a live screenshot of the Revit window (returns a PNG image) so the AI can visually evaluate the current result and decide how to improve it",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "create_dimensions",
       "description": "Create dimension annotations between elements or points in the current view",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "create_reference_plane",
       "description": "Create reference planes by line, by origin+normal, or by three points (mm). Returns created element IDs",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "create_shared_parameter",
       "description": "Create shared parameter definitions and bind them to categories (instance or type). Reuses existing definitions/bindings",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "set_element_parameters",
       "description": "Universal parameter writer: set instance/type parameters by name or BuiltInParameter across many elements (mm/deg in). Returns per-element report",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "create_view_filter",
       "description": "Create a ParameterFilterElement with AND-combined rules and apply it to a view with graphic overrides. Updates existing filter of same name",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "create_global_parameter",
       "description": "Create global parameters, set values, and associate them to element parameters. Per-association validation and error reporting",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "get_element_parameters",
       "description": "Read instance and type parameters from elements (names, values, storage types, units). Read-back companion to set_element_parameters",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "transform_elements",
       "description": "Move, rotate, mirror, copy or array a batch of elements (mm/deg). Returns new element ids for copy/array",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "create_view",
       "description": "Create a view: FloorPlan, CeilingPlan, AreaPlan, Section, Elevation, 3D, or Drafting. Resolves level/view-family-type by name; optional scale and template",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "create_sheet",
       "description": "Create a sheet from a title block (resolved by name) and optionally auto-place views as viewports in a grid",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "place_viewport",
       "description": "Place one or more views as viewports on an existing sheet, at a given center or auto-arranged in a grid",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "tag_elements",
       "description": "Tag elements in a view by explicit ids or by category (generalizes tag_walls/tag_rooms). Picks a sensible tag type when none given",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "get_warnings",
       "description": "Return the model's warnings (Document.GetWarnings) grouped by description with counts, severity, and sample affected element ids",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "mep_create_duct",
       "description": "Create straight ducts from start/end points (mm) with a system type, duct type and level (resolved by name). Sets diameter or width/height per segment",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "mep_create_pipe",
       "description": "Create straight pipes from start/end points (mm) with a piping system type, pipe type and level (resolved by name). Sets diameter per segment",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "mep_create_conduit",
       "description": "Create straight conduits from start/end points (mm) with a conduit type and level (resolved by name). Optional diameter",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "mep_create_cable_tray",
       "description": "Create straight cable trays from start/end points (mm) with a cable tray type and level (resolved by name). Sets width/height",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "mep_place_equipment",
       "description": "Place a loadable family (MEP equipment/fixture/device, resolved by name) at points (mm) on a level, with optional Z rotation",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "mep_create_space",
       "description": "Create MEP spaces at points (mm) on a level, or auto-place spaces in all enclosed regions. Optional tagging",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "mep_get_system_info",
       "description": "Read the MEP system an element belongs to (or is): name, type, member element ids and flow. Read-only review tool",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "arch_create_wall",
       "description": "Create straight walls from start/end points (mm) with a wall type and level (resolved by name). Per-segment or default height, base offset, flip, structural flag",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "arch_create_floor",
       "description": "Create a floor from a closed boundary of points (mm) with a floor type and level (resolved by name)",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "arch_create_ceiling",
       "description": "Create a ceiling from a closed boundary of points (mm) with a ceiling type and level (resolved by name). Requires Revit 2022+",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "arch_create_room",
       "description": "Create rooms at points (mm) on a level with optional names and tags, or auto-place rooms in all enclosed regions",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "arch_create_opening",
       "description": "Create an opening in a host: rectangular in a wall (two corners) or a vertical shaft through floors/roofs using the boundary profile (mm)",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "family_load",
       "description": "Load a family (.rfa) from an absolute path into the project, overwriting if it exists. Returns the family id and its type ids",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "family_place_instance",
       "description": "Place instances of a loaded family type (resolved by name) at points (mm) on a level or host, with optional Z rotation and structural type",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "family_get_types",
       "description": "List loaded family types (FamilySymbols), optionally filtered by category and family name, optionally with each type's parameters. Read-only",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "family_create_type",
       "description": "Duplicate a loaded family type to a new named type and apply parameter overrides (mm/deg). Project context",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "family_add_parameter",
       "description": "Add a parameter to the family being edited (Family Editor only; guarded by IsFamilyDocument). Optional formula. Multi-version (ForgeTypeId 2022+)",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "family_add_type",
       "description": "Add a new type to the family being edited (FamilyManager.NewType). Family Editor only",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
       "commandName": "family_set_formula",
       "description": "Set or clear a formula on a family parameter (FamilyManager.SetFormula). Family Editor only",
-      "assemblyPath": "RevitMCPCommandSet.dll"
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
-    { "commandName": "delete_elements", "description": "Delete elements by id (and their dependents). Returns count removed", "assemblyPath": "RevitMCPCommandSet.dll" },
-    { "commandName": "duplicate_type", "description": "Duplicate any ElementType (resolved by name) to a new named type and apply parameter overrides (mm/deg)", "assemblyPath": "RevitMCPCommandSet.dll" },
-    { "commandName": "group_elements", "description": "Group elements together into a model group; optional name", "assemblyPath": "RevitMCPCommandSet.dll" },
-    { "commandName": "ungroup_group", "description": "Ungroup one or more groups into their member elements", "assemblyPath": "RevitMCPCommandSet.dll" },
-    { "commandName": "pin_elements", "description": "Pin or unpin elements (lock position)", "assemblyPath": "RevitMCPCommandSet.dll" },
-    { "commandName": "rename_element", "description": "Rename an element or type by id", "assemblyPath": "RevitMCPCommandSet.dll" },
-    { "commandName": "copy_parameter_values", "description": "Copy parameter values from a source element to many targets (named params, or all writable)", "assemblyPath": "RevitMCPCommandSet.dll" },
-    { "commandName": "bulk_set_by_filter", "description": "Set a parameter on all elements matching given categories (optionally active view only). Name or BuiltInParameter; mm/deg", "assemblyPath": "RevitMCPCommandSet.dll" },
-    { "commandName": "list_parameters_for_category", "description": "List the parameters available on a category (sampled from an element): names, storage types, read-only, type-vs-instance", "assemblyPath": "RevitMCPCommandSet.dll" },
-    { "commandName": "create_project_parameter", "description": "Create a project parameter bound to categories (instance or type) without a shared parameter file", "assemblyPath": "RevitMCPCommandSet.dll" },
-    { "commandName": "get_element_info", "description": "Compact identity/placement info for elements: name, category, family, type, level, host", "assemblyPath": "RevitMCPCommandSet.dll" },
-    { "commandName": "get_element_geometry", "description": "Geometry summary per element (mm): location point/curve, length, bounding box, area, volume", "assemblyPath": "RevitMCPCommandSet.dll" },
-    { "commandName": "find_elements", "description": "Find element ids by category and optional parameter value (equals/contains), optionally active view only", "assemblyPath": "RevitMCPCommandSet.dll" },
-    { "commandName": "arch_create_roof", "description": "Create a footprint roof from a closed boundary (mm) with a roof type and level (resolved by name)", "assemblyPath": "RevitMCPCommandSet.dll" },
-    { "commandName": "arch_create_curtain_wall", "description": "Create a curtain wall along a line (mm) using a curtain wall type and level", "assemblyPath": "RevitMCPCommandSet.dll" },
-    { "commandName": "arch_create_area_plan", "description": "Create an area plan view for an area scheme and level (resolved by name)", "assemblyPath": "RevitMCPCommandSet.dll" },
-    { "commandName": "arch_create_area", "description": "Place areas at points (mm) in an area plan view", "assemblyPath": "RevitMCPCommandSet.dll" },
-    { "commandName": "arch_create_separator", "description": "Create room/area/space separation lines from a polyline (mm) in a view", "assemblyPath": "RevitMCPCommandSet.dll" },
-    { "commandName": "arch_join_geometry", "description": "Join geometry between two elements (e.g. wall and floor)", "assemblyPath": "RevitMCPCommandSet.dll" },
-    { "commandName": "arch_unjoin_geometry", "description": "Unjoin geometry between two previously-joined elements", "assemblyPath": "RevitMCPCommandSet.dll" },
-    { "commandName": "arch_create_stairs", "description": "Create a straight-run stair between two levels at a run line (mm) with a stairs type and width, via StairsEditScope", "assemblyPath": "RevitMCPCommandSet.dll" },
-    { "commandName": "arch_create_railing", "description": "Create railings on an existing stairs/ramp host (Treads or Stringer position) with a railing type", "assemblyPath": "RevitMCPCommandSet.dll" }
+    {
+      "commandName": "family_open_session",
+      "description": "Open a family for editing: by familyName (EditFamily on a family loaded in the project) or by familyPath (.rfa from disk), or use the active family doc. Subsequent family_* editor tools act on it; finish with family_save_session",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "family_save_session",
+      "description": "Save the open family (Save, or SaveAs to %TEMP% if it has no path), optionally load it back into the project (overwriting), and optionally close it. The end of a family-edit session started by family_open_session",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "delete_elements",
+      "description": "Delete elements by id (and their dependents). Returns count removed",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "duplicate_type",
+      "description": "Duplicate any ElementType (resolved by name) to a new named type and apply parameter overrides (mm/deg)",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "group_elements",
+      "description": "Group elements together into a model group; optional name",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "ungroup_group",
+      "description": "Ungroup one or more groups into their member elements",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "pin_elements",
+      "description": "Pin or unpin elements (lock position)",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "rename_element",
+      "description": "Rename an element or type by id",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "copy_parameter_values",
+      "description": "Copy parameter values from a source element to many targets (named params, or all writable)",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "bulk_set_by_filter",
+      "description": "Set a parameter on all elements matching given categories (optionally active view only). Name or BuiltInParameter; mm/deg",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "list_parameters_for_category",
+      "description": "List the parameters available on a category (sampled from an element): names, storage types, read-only, type-vs-instance",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "create_project_parameter",
+      "description": "Create a project parameter bound to categories (instance or type) without a shared parameter file",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "get_element_info",
+      "description": "Compact identity/placement info for elements: name, category, family, type, level, host",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "get_element_geometry",
+      "description": "Geometry summary per element (mm): location point/curve, length, bounding box, area, volume",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "find_elements",
+      "description": "Find element ids by category and optional parameter value (equals/contains), optionally active view only",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "arch_create_roof",
+      "description": "Create a footprint roof from a closed boundary (mm) with a roof type and level (resolved by name)",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "arch_create_curtain_wall",
+      "description": "Create a curtain wall along a line (mm) using a curtain wall type and level",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "arch_create_area_plan",
+      "description": "Create an area plan view for an area scheme and level (resolved by name)",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "arch_create_area",
+      "description": "Place areas at points (mm) in an area plan view",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "arch_create_separator",
+      "description": "Create room/area/space separation lines from a polyline (mm) in a view",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "arch_join_geometry",
+      "description": "Join geometry between two elements (e.g. wall and floor)",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "arch_unjoin_geometry",
+      "description": "Unjoin geometry between two previously-joined elements",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "arch_create_stairs",
+      "description": "Create a straight-run stair between two levels at a run line (mm) with a stairs type and width, via StairsEditScope",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "arch_create_railing",
+      "description": "Create railings on an existing stairs/ramp host (Treads or Stringer position) with a railing type",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "create_schedule",
+      "description": "Create a ViewSchedule for a category with chosen fields, optional sort/group field and order. Itemized by default. Field names accept BuiltInParameter or display names",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "duplicate_view",
+      "description": "Duplicate a view (Duplicate | WithDetailing | AsDependent), optionally renaming it",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "set_view_properties",
+      "description": "Set view template, scale, crop visible/active, detail level and discipline on a view. Properties controlled by an applied template are skipped with a warning",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "apply_filter_to_view",
+      "description": "Apply an existing ParameterFilterElement to a view: set its visibility and optional graphic overrides (color rgb, line weight, surface transparency)",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "place_text",
+      "description": "Create a TextNote at a point (mm) in a view, with optional TextNoteType and wrap width (mm)",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "create_filled_region",
+      "description": "Create a FilledRegion from a boundary polygon (mm) in a detail-capable view, with an optional FilledRegionType",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "create_revision",
+      "description": "Create a project Revision (description, issued-to/by, issued flag) and optionally draw a RevisionCloud in a view",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "create_legend",
+      "description": "Create a legend view by duplicating an existing legend (Revit has no create-from-scratch API), optionally placing it on a sheet",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "manage_line_pattern",
+      "description": "List line patterns, or create a new LinePatternElement from alternating dash/gap segment lengths (mm). Reuses an existing pattern of the same name",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "manage_fill_pattern",
+      "description": "List fill patterns, or create a simple parallel-line FillPatternElement (Drafting/Model) by angle (deg) and spacing (mm). Reuses an existing pattern of the same name",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "set_object_styles",
+      "description": "Set object-style line weight (projection/cut), line color (rgb) and line pattern for a category",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "viz_create_material",
+      "description": "Create (or update if it exists) a Material with shading color [r,g,b], transparency, shininess, smoothness, optional surface/cut fill patterns and an existing appearance asset. Idempotent by name",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "viz_set_material_appearance",
+      "description": "Edit an existing material's shading graphics: color, transparency, shininess, smoothness, surface/cut patterns, appearance asset",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "viz_list_materials",
+      "description": "List materials with id, name, shading color, transparency and material class. Optional name substring filter",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "viz_assign_material",
+      "description": "Assign a material to elements either via their Material parameter (mode=parameter, default) or by painting all faces (mode=paint)",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "coord_manage_worksets",
+      "description": "Worksets (workshared models only): list, create, set_active, or assign elements to a workset by name",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "coord_link_model",
+      "description": "Manage links: list all, load a .rvt/.dwg/.dxf/.dgn from path, or reload/unload/remove an existing Revit link by id/name",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "coord_purge_unused",
+      "description": "Purge unused elements (Revit 2024+, Document.GetUnusedElements), optionally limited to categories. dryRun reports candidates without deleting",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "coord_audit_model",
+      "description": "Read-only model-health summary: warning count + top warnings, group/in-place-family/link/design-option counts, unused count, worksharing status",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "coord_manage_phases",
+      "description": "Phases: list phases and phase filters, or set Phase Created / Phase Demolished on elements (use 'None' to clear demolished)",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "create_model_lines",
+      "description": "Create model lines from a polyline (mm) on an XY/XZ/YZ work plane through the first point; optionally closed",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "create_detail_lines",
+      "description": "Create view-specific detail lines from a polyline (mm) in a view, optional line style; optionally closed",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "create_direct_shape",
+      "description": "Create a DirectShape element in a category from a box (min/max mm) or an extruded profile (profile + height mm)",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "create_spot_dimension",
+      "description": "Create a spot elevation or spot coordinate on an element at a point (mm) in a view, with optional bend/end and leader",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "create_assembly",
+      "description": "Create an assembly instance from member element ids (naming category taken from the first member); optional name",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "create_multi_segment_grid",
+      "description": "Create a multi-segment grid from a polyline chain (mm, >=2 points) with an optional grid type",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "edit_curtain_grid",
+      "description": "Add U/V grid lines to a curtain wall or curtain system at points (mm) on its surface; oneSegmentOnly for a partial segment",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "place_image",
+      "description": "Import an image file and place it as an ImageInstance in a view at a center point (mm)",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "create_parts",
+      "description": "Split elements (walls/floors/etc.) into Parts via PartUtils; returns the created part ids",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "family_create_extrusion",
+      "description": "FAMILY EDITOR ONLY: create a solid/void extrusion from a profile (mm), extruded by height (mm). Profile supports multiple loops (first=outer, rest=holes) with line and arc segments; the sketch plane can be XY/XZ/YZ or an arbitrary normal+origin; an optional material (name or id) is assigned to the form",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "family_create_revolution",
+      "description": "FAMILY EDITOR ONLY: create a solid/void revolution from a profile (mm) about an axis (start/end mm) through start/end angles (deg)",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "family_associate_parameter",
+      "description": "FAMILY EDITOR ONLY: associate an element's instance parameter to a family parameter so it becomes parametric",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "family_add_reference_plane",
+      "description": "FAMILY EDITOR ONLY: add a named reference plane from bubble end, free end and a cut-vector point (mm)",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "struct_create_beam",
+      "description": "Create a single structural beam as a line-based FamilyInstance (StructuralType.Beam) from start to end (mm) on a level, with a Structural Framing type",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "struct_create_brace",
+      "description": "Create a structural brace as a line-based FamilyInstance (StructuralType.Brace) from start to end (mm) on a level, with a Structural Framing type",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "struct_create_column",
+      "description": "Create a structural column as a FamilyInstance (StructuralType.Column) at a point (mm) on a base level, optional top level, with a Structural Columns type",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "struct_create_foundation",
+      "description": "Create an isolated structural foundation/footing as a FamilyInstance (StructuralType.Footing) at a point (mm) on a level, with a Structural Foundation type",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "parent_link_extract_geometry",
+      "description": "PARENT TOOL: inspect a linked model (IFC/coordination) — element counts by category and optional per-element geometry summaries (bbox/volume in mm, link transform applied). Read-only first step of the link→native pipeline",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "parent_solid_to_member_params",
+      "description": "PARENT TOOL: derive linear-member parameters (centerline start/end, section b×h, length, nearest level — all mm) from a linked element's geometry, by ids or category. Read-only; feeds struct_/arch_ create tools",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "parent_reconstruct_native",
+      "description": "PARENT TOOL: rebuild a linked model's elements of a category as native Revit elements (robust DirectShape copy), idempotent via a CEMAI app-id tag and a back-pointer to each source. Replaces the hand-written link→native recipes",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "parent_validate_deviation",
+      "description": "PARENT TOOL: measure how far the native rebuild deviates from the source link surfaces (avg/worst mm per item, items over tolerance). Read-only QC for parent_reconstruct_native output",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    }
   ]
 }

@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace RevitMCPCommandSet.Models.Common;
+namespace CEM_IAModeler_CommandSet.Models.Common;
 
 /// <summary>
 ///     One generic transform operation over a batch of elements. Operations:

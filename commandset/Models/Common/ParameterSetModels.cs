@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace RevitMCPCommandSet.Models.Common;
+namespace CEM_IAModeler_CommandSet.Models.Common;
 
 /// <summary>
 ///     One generic parameter write request. Targets multiple elements at once.

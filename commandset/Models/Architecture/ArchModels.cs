@@ -1,7 +1,7 @@
 using Newtonsoft.Json;
-using RevitMCPCommandSet.Models.Common;
+using CEM_IAModeler_CommandSet.Models.Common;
 
-namespace RevitMCPCommandSet.Models.Architecture;
+namespace CEM_IAModeler_CommandSet.Models.Architecture;
 
 /// <summary>One straight wall segment. Endpoints in mm.</summary>
 public class WallSegment

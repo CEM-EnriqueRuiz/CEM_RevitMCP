@@ -1,10 +1,10 @@
 using Autodesk.Revit.UI;
 using Newtonsoft.Json.Linq;
 using RevitMCPSDK.API.Base;
-using RevitMCPCommandSet.Models.Family;
-using RevitMCPCommandSet.Services.Family;
+using CEM_IAModeler_CommandSet.Models.Family;
+using CEM_IAModeler_CommandSet.Services.Family;
 
-namespace RevitMCPCommandSet.Commands.Family
+namespace CEM_IAModeler_CommandSet.Commands.Family
 {
     public class PlaceInstanceCommand : ExternalEventCommandBase
     {

@@ -1,10 +1,10 @@
 ﻿using Newtonsoft.Json;
 using RevitMCPSDK.API.Interfaces;
-using revit_mcp_plugin.Utils;
+using CEM_IAModeler.Utils;
 using System;
 using System.IO;
 
-namespace revit_mcp_plugin.Configuration
+namespace CEM_IAModeler.Configuration
 {
     public class ConfigurationManager
     {
