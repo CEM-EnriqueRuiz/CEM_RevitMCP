@@ -374,3 +374,10 @@ FodyWeavers.xsd
 # =============================================================================
 .claude/
 .DS_Store
+
+# MCP browser-automation artifacts (playwright, chrome-devtools, puppeteer, etc.)
+.playwright-mcp/
+.chrome-devtools-mcp/
+.puppeteer-mcp/
+playwright-report/
+test-results/
