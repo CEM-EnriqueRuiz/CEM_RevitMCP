@@ -16,7 +16,8 @@
         "build": "tsc",
         "generate-registry": "node scripts/generate-tool-registry.mjs",
         "bundle": "npm run generate-registry && node scripts/bundle.mjs",
-        "prepublishOnly": "npm run build"
+        "prepublishOnly": "npm run build",
+        "test": "vitest run"
     },
     "files": [
         "build",
@@ -53,6 +54,7 @@
         "@types/ws": "^8.18.0",
         "esbuild": "^0.25.0",
         "rimraf": "^5.0.10",
-        "typescript": "^5.8.2"
+        "typescript": "^5.8.2",
+        "vitest": "^4.1.11"
     }
 }

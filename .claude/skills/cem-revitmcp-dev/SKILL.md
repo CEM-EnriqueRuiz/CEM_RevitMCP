@@ -21,6 +21,14 @@ wrong, and to give you the workflow around the doc.
 Also read [CROSS_REPO.md](../../../../../CROSS_REPO.md) — this is a fork, so upstream-divergence
 discipline applies.
 
+**Write new pure logic test-first, where it exists.** Most of this repo's TS logic wraps a live
+socket to Revit (`withRevitConnection`) and isn't unit-testable in isolation — that's the norm here,
+not a gap to apologize for. The one real testable surface is each tool's zod schema
+(`.safeParse()`), and the existing `Nice3point.TUnit.Revit` C# suite (`tests/commandset/`, needs
+live Revit) is a different tier entirely. See
+[reference/tdd-and-test-runner.md](../../../../../.claude/skills/cemengal-architect/reference/tdd-and-test-runner.md)
+for the workflow and its exemptions.
+
 ## The three facts that break builds
 
 **1. The 4 parts.** A tool is four files plus one registry entry:
@@ -96,6 +104,14 @@ From the doc's "Conventions" section — these are what make tools AI-grade:
 
 ## Verify
 
+**Unit tests: `npx vitest run`** (in `server/`). A real suite validates each tool's zod schema
+(`.safeParse()` against minimal-valid, fully-specified-valid, and each documented invalid shape) for
+a representative tool per domain — the one genuinely pure, unit-testable surface here. Copy its
+shape for a new tool's schema tests; see `server/tests/TESTS.md`. This does **not** touch
+`withRevitConnection` or anything socket-bound — that stays a documented gap. The separate
+`tests/commandset/` C# suite (`Nice3point.TUnit.Revit`) needs a live Revit process and is not run
+by this command.
+
 Build the TS server and the C# command set, then run the smoke test in
 [CEM_RevitMCP.md](../../../CEM_RevitMCP.md) §8 to exercise the full chain.
 
@@ -120,6 +136,8 @@ To return an image, the TS tool returns an MCP content block:
 - [ ] mm in / mm out; `AIResult<T>` with a human-readable `Message`
 - [ ] Batch operations skip-and-warn rather than throwing
 - [ ] `CEM_RevitMCP.md` §5/§7 updated with the new tool and count
+- [ ] New tool's zod schema has a test in `server/tests/` written before/alongside the schema (or the exemption is stated)
+- [ ] `npx vitest run` green in `server/`
 - [ ] `npm run build` in `server/` clean; smoke test passes
 
 ## Decisions and rationale
