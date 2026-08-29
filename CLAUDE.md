@@ -36,4 +36,5 @@ Also:
 Verify: `cd server && npm run build`, build the command set, then run the smoke test in
 `CEM_RevitMCP.md` section 8.
 
-Commit: `FEAT|FIX|REFACTOR - Description. <issue URL>`
+Commit: `FEAT|FIX|REFACTOR - Description. <issue URL>` — **that line is the entire message**:
+no body, no file list, no test tally, no `Co-Authored-By`. One `git commit -m "..."`.
