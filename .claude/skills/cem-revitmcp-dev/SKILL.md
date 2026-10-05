@@ -174,10 +174,11 @@ approach and its orphan model file were abandoned in favor of small tools
 `NewBlend`/`NewSweep` stay excluded — the recipes proved blend fights the API; decompose into sloped
 extrusions instead. Family geometry transactions must be on the **family doc**, not the project.
 
-**Three on-disk audit trails** exist under a hardcoded ACCDocs CEMAIModeler folder, all fail-soft and
-all marked `TODO: make configurable`: `Recipes\` (every `send_code_to_revit` script, saved *before*
-execution), `Screenshots\` (per `take_screenshot`), and `Log\` (one JSONL line per *every* tool call,
-written at `CommandExecutor.ExecuteCommand` — the single dispatch chokepoint). To change the log,
+**Two on-disk audit trails** exist under a hardcoded ACCDocs CEMAIModeler folder, both fail-soft and
+marked `TODO: make configurable`: `Screenshots\` (per `take_screenshot`) and `Log\` (one JSONL line
+per *every* tool call, written at `CommandExecutor.ExecuteCommand` — the single dispatch chokepoint;
+`send_code_to_revit` bodies are omitted). The per-call `Recipes\` dump of every script was removed as
+noise — don't reintroduce it. To change the log,
 edit `plugin/Utils/ActionLogger.cs` — **not** `PathManager`, which points at a different
 plugin-internal `Logs` dir.
 

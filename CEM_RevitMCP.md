@@ -30,12 +30,12 @@ Claude (MCP client) ─► local TS server (server/build/index.js) ─► TCP :8
   build. Single source of truth for which commands exist.
 
 ### Audit trails (on disk, next to the model work)
-Three fail-soft, timestamped logs under `…\05-CEMAIModeler\` (hardcoded today; TODO make configurable):
-- **`Recipes\`** — full `send_code_to_revit` C# per call (`ExecuteCodeEventHandler`).
+Two fail-soft, timestamped logs under `…\05-CEMAIModeler\` (hardcoded today; TODO make configurable):
 - **`Screenshots\`** — optional PNG per `take_screenshot`.
 - **`Log\`** — JSONL one line per *every* tool call (`plugin/Utils/ActionLogger.cs`, written at
-  `CommandExecutor`): `ts, tool, input, ok, result`. `send_code_to_revit` bodies are pointer-only (already
-  in Recipes). This is how a whole AI session is evaluated after the fact.
+  `CommandExecutor`): `ts, tool, input, ok, result`. `send_code_to_revit` bodies are omitted — the C#
+  is deliberately not persisted anywhere (a per-call `Recipes\` dump was removed as noise). This is
+  how a whole AI session is evaluated after the fact.
 
 ---
 
