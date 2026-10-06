@@ -3,188 +3,57 @@ name: cem-revitmcp-dev
 description: Add or modify tools in the CEM Revit MCP server — the 4-part pattern (TS tool + C# Command + EventHandler + Models) wired through command.json and a localhost socket. Use when adding an MCP tool that drives Revit, or changing the command set / server. Triggers "MCP tool", "Revit MCP", "add a command to the MCP server", "CEM_AIModeler", "send_code_to_revit".
 ---
 
-# Adding tools to CEM_RevitMCP
+# CEM_RevitMCP development
 
-This is a **fork** of `mcp-servers-for-revit`. It exposes Revit to an AI agent as MCP tools over a
-localhost socket.
+CEM_RevitMCP is a **fork of `mcp-servers-for-revit`** that lets an AI agent drive Revit. A
+TypeScript MCP server (`server/`, 118 tools) talks JSON-RPC over TCP :8080 to a C# plugin
+(`plugin/`, CEM_IAModeler) that dispatches to a command set (`commandset/`,
+CEM_IAModeler_CommandSet, 120 commands registered in `command.json`). It is hosted and deployed by
+CEM_RibbonUI in the sibling `CEM_RevitAPI` repo. Upstream code is marked as such in the wiki; extend
+the fork through its four-part pattern rather than reworking upstream plumbing.
 
-## Read the authoritative doc first
+**Before planning or editing, read [docs/index.md](../../../docs/index.md) ("Start here"), then
+the pages it names.** Search with qmd when the index is not enough (MCP tools, or
+`qmd query -c cem_revitmcp "..."`). The wiki holds the detail; this skill only holds the hard rules.
+Also read [CROSS_REPO.md](../../../../../CROSS_REPO.md).
 
-**[CEM_RevitMCP.md](../../../CEM_RevitMCP.md) is the source of truth.** It is a single merged
-document (four older plan docs were consolidated into it and deleted) covering architecture,
-domains, folder structure, the tool anatomy with canonical templates, the full toolset list, DB
-coverage, build order, and the smoke test.
+## Hard rules
 
-This skill does not restate it. It exists to surface the handful of facts that are most often got
-wrong, and to give you the workflow around the doc.
+1. A tool = `server/src/tools/<name>.ts` + `commandset/{Commands,Services,Models}/<Domain>/` + a `command.json` entry → [0001](../../../docs/decisions/0001-extend-via-four-part-pattern.md)
+2. `server.tool("x")`, `CommandName => "x"` and `command.json` `commandName` are byte-identical; a mismatch fails silently → [0001](../../../docs/decisions/0001-extend-via-four-part-pattern.md)
+3. The Command never calls the Revit API; the EventHandler owns the Transaction and signals in `finally` → [0002](../../../docs/decisions/0002-command-raises-external-event.md)
+4. Domains from API namespaces; tool prefix == folder == namespace suffix → [0003](../../../docs/decisions/0003-domains-from-api-namespaces.md), [0004](../../../docs/decisions/0004-prefix-equals-folder-equals-namespace.md)
+5. mm in/out, `AIResult<T>` with a readable `Message`, skip-and-warn batches, names and enums, idempotent → [0005](../../../docs/decisions/0005-ai-grade-tool-conventions.md)
+6. Create methods plus common edits, not parity; the long tail goes to `send_code_to_revit` → [0006](../../../docs/decisions/0006-create-methods-not-full-parity.md)
+7. Choose new tools from the recipe corpus → [0008](../../../docs/decisions/0008-parent-tools-from-recipe-corpus.md)
+8. Family geometry on the family doc; small tools; no blend/sweep → [0009](../../../docs/decisions/0009-small-composable-family-tools.md), [0010](../../../docs/decisions/0010-no-newblend-use-sloped-extrusions.md)
+9. CEM_RibbonUI owns deployment; rebuild it with Revit closed → [0011](../../../docs/decisions/0011-cem-ribbonui-hosts-deployment.md)
+10. The code wins over `CEM_RevitMCP.md` (legacy, partly stale) → [doc drift](../../../docs/concepts/doc-drift.md)
+11. `send_code_to_revit` scripts are not persisted: no `Recipes\` dump (removed as noise, don't reintroduce), and the action log omits the body → [0013](../../../docs/decisions/0013-hardcoded-failsoft-audit-trails.md)
 
-Also read [CROSS_REPO.md](../../../../../CROSS_REPO.md) — this is a fork, so upstream-divergence
-discipline applies.
-
-**Write new pure logic test-first, where it exists.** Most of this repo's TS logic wraps a live
-socket to Revit (`withRevitConnection`) and isn't unit-testable in isolation — that's the norm here,
-not a gap to apologize for. The one real testable surface is each tool's zod schema
-(`.safeParse()`), and the existing `Nice3point.TUnit.Revit` C# suite (`tests/commandset/`, needs
-live Revit) is a different tier entirely. See
-[reference/tdd-and-test-runner.md](../../../../../.claude/skills/cemengal-architect/reference/tdd-and-test-runner.md)
-for the workflow and its exemptions.
-
-## The three facts that break builds
-
-**1. The 4 parts.** A tool is four files plus one registry entry:
-
-| Part | Path | Role |
-|---|---|---|
-| TS tool | `server/src/tools/<name>.ts` | `server.tool(...)` → `withRevitConnection(c => c.sendCommand(...))` |
-| C# Command | `commandset/Commands/<Domain>/<Name>Command.cs` | `ExternalEventCommandBase`, raises the event and blocks |
-| C# EventHandler | `commandset/Services/<Domain>/<Name>EventHandler.cs` | `IExternalEventHandler` — the actual Revit work |
-| C# Models | `commandset/Models/<Domain>/<Name>Models.cs` | request/result DTOs with `[JsonProperty]` |
-| Registry | `command.json` (repo root) | `{ "commandName": ..., "assemblyPath": "RevitMCPCommandSet.dll" }` |
-
-**2. Three names must match byte-for-byte:**
-
-```
-server.tool("my_command", ...)          // TypeScript
-public override string CommandName => "my_command";   // C#
-{ "commandName": "my_command", ... }    // command.json
-```
-
-Runtime resolution is by `CommandName` string only (reflection in `CommandManager`), so folders and
-namespaces are purely organizational — but a mismatch in these three strings means the tool silently
-never resolves.
-
-**3. The Command must NEVER call the Revit API directly.** The socket runs on a background thread;
-the Revit API is only valid on the UI thread. The Command raises an `ExternalEvent` and blocks
-(`RaiseAndWaitForCompletion(20000)`); only the EventHandler touches Revit, owns the `Transaction`,
-and signals completion in a `finally`.
-
-Violating this produces intermittent, hard-to-diagnose failures rather than a clean error.
-
-## Registration is automatic on the TS side only
-
-`server/src/tools/register.ts` `readdirSync`s the tools directory, dynamically imports every file,
-and calls any export whose name `startsWith("register")`. **Drop the file in — no list to edit.**
-
-The C# side is the opposite: `command.json` is a hand-maintained registry and is the authoritative
-count of what exists.
-
-```bash
-grep -o '"commandName"[^,]*' command.json      # regenerate the tool list
-grep -c '"commandName"' command.json           # the real count (120 today)
-```
-
-**Planning docs have historically lagged the code — `command.json` is truth.** When a batch lands,
-update `CEM_RevitMCP.md` §5 (toolset list/count) and §7 (build order).
-
-## Naming and folders
-
-- Core tools: flat `verb_noun` (`create_wall`, `tag_elements`).
-- Domain tools: `domain_verb_noun` — `mep_*`, `arch_*`, `family_*`, `coord_*`, `struct_*`, `viz_*`,
-  `parent_*`.
-- **Folder name == namespace suffix == the `domain_` tool prefix.** Canonical domains: `Core`,
-  `Access`, `Architecture`, `Mep`, `Family`, `Struct`, `Views`, `AnnotationComponents`,
-  `DataExtraction`, `Delete`, `Test`, `ExecuteDynamicCode`, `ParentTools` (+ `Models/Common`).
-
-Commands, Services and Models all mirror the same domain subfolders.
-
-*Gotcha:* NTFS case-only renames (e.g. `MEP` → `Mep`) need a two-step rename to take effect on disk.
-
-## Non-negotiable conventions
-
-From the doc's "Conventions" section — these are what make tools AI-grade:
-
-- **mm in, mm out.** Unit conversion happens at the boundary.
-- Return `AIResult<T>` with a **human-readable `Message`** — the model reads it.
-- **Never hard-fail a batch.** Skip, warn, continue.
-- Accept **both** display names and `BuiltInParameter` / `BuiltInCategory` enum names.
-- **Idempotent by name** where creation is involved.
-- One Command + one EventHandler per tool.
-- Multi-version guards (`REVIT2022_OR_GREATER`) and `ElementIdExtensions` instead of
-  `new ElementId(int)`.
+The step-by-step procedure is in [add a tool](../../../docs/workflows/add-a-tool.md).
 
 ## Verify
 
-**Unit tests: `npx vitest run`** (in `server/`). A real suite validates each tool's zod schema
-(`.safeParse()` against minimal-valid, fully-specified-valid, and each documented invalid shape) for
-a representative tool per domain — the one genuinely pure, unit-testable surface here. Copy its
-shape for a new tool's schema tests; see `server/tests/TESTS.md`. This does **not** touch
-`withRevitConnection` or anything socket-bound — that stays a documented gap. The separate
-`tests/commandset/` C# suite (`Nice3point.TUnit.Revit`) needs a live Revit process and is not run
-by this command.
-
-Build the TS server and the C# command set, then run the smoke test in
-[CEM_RevitMCP.md](../../../CEM_RevitMCP.md) §8 to exercise the full chain.
-
 ```bash
-cd server && npm run build       # emits to build/, which the .mcpb and manifest run from
+cd server && npx vitest run      # schema tests; write the new tool's test first
+cd server && npm run build       # build/index.js, what the MCP client runs
 ```
 
-The transport is JSON-RPC over a TCP socket on localhost:8080 (`SocketService` C# side,
-`SocketClient.ts` JS side). The client buffers until the whole JSON parses, so large payloads
-(base64 images) work — but keep them bounded.
+```powershell
+dotnet build commandset\CEM_IAModeler_CommandSet.csproj -c "Debug R24" -p:Platform=x64 -p:DeployRevitAddin=false
+```
 
-To return an image, the TS tool returns an MCP content block:
-`{ type: "image", data: <base64>, mimeType: "image/png" }`.
+Then rebuild CEM_RibbonUI with Revit closed and run the
+[smoke test](../../../docs/workflows/smoke-test.md). C# handler logic is Revit-bound: state the TDD
+exemption rather than skipping silently. Driving Revit through MCP is not a test.
 
-## Pre-flight checklist
+## Finish (commit-time ingest)
 
-- [ ] All four files created in the matching domain subfolder
-- [ ] `command.json` entry added
-- [ ] The three names match byte-for-byte
-- [ ] Command raises an ExternalEvent; **no Revit API call in the Command**
-- [ ] EventHandler owns its `Transaction` and signals completion in `finally`
-- [ ] mm in / mm out; `AIResult<T>` with a human-readable `Message`
-- [ ] Batch operations skip-and-warn rather than throwing
-- [ ] `CEM_RevitMCP.md` §5/§7 updated with the new tool and count
-- [ ] New tool's zod schema has a test in `server/tests/` written before/alongside the schema (or the exemption is stated)
-- [ ] `npx vitest run` green in `server/`
-- [ ] `npm run build` in `server/` clean; smoke test passes
-
-## Decisions and rationale
-
-**Domains are derived from the Revit API CHM namespace inventory, not wishlist words.**
-`commandset/Utils/RevitAPI_2024_namespaces.md` is the map. When someone says
-"views/styles/sheets/schedules/tagging", check which namespace the class actually lives in first —
-views, sheets, `ViewSchedule`, `IndependentTag`, dimensions, `TextNote`, `FilledRegion`,
-`GraphicsStyle` **all live in `Autodesk.Revit.DB`**, so they extend the **Core** pack and are not
-separate domains. The only real appearance namespace is `Autodesk.Revit.DB.Visual` → `viz_*`.
-
-**Don't chase full property parity.** Past ~100 tools, LLM tool-selection degrades. The target is
-the ~151 DB create-methods plus common edits; reads stay generic via `get_element_*` / `find_elements`.
-
-**Some APIs have no public create path** (scope box, portable clash). Document and defer to
-`send_code_to_revit` rather than shipping a guess. Deliberately excluded: rebar/loads/analytical
-(fragile, version-sensitive), conceptual mass, site, model text, host sweeps, ExtensibleStorage.
-
-**Always check existing tools before adding.** A per-namespace audit found Selection was already
-covered (`operate_element` does `Selection.SetElementIds`) and Events correctly absent (host
-subscriptions, not tools).
-
-**The real capability gap was reading, not authoring.** Analysis of the recipe corpus (the C#
-payloads the AI emits via `send_code_to_revit`) showed ~67% was link-geometry reconstruction:
-read geometry from a linked IFC → measure → recreate as native Revit elements → validate deviation.
-The existing tools were all *authoring* primitives taking clean numeric input, so the AI fell back
-to raw code for the whole pipeline. That drove the `parent_*` pack
-(`parent_link_extract_geometry`, `parent_solid_to_member_params`, `parent_reconstruct_native`,
-`parent_validate_deviation`). **When asked what to build next, look at the recipe corpus first.**
-
-**Small composable tools beat a monolith.** An earlier monolithic `parent_family_build_geometry`
-approach and its orphan model file were abandoned in favor of small tools
-(`family_open_session`, `family_save_session`, an upgraded `family_create_extrusion`).
-`NewBlend`/`NewSweep` stay excluded — the recipes proved blend fights the API; decompose into sloped
-extrusions instead. Family geometry transactions must be on the **family doc**, not the project.
-
-**Two on-disk audit trails** exist under a hardcoded ACCDocs CEMAIModeler folder, both fail-soft and
-marked `TODO: make configurable`: `Screenshots\` (per `take_screenshot`) and `Log\` (one JSONL line
-per *every* tool call, written at `CommandExecutor.ExecuteCommand` — the single dispatch chokepoint;
-`send_code_to_revit` bodies are omitted). The per-call `Recipes\` dump of every script was removed as
-noise — don't reintroduce it. To change the log,
-edit `plugin/Utils/ActionLogger.cs` — **not** `PathManager`, which points at a different
-plugin-internal `Logs` dir.
-
-**`System.Drawing` collides with `Autodesk.Revit.DB`** (both define `Rectangle`/`Color`) — alias the
-GDI types. On net8 (R25/R26) it needs the `System.Drawing.Common` package; on net48 it is a
-framework reference.
-
-**Deliberately kept:** `store_project_data` / `store_room_data` / `query_stored_data` are a TS-only
-local SQLite pack that never touches Revit. Don't "fix" them by adding a C# side.
+Commit only after the user sends the issue URL. In the **same** commit, ingest the change into
+`docs/`: the source page (`sources/issues/<org>-<repo>-<N>.md`, or `sources/commits/<YYYY-MM>.md`)
+with every decision, its reason and the rejected alternatives; the affected pages (new tools →
+`modules/toolset.md`); `index.md`; and a `log.md` entry. `python ../../tools/wiki/wiki_lint.py .`
+must show 0 errors. Message: one line, `FEAT|FIX|REFACTOR - Description. <issue URL>`, no body.
+Stage explicit paths; `.claude/` is gitignored (`git add -f`). See
+[finish a change](../../../docs/workflows/finish-a-change.md).

@@ -5,4 +5,4 @@ description: "Add or modify tools in the CEM Revit MCP server — the 4-part pat
 
 Read and follow [the canonical skill](../../../.claude/skills/cem-revitmcp-dev/SKILL.md) before working on this task. Resolve its relative links from the canonical file's directory.
 
-Also read [repo procedures](../../../CLAUDE.md), applicable `AGENTS.md` files, and [shared cross-repo guidance](../../../../../CROSS_REPO.md).
+Also read [the repo wiki](../../../docs/index.md) ("Start here"), [repo procedures](../../../CLAUDE.md), applicable `AGENTS.md` files ([repo AGENTS.md](../../../AGENTS.md)), and [shared cross-repo guidance](../../../../../CROSS_REPO.md).

@@ -1,0 +1,5 @@
+{
+  "mcpServers": {
+    "qmd": { "command": "cmd", "args": ["/c", "qmd", "mcp"] }
+  }
+}
