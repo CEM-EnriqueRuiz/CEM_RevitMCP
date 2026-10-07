@@ -34,6 +34,9 @@ Code: `commandset/Commands/ParentTools/ParentToolCommands.cs`, `Services/ParentT
 
 ## Consequences
 
+- **Update (2026-10-07):** new scripts are no longer saved ([0023](0023-send-code-scripts-not-persisted.md)).
+  The existing `Recipes\` files are a historical corpus. New evidence is how often `send_code_to_revit`
+  appears in the `Log\` JSONL, and what the session was doing.
 - **When asked what to build next, look at the recipe corpus first.** Choose tools from evidence of
   what the AI actually hand-writes, not from API coverage.
 - The audit logs are the success metric: after a change, `Log\actions_*.jsonl` should show the

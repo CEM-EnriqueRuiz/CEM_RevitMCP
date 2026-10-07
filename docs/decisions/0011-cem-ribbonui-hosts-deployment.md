@@ -39,5 +39,8 @@ deploy targets. Cemengal already has a ribbon add-in, `CEM_RibbonUI`, in the sib
 - If no commands load, CEM_RibbonUI was not rebuilt or redeployed.
 - This is a cross-repo coupling: changing project names or paths here also requires edits in
   `CEM_RevitAPI` (report these; don't edit them from this repo).
+- **Refined by [0024](0024-standalone-deploy-only-without-ribbon-host.md):** both projects are also members of
+  `CEM_RevitAPI.sln`, so a direct solution build bypasses `CemRibbonHostBuild`. The plugin now also detects the
+  sibling CEM_RibbonUI and skips its standalone deploy.
 - The fork's standalone build path still exists (`DeployCommandSet`, `CopyFiles` targets) for
   `CemRibbonHostBuild != true`.

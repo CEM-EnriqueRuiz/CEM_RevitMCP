@@ -10,8 +10,9 @@ tags: [toolset, catalog]
 # The toolset (120 commands by domain)
 
 `command.json` is the source of truth: 120 entries, all matched by a C# `CommandName`. **118 have a
-TS tool.** `tag_walls` and `tag_rooms` are registered in C# but have no TS wrapper (use
-`tag_elements`). Regenerate with `grep -o '"commandName"[^,]*' command.json`.
+TS tool.** `tag_walls` and `tag_rooms` are registered in C# but have no TS wrapper. This is **deliberate**: they were
+consolidated into the single `tag_elements` tool, and the C# side still serves both names (user note in
+`CEM_RevitMCP.md`, `29b3fba`). Regenerate with `grep -o '"commandName"[^,]*' command.json`.
 
 Grouped by **C# folder** (what you open to edit). Items marked † are **upstream** (23); everything
 else was added by Cemengal.

@@ -29,7 +29,7 @@ Rules: [CROSS_REPO.md §4 and §9](../../../../CROSS_REPO.md). Tooling:
    - Add any new page to [index.md](../index.md).
    - Append to [log.md](../log.md): `## [YYYY-MM-DD] ingest | <org>/<repo>#<N> <title>`.
 4. Lint: `python ../../tools/wiki/wiki_lint.py .` must show 0 errors.
-5. Stage explicit paths (code + `docs/`), never `git add -A`. Remember `.claude/` is gitignored
+5. Stage explicit paths (code + `docs/`), never `git add -A`. Remember `.claude/*` is gitignored except `agents/` and `skills/cem-revitmcp-dev/`; `settings.json` is already tracked
    (`git add -f` for files there).
 6. Commit with **one line**: `git commit -m "FEAT|FIX|REFACTOR - Description. <issue URL>"`. No
    body and no trailers. `DOCS - …` is only for wiki-only commits.

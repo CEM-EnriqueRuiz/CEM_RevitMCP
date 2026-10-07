@@ -42,7 +42,9 @@ Why it works this way: [0011](../decisions/0011-cem-ribbonui-hosts-deployment.md
 
 ## Standalone path (the fork's own targets)
 
-A Debug build of the command set without `CemRibbonHostBuild` copies DLLs and `command.json` to
+The plugin deploys standalone only when no sibling `CEM_RevitAPI/CEM_RibbonUI` exists
+([0024](../decisions/0024-standalone-deploy-only-without-ribbon-host.md)); the command set still keys only on
+`CemRibbonHostBuild`. A Debug build of the command set without `CemRibbonHostBuild` copies DLLs and `command.json` to
 `plugin/bin/AddIn <ver> <cfg>/...` and `%AppData%\Autodesk\Revit\Addins\<ver>\CEM_IAModeler\...`.
 The plugin's `CopyFiles` target ships `CEM_IAModeler.addin`. Use this only when CEM_RibbonUI is not
 involved; it registers an add-in with **no UI**, so nothing can start the server.

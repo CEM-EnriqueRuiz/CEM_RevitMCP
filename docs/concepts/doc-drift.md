@@ -20,7 +20,7 @@ the truth.** None of these were fixed in code; each needs its own change with an
 | old skill table, `CEM_RevitMCP.md` §4 template | `"assemblyPath": "RevitMCPCommandSet.dll"` | `CEM_IAModeler_CommandSet.dll` (all 120 entries) |
 | `CEM_RevitMCP.md` §1 diagram | `RevitMCPPlugin` → `RevitMCPCommandSet` | `CEM_IAModeler` → `CEM_IAModeler_CommandSet` |
 | `CEM_RevitMCP.md` §4 build checklist | `dotnet build commandset\RevitMCPCommandSet.csproj` | `commandset\CEM_IAModeler_CommandSet.csproj` |
-| `CEM_RevitMCP.md` §5, header | "120 wired commands", `tag_walls`/`tag_rooms` listed | 120 in `command.json`/C#, but only **118 TS tools**: `tag_walls` and `tag_rooms` have no TS wrapper, so MCP can't reach them; `say_hello` is unlisted |
+| `CEM_RevitMCP.md` §5 | `tag_walls`/`tag_rooms` listed as tools | **header resolved in `29b3fba`:** it now says 120 entries / 118 MCP tools, with `tag_walls`/`tag_rooms` deliberately consolidated into `tag_elements` (the C# still serves both). The §5 list still shows them, and `say_hello` is unlisted |
 | `CEM_RevitMCP.md` §8 smoke test | MCP path `d:\repos\Cemengal\CEM_IA\CEM_RevitMCP\mcp-servers-for-revit\server\build\index.js` | `<checkout>\CEM_IA\CEM_RevitMCP\server\build\index.js` (no `mcp-servers-for-revit` level) |
 | `CEM_RevitMCP.md` intro | AI-behaviour guide is the "`CEM_AIModeler` Claude skill" | it exists outside this repo (installed as `cem-aimodeler`); not verifiable from here |
 | old skill | "four older plan docs were consolidated" | git history has three (`TOOLSET_ROADMAP.md`, `SPECIALIST_ARCHITECTURE.md`, `SMOKE_TEST.md`) |
@@ -45,6 +45,15 @@ the truth.** None of these were fixed in code; each needs its own change with an
 - **`CommandManager` instantiates every command type per registry entry** (120 × ~120 reflection
   constructions at startup; upstream design). It works but is wasteful. Its success log line also
   says "Failed to create command instance", an upstream copy-paste typo.
-- **Hardcoded audit root**, in three files ([0013](../decisions/0013-hardcoded-failsoft-audit-trails.md)).
-- **`.gitignore` ignores `.claude/`**: the skill is tracked only because it was force-added, and
-  `.claude/settings.json` needs `git add -f` or an ignore exception.
+- **Hardcoded audit root**, now in two files (`ActionLogger`, `TakeScreenshotEventHandler`). The
+  third (Recipes) was removed in `fe06b6c` ([0023](../decisions/0023-send-code-scripts-not-persisted.md)).
+- ~~**`.gitignore` ignores `.claude/`**~~ **resolved** in `29b3fba`: `.claude/*` is ignored except
+  `agents/` and `skills/cem-revitmcp-dev/`. `.claude/settings.json` is tracked (force-added) even
+  though the rule still matches it.
+- **Command-set standalone deploy not guarded** (found 2026-10-07): `29b3fba` added the
+  CEM_RibbonUI-sibling guard to the plugin only. `CEM_IAModeler_CommandSet.csproj` still deploys on
+  any build without `CemRibbonHostBuild`, including a direct `CEM_RevitAPI.sln` Debug build
+  ([0024](../decisions/0024-standalone-deploy-only-without-ribbon-host.md)).
+- **Remote agent definition drifted from the wiki** (resolved at the 2026-10-07 DOCS catch-up):
+  `.claude/agents/cem-revitmcp-dev.md` (`29b3fba`) called `CEM_RevitMCP.md` authoritative and said
+  to update its §5/§7. It now points to `docs/index.md`.

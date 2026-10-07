@@ -13,7 +13,8 @@ tags: [workflow, tools]
 
 - Check existing tools first ([toolset](../modules/toolset.md)); a per-namespace audit found most
   "missing" capabilities already covered.
-- Prefer evidence: what does the AI hand-write in `Recipes\`
+- Prefer evidence: how often does the AI fall back to `send_code_to_revit` (in the `Log\` JSONL, and in
+  the historical `Recipes\` corpus)
   ([0008](../decisions/0008-parent-tools-from-recipe-corpus.md))?
 - Respect the scope line ([0006](../decisions/0006-create-methods-not-full-parity.md)): no full
   parity, and no rebar/loads/analytical, blend/sweep, or scope box.

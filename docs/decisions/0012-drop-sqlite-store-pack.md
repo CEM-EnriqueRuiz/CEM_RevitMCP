@@ -35,7 +35,7 @@ In `aa88b96` (2026-06-15), all of these were removed:
 - **Superseded claim:** the old skill (`b05a76f`) said the SQLite pack was "deliberately kept —
   don't fix them by adding a C# side". That contradicted the code from the day it was written. It
   was flagged in `server/tests/TESTS.md` (`0556fb0`) and is corrected here. The code wins.
-- The C# commands `tag_walls` and `tag_rooms` (upstream) are **still registered** in `command.json`
+- The C# commands `tag_walls` and `tag_rooms` (upstream) are **still registered** (deliberately; consolidated into `tag_elements`, `29b3fba`) in `command.json`
   and the command set, but now have **no TS tool**, so MCP clients cannot reach them. See
   [doc drift](../concepts/doc-drift.md).
 - A gitignored `server/revit-data.db` may still exist on old checkouts; it is a leftover.

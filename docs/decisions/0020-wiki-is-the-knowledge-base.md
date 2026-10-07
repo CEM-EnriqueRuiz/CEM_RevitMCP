@@ -30,6 +30,8 @@ code ([0019](0019-single-authoritative-doc.md)). The root schema
 ## Consequences
 
 - Finish every change with [finish a change](../workflows/finish-a-change.md).
-- `.gitignore` ignores `.claude/` (only the skill is tracked, force-added). The new
-  `.claude/settings.json` therefore needs `git add -f`, or a `.gitignore` exception, when it is
+- `.gitignore` now ignores `.claude/*` except `agents/` and `skills/cem-revitmcp-dev/` (`29b3fba`).
+  `.claude/settings.json` is still matched by the ignore rule, but it is tracked (force-added at bootstrap), so
+  later edits stage normally. Any **new** file under `.claude/` outside those two needs `git add -f`, or a
+  `.gitignore` exception, when it is
   committed.

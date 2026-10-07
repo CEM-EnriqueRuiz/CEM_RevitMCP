@@ -33,6 +33,7 @@ external-event plumbing. It holds no tool logic.
 - Depends on the `RevitMCPSDK`, `Nice3point.Revit.Api.*` and `Nice3point.Revit.Toolkit` NuGet
   packages, plus a **`ProjectReference` to `../../../CEM_RevitAPI/CEM_RevitAuth`**, so the sibling
   repo must be checked out.
-- Standalone build (`CemRibbonHostBuild != true`): the `CopyFiles` target deploys
+- Standalone build (`CemStandaloneDeploy`: `CemRibbonHostBuild != true` **and** no sibling
+  `CEM_RevitAPI/CEM_RibbonUI`, [0024](../decisions/0024-standalone-deploy-only-without-ribbon-host.md)): the `CopyFiles` target deploys
   `CEM_IAModeler.addin` and the DLLs to `%AppData%\Autodesk\Revit\Addins\<ver>` on Debug builds.
   Hosted build: CEM_RibbonUI owns deployment.

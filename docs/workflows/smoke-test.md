@@ -61,4 +61,5 @@ appear in Revit; family-editor tools succeed in an .rfa and fail clearly in a pr
 | "Method not found" / command not found | registry not deployed, or a name mismatch among the three strings |
 | "No <X>Type available" | the project lacks that type |
 | 0 commands loaded | rebuild CEM_RibbonUI **with Revit closed** |
+| connects, then every call says "Method not found" | a stray `CEM_IAModeler.addin` in the Addins folder serves an empty registry; delete it ([0024](../decisions/0024-standalone-deploy-only-without-ribbon-host.md)) |
 | times out after 120 s | TS client timeout; the handler is slow or blocked by a modal dialog |

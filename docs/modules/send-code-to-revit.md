@@ -9,7 +9,7 @@ tags: [send-code, roslyn, upstream]
 
 # send_code_to_revit — the escape hatch
 
-**Origin: upstream.** Cemengal added recipe logging (`aa88b96`). Upstream added `transactionMode`
+**Origin: upstream.** Cemengal added recipe logging (`aa88b96`) and later removed it (`fe06b6c`). Upstream added `transactionMode`
 (`17d0108`).
 
 Arbitrary C# is compiled with Roslyn (`Microsoft.CodeAnalysis.CSharp`) into a template `Execute`
@@ -19,8 +19,9 @@ Input: `code` (string), `parameters` (string[], optional), and `transactionMode`
 default, wraps the snippet in a transaction; `"none"` lets the code manage its own,
 [0018](../decisions/0018-send-code-transaction-mode.md)).
 
-Every script is saved to the `Recipes\` audit folder **before** execution
-([audit trails](../concepts/audit-trails.md)).
+Scripts are **not persisted**. The per-call `Recipes\` dump (added in `aa88b96`) was removed in `fe06b6c`,
+and the action log records the call with `code`/`data` as `"<omitted>"`
+([0023](../decisions/0023-send-code-scripts-not-persisted.md), [audit trails](../concepts/audit-trails.md)).
 
 ## When to use it
 

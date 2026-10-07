@@ -29,7 +29,7 @@ Also read [CROSS_REPO.md](../../../../../CROSS_REPO.md).
 8. Family geometry on the family doc; small tools; no blend/sweep → [0009](../../../docs/decisions/0009-small-composable-family-tools.md), [0010](../../../docs/decisions/0010-no-newblend-use-sloped-extrusions.md)
 9. CEM_RibbonUI owns deployment; rebuild it with Revit closed → [0011](../../../docs/decisions/0011-cem-ribbonui-hosts-deployment.md)
 10. The code wins over `CEM_RevitMCP.md` (legacy, partly stale) → [doc drift](../../../docs/concepts/doc-drift.md)
-11. `send_code_to_revit` scripts are not persisted: no `Recipes\` dump (removed as noise, don't reintroduce), and the action log omits the body → [0013](../../../docs/decisions/0013-hardcoded-failsoft-audit-trails.md)
+11. `send_code_to_revit` scripts are not persisted: no `Recipes\` dump (removed as noise, don't reintroduce), and the action log omits the body → [0023](../../../docs/decisions/0023-send-code-scripts-not-persisted.md)
 
 The step-by-step procedure is in [add a tool](../../../docs/workflows/add-a-tool.md).
 

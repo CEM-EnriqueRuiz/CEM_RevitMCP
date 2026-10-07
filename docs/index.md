@@ -23,7 +23,7 @@ Read [overview.md](overview.md) first. Upstream vs our parts: [upstream and fork
 4. Domains come from API namespaces; prefix == folder == namespace suffix → [0003](decisions/0003-domains-from-api-namespaces.md), [0004](decisions/0004-prefix-equals-folder-equals-namespace.md)
 5. mm in/out, `AIResult<T>` with a readable `Message`, never hard-fail a batch, names and enums accepted, idempotent by name → [0005](decisions/0005-ai-grade-tool-conventions.md)
 6. No full API parity; the long tail goes to `send_code_to_revit` → [0006](decisions/0006-create-methods-not-full-parity.md)
-7. Pick new tools from the recipe corpus, not wishlists → [0008](decisions/0008-parent-tools-from-recipe-corpus.md)
+7. Pick new tools from evidence of `send_code_to_revit` fallbacks, not wishlists; scripts themselves are never persisted → [0008](decisions/0008-parent-tools-from-recipe-corpus.md), [0023](decisions/0023-send-code-scripts-not-persisted.md)
 8. Family geometry: small tools, on the family doc, no blend/sweep → [0009](decisions/0009-small-composable-family-tools.md), [0010](decisions/0010-no-newblend-use-sloped-extrusions.md)
 9. CEM_RibbonUI (sibling `CEM_RevitAPI`) owns deployment; rebuild it with Revit closed → [0011](decisions/0011-cem-ribbonui-hosts-deployment.md)
 10. The code wins over `CEM_RevitMCP.md`, which is legacy and partly stale → [0019](decisions/0019-single-authoritative-doc.md), [doc drift](concepts/doc-drift.md)
@@ -42,7 +42,7 @@ Read [overview.md](overview.md) first. Upstream vs our parts: [upstream and fork
 | TS server, registration, bundle | [server](modules/server.md), [0015](decisions/0015-single-file-bundle.md) |
 | Plugin, socket, dispatch, logging | [plugin](modules/plugin.md), [0013](decisions/0013-hardcoded-failsoft-audit-trails.md), [0014](decisions/0014-license-gated-listener.md) |
 | `command.json` | [command registry](modules/command-registry.md) |
-| Csproj, build, deploy, CEM_RibbonUI | [build and deploy](workflows/build-and-deploy.md), [0011](decisions/0011-cem-ribbonui-hosts-deployment.md) |
+| Csproj, build, deploy, CEM_RibbonUI | [build and deploy](workflows/build-and-deploy.md), [0011](decisions/0011-cem-ribbonui-hosts-deployment.md), [0024](decisions/0024-standalone-deploy-only-without-ribbon-host.md) |
 | Tests | [test](workflows/test.md), [0016](decisions/0016-schema-only-ts-unit-tests.md) |
 | Pull from upstream / release | [upstream and fork](concepts/upstream-and-fork.md), [release](workflows/release.md) |
 
@@ -74,7 +74,7 @@ Read [overview.md](overview.md) first. Upstream vs our parts: [upstream and fork
 - [AI-grade conventions](concepts/ai-grade-conventions.md): helpers to use, message style, batches.
 - [domains and naming](concepts/domains-and-naming.md): namespace → prefix → folder map.
 - [upstream and fork](concepts/upstream-and-fork.md): what is upstream, what we changed, divergence.
-- [audit trails](concepts/audit-trails.md): Recipes, Screenshots and the JSONL action log.
+- [audit trails](concepts/audit-trails.md): Screenshots and the JSONL action log (no script persistence).
 - [doc drift and latent issues](concepts/doc-drift.md): stale claims and unfixed code issues found at bootstrap.
 
 ## Workflows
@@ -100,7 +100,7 @@ Read [overview.md](overview.md) first. Upstream vs our parts: [upstream and fork
 - [0010](decisions/0010-no-newblend-use-sloped-extrusions.md): no blend/sweep; sloped extrusions (current)
 - [0011](decisions/0011-cem-ribbonui-hosts-deployment.md): CEM_RibbonUI hosts and deploys (current)
 - [0012](decisions/0012-drop-sqlite-store-pack.md): drop the SQLite store pack and dead TS tools (current)
-- [0013](decisions/0013-hardcoded-failsoft-audit-trails.md): fail-soft audit trails, hardcoded root (current)
+- [0013](decisions/0013-hardcoded-failsoft-audit-trails.md): fail-soft audit trails, hardcoded root (superseded by 0023)
 - [0014](decisions/0014-license-gated-listener.md): license-gated listener (current)
 - [0015](decisions/0015-single-file-bundle.md): single-file esbuild bundle (current)
 - [0016](decisions/0016-schema-only-ts-unit-tests.md): schema-only TS unit tests (current)
@@ -108,6 +108,8 @@ Read [overview.md](overview.md) first. Upstream vs our parts: [upstream and fork
 - [0018](decisions/0018-send-code-transaction-mode.md): `send_code_to_revit` transactionMode (current, upstream)
 - [0019](decisions/0019-single-authoritative-doc.md): one authoritative doc (superseded by 0020)
 - [0020](decisions/0020-wiki-is-the-knowledge-base.md): `docs/` wiki is the knowledge base (current)
+- [0023](decisions/0023-send-code-scripts-not-persisted.md): no `send_code_to_revit` script persistence; two audit trails (current)
+- [0024](decisions/0024-standalone-deploy-only-without-ribbon-host.md): standalone deploy only without a CEM_RibbonUI sibling (current)
 
 ## Sources
 
@@ -123,3 +125,4 @@ Commits without an issue:
 - [2026-04](sources/commits/2026-04.md): upstream: install/schema/addin fixes; last upstream sync `86cf705`.
 - [2026-06](sources/commits/2026-06.md): Cemengal: first 53 tools (`b04b41e`), CEM_IAModeler and 120 tools (`aa88b96`).
 - [2026-08](sources/commits/2026-08.md): Cemengal: CLAUDE.md and skill, gitignore, commit convention.
+- [2026-10](sources/commits/2026-10.md): Cemengal: no script persistence (`fe06b6c`); skills/agents, `.gitignore`, deploy guard (`29b3fba`).

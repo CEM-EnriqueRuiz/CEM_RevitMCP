@@ -1,7 +1,8 @@
 ---
 title: "0013 Three fail-soft audit trails under a hardcoded ACCDocs folder"
 type: decision
-status: current
+status: superseded
+superseded_by: 0023-send-code-scripts-not-persisted.md
 updated: 2026-10-06
 sources: [aa88b96, plugin/Utils/ActionLogger.cs, plugin/Core/CommandExecutor.cs, commandset/Commands/ExecuteDynamicCode/ExecuteCodeEventHandler.cs, commandset/Services/AnnotationComponents/TakeScreenshotEventHandler.cs]
 related: [../concepts/audit-trails.md, 0008-parent-tools-from-recipe-corpus.md]
@@ -9,6 +10,10 @@ tags: [logging, audit, todo]
 ---
 
 # 0013 Three fail-soft audit trails under a hardcoded ACCDocs folder
+
+**Status: superseded** by [0023](0023-send-code-scripts-not-persisted.md) (`fe06b6c`, 2026-10-05): the `Recipes\`
+trail was removed and script bodies are not persisted anywhere. Everything else below still holds for the two
+remaining trails (`Screenshots\`, `Log\`).
 
 ## Context
 

@@ -49,3 +49,15 @@ The issue has no body or comments. One commit here (`0556fb0`) →
 The bootstrap commit, recorded as its own source:
 [CEM_API#68](sources/issues/CEM-EnriqueRuiz-CEM_API-68.md). It is the first commit under the
 per-commit ingest rule.
+
+## [2026-10-07] ingest | Commits 2026-10 pulled from the remote: fe06b6c (no script persistence) and 29b3fba (REFACTOR - Skills)
+
+Rebased the local bootstrap commit onto them. New: [2026-10](sources/commits/2026-10.md), [0023](decisions/0023-send-code-scripts-not-persisted.md)
+(supersedes 0013), and [0024](decisions/0024-standalone-deploy-only-without-ribbon-host.md) (refines 0011). Updated 0008, 0011, 0012, 0020, the audit-trails,
+send-code, toolset, plugin, build-and-deploy, smoke-test, add-a-tool, finish-a-change, doc-drift and index pages. The remote agent
+definition `.claude/agents/cem-revitmcp-dev.md` now reads the wiki first and follows the wiki drift rule, and skill hard rule 11 (no script persistence) was added.
+
+## [2026-10-07] lint | Re-checked earlier claims against the pulled code
+
+Resolved drift: the `CEM_RevitMCP.md` tool-count header (118 vs 120, tag_* consolidation deliberate) and `.gitignore` of `.claude/`.
+Corrected: the audit root is now hardcoded in two files, not three. New gap recorded: the command set lacks the plugin's CEM_RibbonUI-sibling deploy guard.
