@@ -50,6 +50,16 @@ The bootstrap commit, recorded as its own source:
 [CEM_API#68](sources/issues/CEM-EnriqueRuiz-CEM_API-68.md). It is the first commit under the
 per-commit ingest rule.
 
+## [2026-10-06] decision | 0021 Loopback-only socket, client pinned to 127.0.0.1, dispatch through CommandExecutor (drafted, uncommitted)
+
+Security hardening: `SocketService` bound `IPAddress.Any` (remote code execution through `send_code_to_revit`) and bypassed
+`CommandExecutor`, so the audit log was never written. Fixed in code (not yet committed; awaiting an issue URL). Updated 0013, 0014,
+the plugin, server, threading, audit-trails, doc-drift, tests and build-and-deploy pages → [0021](decisions/0021-loopback-only-socket.md).
+
+## [2026-10-06] decision | 0022 Local shared-secret handshake proposed as a follow-up
+
+→ [0022](decisions/0022-local-shared-secret-handshake.md).
+
 ## [2026-10-07] ingest | Commits 2026-10 pulled from the remote: fe06b6c (no script persistence) and 29b3fba (REFACTOR - Skills)
 
 Rebased the local bootstrap commit onto them. New: [2026-10](sources/commits/2026-10.md), [0023](decisions/0023-send-code-scripts-not-persisted.md)
@@ -61,3 +71,9 @@ definition `.claude/agents/cem-revitmcp-dev.md` now reads the wiki first and fol
 
 Resolved drift: the `CEM_RevitMCP.md` tool-count header (118 vs 120, tag_* consolidation deliberate) and `.gitignore` of `.claude/`.
 Corrected: the audit root is now hardcoded in two files, not three. New gap recorded: the command set lacks the plugin's CEM_RibbonUI-sibling deploy guard.
+
+## [2026-10-07] ingest | HOT FIX Revit socket loopback-only and audited dispatch
+
+Committed the 0021 work (drafted 2026-10-06) as a HOT FIX with no issue link →
+[2026-10 commits](sources/commits/2026-10.md#hot-fix-2026-10-07-loopback-only-socket-and-audited-dispatch).
+0021 is now committed (current), and 0022 stays proposed.

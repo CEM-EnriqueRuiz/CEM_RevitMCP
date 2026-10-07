@@ -17,7 +17,7 @@ external-event plumbing. It holds no tool logic.
 |---|---|---|
 | `Core/Application.cs` | `IExternalApplication`; registers **no UI**, stops the socket on shutdown | UI removed ([0011](../decisions/0011-cem-ribbonui-hosts-deployment.md)) |
 | `Core/MCPServiceConnection.cs` | the toggle command the ribbon button calls: Initialize + Start, or Stop | license-gated via `CEM_RevitAuth.AuthenticatedExternalCommand` ([0014](../decisions/0014-license-gated-listener.md)) |
-| `Core/SocketService.cs` | singleton `TcpListener(IPAddress.Any, 8080)`, hardwired port; on Initialize, sets up `ExternalEventManager` and runs `CommandManager.LoadCommands()` | minor |
+| `Core/SocketService.cs` | singleton `TcpListener(BindAddress = IPAddress.Loopback, 8080)`, hardwired port; on Initialize, sets up `ExternalEventManager` and runs `CommandManager.LoadCommands()`; parses JSON-RPC and dispatches via `CommandExecutor` | loopback bind + audited dispatch ([0021](../decisions/0021-loopback-only-socket.md)) |
 | `Core/CommandManager.cs` | reads the registry config and loads `assemblyPath` (relative to `PathManager.GetCommandsDirectoryPath()`), registers the `IRevitCommand` whose `CommandName` matches | none (upstream) |
 | `Core/CommandExecutor.cs` | `ExecuteCommand(JsonRPCRequest)`: lookup, `command.Execute(params, id)`, JSON-RPC response | audit hook `ActionLogger.Log` on every path ([0013](../decisions/0013-hardcoded-failsoft-audit-trails.md)) |
 | `Core/ExternalEventManager.cs`, `RevitCommandRegistry.cs`, `Settings.cs` | plumbing | none |

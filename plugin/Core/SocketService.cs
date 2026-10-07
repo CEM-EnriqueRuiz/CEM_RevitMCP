@@ -16,6 +16,14 @@ namespace CEM_IAModeler.Core
 {
     public class SocketService
     {
+        /// <summary>
+        /// Interface the listener binds to. CEM divergence from upstream (which binds IPAddress.Any):
+        /// the socket accepts arbitrary C# through send_code_to_revit and has no authentication, so it
+        /// must never be reachable from the network. The TS server connects to 127.0.0.1 explicitly
+        /// (server/src/utils/ConnectionManager.ts) so it does not depend on how 'localhost' resolves.
+        /// </summary>
+        public static readonly IPAddress BindAddress = IPAddress.Loopback;
+
         private static SocketService _instance;
         private TcpListener _listener;
         private Thread _listenerThread;
@@ -108,7 +116,7 @@ namespace CEM_IAModeler.Core
             try
             {
                 _isRunning = true;
-                _listener = new TcpListener(IPAddress.Any, _port);
+                _listener = new TcpListener(BindAddress, _port);
                 _listener.Start();
 
                 _listenerThread = new Thread(ListenForClients)
@@ -245,26 +253,10 @@ namespace CEM_IAModeler.Core
                     );
                 }
 
-                // 查找命令
-                // Search for the command in the registry.
-                if (!_commandRegistry.TryGetCommand(request.Method, out var command))
-                {
-                    return CreateErrorResponse(request.Id, JsonRPCErrorCodes.MethodNotFound,
-                        $"Method '{request.Method}' not found");
-                }
-
-                // 执行命令
-                // Execute command.
-                try
-                {                
-                    object result = command.Execute(request.GetParamsObject(), request.Id);
-
-                    return CreateSuccessResponse(request.Id, result);
-                }
-                catch (Exception ex)
-                {
-                    return CreateErrorResponse(request.Id, JsonRPCErrorCodes.InternalError, ex.Message);
-                }
+                // CEM divergence: dispatch through CommandExecutor (the single chokepoint) so every
+                // call, including send_code_to_revit, reaches the ActionLogger audit log. Upstream
+                // executed the command directly here, which bypassed the log.
+                return _commandExecutor.ExecuteCommand(request);
             }
             catch (JsonException)
             {

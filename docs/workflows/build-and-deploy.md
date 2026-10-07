@@ -24,6 +24,12 @@ npm run bundle     # optional: dist/index.js single self-contained file
 dotnet build commandset\CEM_IAModeler_CommandSet.csproj -c "Debug R24" -p:Platform=x64 -p:DeployRevitAddin=false
 ```
 
+**Use a modern .NET SDK.** On this machine the default `dotnet` on PATH is SDK 5.0.103 (C# 9), which fails
+on `CEM_RevitAuth`'s file-scoped namespaces ("Se esperaba }" / CS1513). Use the Cemengal-provisioned
+SDK: `%LOCALAPPDATA%\Cemengal\dotnet\dotnet.exe` (SDK 10.0.401 at 2026-10-06). The plugin builds with
+`... build plugin\CEM_IAModeler.csproj -c "Debug R24" -p:Platform=x64 -p:CemRibbonHostBuild=true`
+(no deploy).
+
 Older docs say `RevitMCPCommandSet.csproj`, but that project no longer exists. Configurations:
 `Debug|Release R20…R26`. The plugin (`plugin\CEM_IAModeler.csproj`) needs the sibling
 `CEM_RevitAPI` checkout for `CEM_RevitAuth` ([0014](../decisions/0014-license-gated-listener.md)).

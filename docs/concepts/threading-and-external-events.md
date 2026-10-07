@@ -15,12 +15,13 @@ tags: [threading, revit-api, upstream]
 
 1. An MCP client calls a tool. The TS handler calls `withRevitConnection(...)`
    (`server/src/utils/ConnectionManager.ts`). This **serializes all requests through a mutex**,
-   opens a fresh TCP connection to `localhost:8080` (5 s connect timeout), sends one JSON-RPC
+   opens a fresh TCP connection to `127.0.0.1:8080` (`REVIT_HOST`/`REVIT_PORT`, [0021](../decisions/0021-loopback-only-socket.md)) (5 s connect timeout), sends one JSON-RPC
    command, and disconnects. Parallel tool calls run one at a time.
 2. `RevitClientConnection.sendCommand` (`SocketClient.ts`) buffers the response until the whole JSON
    parses (so large base64 images work), with a **120 s** timeout.
-3. Inside Revit, `SocketService` (a `TcpListener` on `IPAddress.Any:8080`, hardwired) receives the
-   request on a **background thread** and calls `CommandExecutor.ExecuteCommand`.
+3. Inside Revit, `SocketService` (a `TcpListener` on `SocketService.BindAddress` = `IPAddress.Loopback`, port 8080, hardwired) receives the
+   request on a **background thread**, parses and validates it, and calls `CommandExecutor.ExecuteCommand`
+   (lookup, execute, audit log). Before [0021](../decisions/0021-loopback-only-socket.md) it bound `IPAddress.Any` and executed directly, bypassing the log.
 4. The Command's `Execute` runs on that background thread. It must only parse input, set the
    handler's request, call `RaiseAndWaitForCompletion(ms)`, and return `H.Result`.
 5. Revit runs `IExternalEventHandler.Execute(UIApplication)` on the **UI thread** when it is idle.

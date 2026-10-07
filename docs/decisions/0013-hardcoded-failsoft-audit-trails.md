@@ -44,5 +44,6 @@ script is already in `Recipes\`), truncates results at 8000 chars, and `Describe
   is writable.
 - To change the log, edit `plugin/Utils/ActionLogger.cs`, **not** `PathManager`, which points at a
   different plugin-internal `Logs` dir.
+- **Correction (2026-10-06):** until [0021](0021-loopback-only-socket.md), `SocketService` executed commands itself and never called `CommandExecutor`, so the `Log\` trail was never written (Recipes and Screenshots were unaffected). 0021 routes dispatch through it.
 - `CommandExecutor.ExecuteCommand` is the single dispatch chokepoint. Anything that must happen on
   every call goes there.

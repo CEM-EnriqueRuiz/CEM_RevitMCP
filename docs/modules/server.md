@@ -23,7 +23,7 @@ bundle scripts and the vitest suite. This is what the LLM sees: a stdio MCP serv
 | `src/tools/register.ts` | runtime discovery: `readdirSync` + dynamic import, calls the first `register*` export |
 | `src/tools/register.generated.ts` | **generated, gitignored**: static imports for esbuild |
 | `src/utils/ConnectionManager.ts` | `withRevitConnection(op)`: global mutex, new socket per call, 5 s connect timeout |
-| `src/utils/SocketClient.ts` | `RevitClientConnection`: `net.Socket` to `localhost:8080`, JSON-RPC, buffers until JSON parses, 120 s timeout |
+| `src/utils/SocketClient.ts` | `RevitClientConnection`: `net.Socket` to `127.0.0.1:8080` (`REVIT_HOST`/`REVIT_PORT` in `ConnectionManager.ts`, [0021](../decisions/0021-loopback-only-socket.md)), JSON-RPC, buffers until JSON parses, 120 s timeout |
 | `scripts/generate-tool-registry.mjs` | writes `register.generated.ts` |
 | `scripts/bundle.mjs` | esbuild → `dist/index.js` (single ESM file, node20) |
 | `manifest.json` | `.mcpb` manifest (`cem-revit-ai`), entry `build/index.js` |

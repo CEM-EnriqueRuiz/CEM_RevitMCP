@@ -40,7 +40,7 @@ the truth.** None of these were fixed in code; each needs its own change with an
 - **Release pipeline is broken for the fork:** `.github/workflows/release.yml` builds
   `mcp-servers-for-revit.sln` (renamed to `CEM_RevitMCP.sln`) with Node 18 (engines require >=20)
   and publishes the upstream npm package name ([release](../workflows/release.md)).
-- **Listener binds all interfaces:** `SocketService` uses `IPAddress.Any:8080` (upstream). Any host
+- ~~**Listener binds all interfaces**~~ fixed (HOT FIX, 2026-10-07) by [0021](../decisions/0021-loopback-only-socket.md), which also fixed the never-written audit log (`SocketService` bypassed `CommandExecutor`). Original note: `SocketService` used `IPAddress.Any:8080` (upstream). Any host
   that can reach port 8080 can drive Revit while the server is on.
 - **`CommandManager` instantiates every command type per registry entry** (120 × ~120 reflection
   constructions at startup; upstream design). It works but is wasteful. Its success log line also

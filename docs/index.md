@@ -40,7 +40,7 @@ Read [overview.md](overview.md) first. Upstream vs our parts: [upstream and fork
 | `parent_*` / IFC-link reconstruction | [parent tools](modules/parent-tools.md) |
 | `send_code_to_revit` | [send code](modules/send-code-to-revit.md) |
 | TS server, registration, bundle | [server](modules/server.md), [0015](decisions/0015-single-file-bundle.md) |
-| Plugin, socket, dispatch, logging | [plugin](modules/plugin.md), [0013](decisions/0013-hardcoded-failsoft-audit-trails.md), [0014](decisions/0014-license-gated-listener.md) |
+| Plugin, socket, dispatch, logging, security | [plugin](modules/plugin.md), [0021](decisions/0021-loopback-only-socket.md), [0013](decisions/0013-hardcoded-failsoft-audit-trails.md), [0014](decisions/0014-license-gated-listener.md), [0022](decisions/0022-local-shared-secret-handshake.md) |
 | `command.json` | [command registry](modules/command-registry.md) |
 | Csproj, build, deploy, CEM_RibbonUI | [build and deploy](workflows/build-and-deploy.md), [0011](decisions/0011-cem-ribbonui-hosts-deployment.md), [0024](decisions/0024-standalone-deploy-only-without-ribbon-host.md) |
 | Tests | [test](workflows/test.md), [0016](decisions/0016-schema-only-ts-unit-tests.md) |
@@ -108,6 +108,8 @@ Read [overview.md](overview.md) first. Upstream vs our parts: [upstream and fork
 - [0018](decisions/0018-send-code-transaction-mode.md): `send_code_to_revit` transactionMode (current, upstream)
 - [0019](decisions/0019-single-authoritative-doc.md): one authoritative doc (superseded by 0020)
 - [0020](decisions/0020-wiki-is-the-knowledge-base.md): `docs/` wiki is the knowledge base (current)
+- [0021](decisions/0021-loopback-only-socket.md): loopback-only socket, client pinned to 127.0.0.1, audited dispatch (current, our divergence)
+- [0022](decisions/0022-local-shared-secret-handshake.md): local shared-secret handshake (proposed)
 - [0023](decisions/0023-send-code-scripts-not-persisted.md): no `send_code_to_revit` script persistence; two audit trails (current)
 - [0024](decisions/0024-standalone-deploy-only-without-ribbon-host.md): standalone deploy only without a CEM_RibbonUI sibling (current)
 

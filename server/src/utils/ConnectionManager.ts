@@ -1,5 +1,11 @@
 import { RevitClientConnection } from "./SocketClient.js";
 
+// CEM divergence from upstream ("localhost"): the Revit plugin listens on IPv4 loopback only
+// (SocketService.BindAddress). Connect to 127.0.0.1 explicitly so the result doesn't depend on
+// whether 'localhost' resolves to ::1 first on this Node version / OS.
+export const REVIT_HOST = "127.0.0.1";
+export const REVIT_PORT = 8080;
+
 // Mutex to serialize all Revit connections - prevents race conditions
 // when multiple requests are made in parallel
 let connectionMutex: Promise<void> = Promise.resolve();
@@ -20,7 +26,7 @@ export async function withRevitConnection<T>(
   });
   await previousMutex;
 
-  const revitClient = new RevitClientConnection("localhost", 8080);
+  const revitClient = new RevitClientConnection(REVIT_HOST, REVIT_PORT);
 
   try {
     // 连接到Revit客户端

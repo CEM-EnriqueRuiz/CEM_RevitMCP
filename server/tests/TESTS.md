@@ -63,3 +63,9 @@ a "Removed" line documenting the SQLite pack's removal); only the skill's "Decis
 rationale" section is stale. A leftover `server/revit-data.db` (gitignored) is still present on
 disk as a relic of that removed feature. See this task's final report for the full write-up;
 this file only records it for anyone reading the test suite later.
+
+## Connection target (security)
+
+| File | Verifies | Why |
+|---|---|---|
+| `utils/connection.test.ts` | `ConnectionManager` pins `REVIT_HOST`=`127.0.0.1`, `REVIT_PORT`=8080, and `withRevitConnection` reaches a listener bound only to `127.0.0.1:8080` (skipped if 8080 is busy) | The Revit plugin binds IPv4 loopback only (`docs/decisions/0021-loopback-only-socket.md`); `localhost` may resolve to `::1` first. Mutation-checked: reverting the host to `localhost` fails the first test. |

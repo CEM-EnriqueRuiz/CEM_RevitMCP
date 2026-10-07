@@ -34,7 +34,7 @@ the script body in the JSONL log with a pointer to that folder.
 ## Consequences
 
 - **Every command is audited, but no script body is logged.** With the loopback/audited-dispatch
-  change (decision 0021, drafted and still uncommitted on 2026-10-07), `SocketService` dispatches through
+  change ([0021](0021-loopback-only-socket.md), HOT FIX 2026-10-07), `SocketService` dispatches through
   `CommandExecutor.ExecuteCommand`, which calls `ActionLogger.Log` on every path, so
   `send_code_to_revit` calls do appear in the log, with `code` and `data` as `"<omitted>"`. Both
   meanings hold together. Without 0021, the log was never written at all (see 0013's correction).

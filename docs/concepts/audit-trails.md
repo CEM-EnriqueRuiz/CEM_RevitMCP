@@ -17,7 +17,7 @@ Root: `C:\DC\ACCDocs\Cemengal\CMGL-TechnicalOffice\Project Files\01-Shared\02-So
 | Trail | Code | When | Format |
 |---|---|---|---|
 | `Screenshots\` | `TakeScreenshotEventHandler` | `take_screenshot` with `saveToDisk: true` | timestamped PNG |
-| `Log\` | `ActionLogger.Log`, called in `CommandExecutor.ExecuteCommand` | **every** tool call, success or failure | `actions_yyyyMMdd.jsonl`: `{ts, tool, input, ok, result}` |
+| `Log\` | `ActionLogger.Log`, called in `CommandExecutor.ExecuteCommand` (reached from `SocketService` only since [0021](../decisions/0021-loopback-only-socket.md); before that the log was never written) | **every** tool call, success or failure, including `send_code_to_revit` (its `code`/`data` logged as `"<omitted>"`) | `actions_yyyyMMdd.jsonl`: `{ts, tool, input, ok, result}` |
 
 ## Using them
 

@@ -21,6 +21,8 @@ tags: [testing]
   `z.object(shape)` from the real tool file.
 - `tools/`: `create_level`, `family_add_parameter`, `arch_create_wall`, `mep_create_duct`,
   `viz_create_material`, one per representative domain.
+- `utils/connection.test.ts`: the client is pinned to `127.0.0.1:8080` and reaches an IPv4-loopback-only
+  listener ([0021](../decisions/0021-loopback-only-socket.md)). The second test skips if port 8080 is busy.
 - `TESTS.md`: the traceability note. Add one line per new test. (Its "Traceability" paragraph has a
   factual error; see [doc drift](../concepts/doc-drift.md).)
 

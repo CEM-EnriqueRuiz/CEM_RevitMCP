@@ -28,5 +28,5 @@ with a valid CEM license. This is checked alongside the ribbon button's `Enabled
   coupling.
 - The plugin also needs `Nice3point.Revit.Toolkit`, because the base type is Nice3point's
   `ExternalCommand`.
-- Note: the listener binds `IPAddress.Any:8080` (`SocketService.cs`, upstream), not only loopback.
+- Note: the listener used to bind `IPAddress.Any:8080` (upstream). Since [0021](0021-loopback-only-socket.md) it binds loopback only. There is still no per-request authentication ([0022](0022-local-shared-secret-handshake.md), proposed).
   The license gate controls *whether* it starts, not who can connect.

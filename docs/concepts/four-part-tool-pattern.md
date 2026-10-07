@@ -14,7 +14,7 @@ One MCP tool spans both projects. A single command-name string ties them togethe
 ```
 server/src/tools/<name>.ts        server.tool("my_command", desc, zodShape, handler)
                                   handler → withRevitConnection(c => c.sendCommand("my_command", params))
-        │  TCP JSON-RPC, localhost:8080
+        │  TCP JSON-RPC, 127.0.0.1:8080 (loopback only, 0021)
         ▼
 commandset/Commands/<Domain>/MyCommand.cs     : ExternalEventCommandBase — parse JObject, raise event, wait
 commandset/Services/<Domain>/MyEventHandler.cs: IExternalEventHandler   — Revit work on the UI thread
