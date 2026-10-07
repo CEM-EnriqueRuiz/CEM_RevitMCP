@@ -9,6 +9,9 @@ C# plugin (`plugin/`) and command set (`commandset/`) over a localhost socket.
 2. Then follow the canonical skill
    [.claude/skills/cem-revitmcp-dev/SKILL.md](.claude/skills/cem-revitmcp-dev/SKILL.md) (the hard
    rules and verify commands) and the cross-repo rules in [../../CROSS_REPO.md](../../CROSS_REPO.md).
+   To **use** the MCP on a live model rather than change it (modelling, replacing elements, the
+   Cemengal add-ins), follow [.claude/skills/cem-aimodeler/SKILL.md](.claude/skills/cem-aimodeler/SKILL.md)
+   instead.
 3. Search the wiki with the qmd CLI when the index is not enough:
    `qmd query -c cem_revitmcp "why does the command not call the Revit API"`, then
    `qmd get qmd://cem_revitmcp/<path>`. Collection names for other repos are in

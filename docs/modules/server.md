@@ -1,7 +1,7 @@
 ---
 title: server/ — the TypeScript MCP server
 type: module
-updated: 2026-10-06
+updated: 2026-10-07
 sources: [server/package.json, server/src/index.ts, server/src/index.bundle.ts, server/src/tools/register.ts, server/src/utils/ConnectionManager.ts, server/src/utils/SocketClient.ts, server/scripts/bundle.mjs, server/manifest.json]
 related: [../concepts/four-part-tool-pattern.md, ../decisions/0015-single-file-bundle.md, ../decisions/0016-schema-only-ts-unit-tests.md, ../workflows/build-and-deploy.md]
 tags: [server, typescript]
@@ -19,7 +19,7 @@ bundle scripts and the vitest suite. This is what the LLM sees: a stdio MCP serv
 |---|---|
 | `src/index.ts` | dev entry: `McpServer({name: "mcp-server-for-revit"})`, `await registerTools`, stdio transport |
 | `src/index.bundle.ts` | bundle entry: identical, but uses `tools/register.generated.ts` |
-| `src/tools/<name>.ts` | one file per tool (118), each exporting `register<Name>Tool(server)` |
+| `src/tools/<name>.ts` | one file per tool (124), each exporting `register<Name>Tool(server)` |
 | `src/tools/register.ts` | runtime discovery: `readdirSync` + dynamic import, calls the first `register*` export |
 | `src/tools/register.generated.ts` | **generated, gitignored**: static imports for esbuild |
 | `src/utils/ConnectionManager.ts` | `withRevitConnection(op)`: global mutex, new socket per call, 5 s connect timeout |

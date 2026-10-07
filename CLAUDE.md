@@ -8,7 +8,9 @@ names. The wiki holds the conventions, the decisions and their reasons, and the 
 `CEM_RevitMCP.md` is legacy and partly stale; the code and the wiki win.
 
 Load the `cem-revitmcp-dev` skill (`.claude/skills/cem-revitmcp-dev/SKILL.md`) before writing code.
-Cross-repo rules: [../../CROSS_REPO.md](../../CROSS_REPO.md).
+To **use** the MCP on a live model (modelling, replacing elements, running or opening the Cemengal
+add-ins through it), load the `cem-aimodeler` skill (`.claude/skills/cem-aimodeler/SKILL.md`) instead;
+it is the only copy of that skill. Cross-repo rules: [../../CROSS_REPO.md](../../CROSS_REPO.md).
 
 Every commit carries its wiki update ([docs/workflows/finish-a-change.md](docs/workflows/finish-a-change.md)).
 Commit message: `FEAT|FIX|REFACTOR - Description. <issue URL>`. **That line is the entire message**:

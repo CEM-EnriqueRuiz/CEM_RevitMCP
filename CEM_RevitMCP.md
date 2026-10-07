@@ -2,7 +2,7 @@
 
 The single source of truth for this repository: how the Revit MCP tool set is structured, how to add
 tools, what exists today, and what is deliberately deferred. (User-facing install lives in `README.md`;
-the AI-behaviour guide lives in the `CEM_AIModeler` Claude skill.)
+the AI-behaviour guide is the `cem-aimodeler` skill, `.claude/skills/cem-aimodeler/SKILL.md`.)
 
 Goal: grow this command set into a tool surface broad and generic enough that Claude can act as a
 **senior Revit modeler** — strong on Architecture, MEP, Families, Structure, Coordination and Parameters,

@@ -1,7 +1,7 @@
 ---
 title: The four-part tool pattern
 type: concept
-updated: 2026-10-06
+updated: 2026-10-07
 sources: [CEM_RevitMCP.md, commandset/Commands/Struct/StructCommands.cs, server/src/tools/register.ts, command.json]
 related: [../decisions/0001-extend-via-four-part-pattern.md, ../workflows/add-a-tool.md, threading-and-external-events.md]
 tags: [tools, architecture]
@@ -41,7 +41,7 @@ command.json  →  { "commandName": "my_command", "description": "…", "assembl
   `CommandName` equals the config entry.
 
 ```bash
-grep -c '"commandName"' command.json           # the real count (120)
+grep -c '"commandName"' command.json           # the real count (126)
 grep -o '"commandName"[^,]*' command.json      # the list
 ```
 

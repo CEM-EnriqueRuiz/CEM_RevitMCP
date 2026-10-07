@@ -1,7 +1,7 @@
 ---
 title: commandset/ — the Revit command set (CEM_IAModeler_CommandSet)
 type: module
-updated: 2026-10-06
+updated: 2026-10-07
 sources: [commandset/CEM_IAModeler_CommandSet.csproj, commandset/Commands, commandset/Services, commandset/Models, commandset/Utils, command.json]
 related: [../concepts/four-part-tool-pattern.md, ../concepts/domains-and-naming.md, ../concepts/ai-grade-conventions.md, toolset.md]
 tags: [commandset, csharp]
@@ -10,7 +10,7 @@ tags: [commandset, csharp]
 # commandset/ — the Revit command set (CEM_IAModeler_CommandSet)
 
 **Origin: upstream** `RevitMCPCommandSet` (23 commands). It was renamed and extended by Cemengal to
-120 commands. It builds one `CEM_IAModeler_CommandSet.dll` per Revit version, which the plugin loads
+126 commands. It builds one `CEM_IAModeler_CommandSet.dll` per Revit version, which the plugin loads
 by reflection.
 
 ## Layout
@@ -23,11 +23,19 @@ commandset/
   Utils/               shared helpers + Revit 2024 API inventories (dev reference)
 ```
 
-Domains: `Access, AnnotationComponents, Architecture, Core, DataExtraction, Delete,
+Domains: `Access, AnnotationComponents, Architecture, Cemengal, Core, DataExtraction, Delete,
 ExecuteDynamicCode, Family, Mep, ParentTools, Struct, Test, Views`. The namespace is
 `CEM_IAModeler_CommandSet.<Commands|Services|Models>.<Domain>`
 ([0004](../decisions/0004-prefix-equals-folder-equals-namespace.md)). Which command lives where:
 [toolset](toolset.md).
+
+## References into CEM_RevitAPI
+
+The `Cemengal` domain ProjectReferences `CEM_RevitAPI_Extended`, `CEM_Rules` and `CEM_SwapManager` from the
+sibling checkout (not for R20), plus the `Nice3point.Revit.Api.AdWindows` reference package. Their DLLs are
+copied into the output and staged into `Commands\` with the command set. Add-in types appear only inside
+the handlers' `Run` bodies, so `GetTypes()` never needs them
+([0025](../decisions/0025-cemengal-addins-as-tools-via-project-references.md)).
 
 ## Models/Common
 

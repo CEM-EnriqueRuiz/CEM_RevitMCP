@@ -1,7 +1,7 @@
 ---
 title: command.json — the command registry
 type: module
-updated: 2026-10-06
+updated: 2026-10-07
 sources: [command.json, plugin/Core/CommandManager.cs, plugin/Configuration/CommandConfig.cs]
 related: [../concepts/four-part-tool-pattern.md, ../decisions/0011-cem-ribbonui-hosts-deployment.md, toolset.md]
 tags: [registry]
@@ -10,7 +10,7 @@ tags: [registry]
 # command.json — the command registry
 
 The hand-maintained list of every C# command, at the repo root. **It is the source of truth for
-what exists** (120 entries).
+what exists** (126 entries).
 
 ```json
 {

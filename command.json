@@ -607,6 +607,36 @@
       "commandName": "parent_validate_deviation",
       "description": "PARENT TOOL: measure how far the native rebuild deviates from the source link surfaces (avg/worst mm per item, items over tolerance). Read-only QC for parent_reconstruct_native output",
       "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "cem_open_tool",
+      "description": "CEMENGAL TOOL: press a button of the Cemengal ribbon tab for the user (Filter Manager, Nested Manager, Numerate, Renamer, CEM Swap...), or list them. Never the CEM_AIModeler button",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "cem_swap_find_types",
+      "description": "CEMENGAL TOOL: the model's types as CEM Swap lists them (placed count, creatable and why not). Read-only",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "cem_swap_list_presets",
+      "description": "CEMENGAL TOOL: the office's CEM Swap presets in SwapPresets.json. Read-only",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "cem_swap_run",
+      "description": "CEMENGAL TOOL: replace elements of some types by another type through CEM Swap's engine, as a trial on one element or over every candidate; old elements are kept for the user's review",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "cem_swap_remove_trial",
+      "description": "CEMENGAL TOOL: remove the CEM Swap trial standing in the model and restore the type values it changed",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
+    },
+    {
+      "commandName": "cem_rules_apply",
+      "description": "CEMENGAL TOOL: run every CEM_Rules rule over the whole model, as the CEM Rules button does, and return its report",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     }
   ]
 }

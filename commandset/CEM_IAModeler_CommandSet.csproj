@@ -71,6 +71,25 @@
       <Reference Include="System.Net.Http" />
     </ItemGroup>
 
+    <!-- The cem_* tools call the Cemengal add-ins' own code, so they change when the add-ins change:
+         a rebuild of CEM_RibbonUI rebuilds the add-ins, this command set against them, and stages both.
+         Couples this fork to the sibling CEM_RevitAPI checkout, as the plugin's CEM_RevitAuth reference
+         already does. The copies that land in Commands\ have the identities CEM_RibbonUI loaded at
+         startup, so they resolve to the instances already in Revit, not to second ones.
+         GlobalPropertiesToRemove: built through CEM_RibbonUI this project gets CemRibbonHostBuild=true;
+         passing it on would make MSBuild build each add-in a second time, alongside the ribbon's own build
+         of it. CEM_RevitAPI has no Revit 2020 configuration, so R20 builds without the cem_* tools. -->
+    <ItemGroup Condition="'$(RevitVersion)' != '2020'">
+        <ProjectReference Include="..\..\..\CEM_RevitAPI\CEM_RevitAPI_Extended\CEM_RevitAPI_Extended.csproj" GlobalPropertiesToRemove="CemRibbonHostBuild" />
+        <ProjectReference Include="..\..\..\CEM_RevitAPI\CEM_Rules\CEM_Rules.csproj" GlobalPropertiesToRemove="CemRibbonHostBuild" />
+        <ProjectReference Include="..\..\..\CEM_RevitAPI\CEM_SwapManager\CEM_SwapManager.csproj" GlobalPropertiesToRemove="CemRibbonHostBuild" />
+        <!-- cem_open_tool finds the Cemengal ribbon buttons through AdWindows (reference only; Revit ships it). -->
+        <PackageReference Include="Nice3point.Revit.Api.AdWindows" Version="$(RevitVersion).*" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(RevitVersion)' == '2020'">
+        <Compile Remove="**\Cemengal\**" />
+    </ItemGroup>
+
     <!-- take_screenshot uses GDI (System.Drawing) to grab the Revit window.
          On net48 System.Drawing is a framework assembly; on net8-windows it ships
          in the System.Drawing.Common package (WPF alone doesn't bring it in). -->

@@ -1,8 +1,8 @@
 ---
 title: CEM_RevitMCP wiki index
 type: index
-updated: 2026-10-06
-sources: [command.json, CEM_RevitMCP.md, .claude/skills/cem-revitmcp-dev/SKILL.md]
+updated: 2026-10-07
+sources: [command.json, CEM_RevitMCP.md, .claude/skills/cem-revitmcp-dev/SKILL.md, .claude/skills/cem-aimodeler/SKILL.md]
 related: [overview.md, log.md]
 tags: [index]
 ---
@@ -12,8 +12,11 @@ tags: [index]
 ## Start here
 
 CEM_RevitMCP is a **fork of `mcp-servers-for-revit`**: a TS MCP server (`server/`) that drives Revit
-over TCP :8080 through a C# plugin (`plugin/`) and command set (`commandset/`), with 120 commands.
+over TCP :8080 through a C# plugin (`plugin/`) and command set (`commandset/`), with 126 commands.
 Read [overview.md](overview.md) first. Upstream vs our parts: [upstream and fork](concepts/upstream-and-fork.md).
+To **use** the MCP on a live model (not change it), load the
+[`cem-aimodeler` skill](../.claude/skills/cem-aimodeler/SKILL.md); it also covers reaching the Cemengal
+add-ins → [Cemengal add-ins through the MCP](concepts/cemengal-addins-via-mcp.md).
 
 **Hard rules**
 
@@ -33,6 +36,7 @@ Read [overview.md](overview.md) first. Upstream vs our parts: [upstream and fork
 | Task / area | Read |
 |---|---|
 | Add or change a tool | [add a tool](workflows/add-a-tool.md), [four-part pattern](concepts/four-part-tool-pattern.md), [toolset](modules/toolset.md) |
+| A `cem_*` tool, or a Cemengal add-in the MCP calls | [Cemengal add-ins](concepts/cemengal-addins-via-mcp.md), [0025](decisions/0025-cemengal-addins-as-tools-via-project-references.md) |
 | Write a handler (threads, transactions, timeouts) | [threading](concepts/threading-and-external-events.md), [AI-grade conventions](concepts/ai-grade-conventions.md) |
 | Choose a name, domain or folder | [domains and naming](concepts/domains-and-naming.md) |
 | Decide what to build next / scope | [0006](decisions/0006-create-methods-not-full-parity.md), [0008](decisions/0008-parent-tools-from-recipe-corpus.md), [audit trails](concepts/audit-trails.md) |
@@ -61,7 +65,7 @@ Read [overview.md](overview.md) first. Upstream vs our parts: [upstream and fork
 - [plugin](modules/plugin.md): CEM_IAModeler add-in; socket, registry, dispatch, audit hook.
 - [commandset](modules/commandset.md): CEM_IAModeler_CommandSet; domain layout, Models/Common, Utils.
 - [command registry](modules/command-registry.md): `command.json`, the source of truth.
-- [toolset](modules/toolset.md): all 120 commands by folder, upstream marked, overlaps, build order.
+- [toolset](modules/toolset.md): all 126 commands by folder, upstream marked, overlaps, build order.
 - [parent tools](modules/parent-tools.md): the `parent_*` IFC-link → native pipeline.
 - [family editing](modules/family-editing.md): `family_*` tools and the edit session.
 - [send_code_to_revit](modules/send-code-to-revit.md): the Roslyn escape hatch.
@@ -76,6 +80,7 @@ Read [overview.md](overview.md) first. Upstream vs our parts: [upstream and fork
 - [upstream and fork](concepts/upstream-and-fork.md): what is upstream, what we changed, divergence.
 - [audit trails](concepts/audit-trails.md): Screenshots and the JSONL action log (no script persistence).
 - [doc drift and latent issues](concepts/doc-drift.md): stale claims and unfixed code issues found at bootstrap.
+- [Cemengal add-ins through the MCP](concepts/cemengal-addins-via-mcp.md): the `cem_*` tools, the add-in code each runs, what stays the user's.
 
 ## Workflows
 
@@ -112,6 +117,7 @@ Read [overview.md](overview.md) first. Upstream vs our parts: [upstream and fork
 - [0022](decisions/0022-local-shared-secret-handshake.md): local shared-secret handshake (proposed)
 - [0023](decisions/0023-send-code-scripts-not-persisted.md): no `send_code_to_revit` script persistence; two audit trails (current)
 - [0024](decisions/0024-standalone-deploy-only-without-ribbon-host.md): standalone deploy only without a CEM_RibbonUI sibling (current)
+- [0025](decisions/0025-cemengal-addins-as-tools-via-project-references.md): the Cemengal add-ins are `cem_*` tools calling their own code through ProjectReferences (current)
 
 ## Sources
 
@@ -127,4 +133,4 @@ Commits without an issue:
 - [2026-04](sources/commits/2026-04.md): upstream: install/schema/addin fixes; last upstream sync `86cf705`.
 - [2026-06](sources/commits/2026-06.md): Cemengal: first 53 tools (`b04b41e`), CEM_IAModeler and 120 tools (`aa88b96`).
 - [2026-08](sources/commits/2026-08.md): Cemengal: CLAUDE.md and skill, gitignore, commit convention.
-- [2026-10](sources/commits/2026-10.md): Cemengal: no script persistence (`fe06b6c`); skills/agents, `.gitignore`, deploy guard (`29b3fba`).
+- [2026-10](sources/commits/2026-10.md): Cemengal: no script persistence (`fe06b6c`); skills/agents, `.gitignore`, deploy guard (`29b3fba`); loopback-only socket (HOT FIX); `cem-aimodeler` skill moved into the repo.

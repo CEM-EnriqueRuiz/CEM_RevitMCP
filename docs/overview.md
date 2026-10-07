@@ -1,7 +1,7 @@
 ---
 title: CEM_RevitMCP overview
 type: overview
-updated: 2026-10-06
+updated: 2026-10-07
 sources: [README.md, CEM_RevitMCP.md, command.json, CEM_RevitMCP.sln]
 related: [concepts/upstream-and-fork.md, concepts/four-part-tool-pattern.md, modules/toolset.md]
 tags: [overview]
@@ -11,7 +11,7 @@ tags: [overview]
 
 An **MCP server that lets an AI agent drive Autodesk Revit**. It is a **fork** of
 [`mcp-servers-for-revit`](https://github.com/mcp-servers-for-revit/mcp-servers-for-revit), extended
-by Cemengal from 23 to **120 commands** so Claude can act as a senior Revit modeler (architecture,
+by Cemengal from 23 to **126 commands** so Claude can act as a senior Revit modeler (architecture,
 MEP, families, structure, coordination, parameters), with `take_screenshot` as its eyes. It is a
 shipped Cemengal product feature ("CEM_RevitAI" on the Cemengal ribbon), not just a dev tool.
 Upstream vs Cemengal parts: [upstream and fork](concepts/upstream-and-fork.md).
@@ -31,10 +31,10 @@ MCP client (Claude) ──stdio──► server/ (TS, build/index.js)  ── on
 
 | Part | Page |
 |---|---|
-| `server/`: TS MCP server, 118 tools, vitest schema suite | [server](modules/server.md) |
+| `server/`: TS MCP server, 124 tools, vitest schema suite | [server](modules/server.md) |
 | `plugin/`: socket, registry, dispatch, audit log, license-gated toggle | [plugin](modules/plugin.md) |
 | `commandset/`: Commands / Services / Models / Utils by domain | [commandset](modules/commandset.md) |
-| `command.json`: the registry (source of truth, 120 entries) | [command registry](modules/command-registry.md) |
+| `command.json`: the registry (source of truth, 126 entries) | [command registry](modules/command-registry.md) |
 | the tools by domain | [toolset](modules/toolset.md) |
 | `tests/commandset/`: upstream TUnit suite (live Revit) | [tests](modules/tests.md) |
 

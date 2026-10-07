@@ -1,7 +1,7 @@
 ---
 title: Domains and naming
 type: concept
-updated: 2026-10-06
+updated: 2026-10-07
 sources: [commandset/Utils/RevitAPI_2024_namespaces.md, CEM_RevitMCP.md]
 related: [../decisions/0003-domains-from-api-namespaces.md, ../decisions/0004-prefix-equals-folder-equals-namespace.md, ../modules/toolset.md]
 tags: [domains, naming]
@@ -23,6 +23,7 @@ The tool prefix, the folder and the namespace suffix are the same string
 | worksharing / links / QA (+ `DB.IFC`) | worksets, links, phases, purge, audit | `coord_*` | `Core` |
 | `DB.Visual` | material appearance | `viz_*` | `Core` |
 | (pipelines, not one namespace) | IFC-link → native reconstruction | `parent_*` | `ParentTools` |
+| (the Cemengal add-ins, sibling `CEM_RevitAPI`) | CEM Swap, CEM Rules, the Cemengal ribbon buttons | `cem_*` | `Cemengal` |
 
 Also: `ExecuteDynamicCode` (`send_code_to_revit`) and `Test` (`say_hello`).
 

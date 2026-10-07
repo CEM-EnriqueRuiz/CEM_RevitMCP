@@ -377,6 +377,7 @@ FodyWeavers.xsd
 !.claude/skills/
 .claude/skills/*
 !.claude/skills/cem-revitmcp-dev/
+!.claude/skills/cem-aimodeler/
 .DS_Store
 
 # MCP browser-automation artifacts (playwright, chrome-devtools, puppeteer, etc.)

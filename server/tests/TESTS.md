@@ -64,6 +64,12 @@ rationale" section is stale. A leftover `server/revit-data.db` (gitignored) is s
 disk as a relic of that removed feature. See this task's final report for the full write-up;
 this file only records it for anyone reading the test suite later.
 
+## Cemengal tools
+
+| File | Verifies | Why |
+|---|---|---|
+| `tools/cem_tools.test.ts` | the schemas of the six `cem_*` tools: `cem_open_tool` (optional label), `cem_swap_find_types` (positive integer cap), the two no-argument tools, `cem_swap_run` (preset or an inline swap in the `SwapPresets.json` shape; `sources` min 1 and `target` required; the add-in's enums: scopes, comparisons, placement modes, trial/all) and `cem_rules_apply` | The inline swap is parsed in C# by CEM Swap's own `SwapPresetStore`; the schema keeps the LLM inside the shape and enums that parser accepts (`docs/decisions/0025-cemengal-addins-as-tools-via-project-references.md`). Written before the tool files (12 tests, failing first). |
+
 ## Connection target (security)
 
 | File | Verifies | Why |

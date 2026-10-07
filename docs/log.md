@@ -1,7 +1,7 @@
 ---
 title: CEM_RevitMCP wiki log
 type: log
-updated: 2026-10-06
+updated: 2026-10-07
 sources: []
 related: [index.md]
 tags: [log]
@@ -77,3 +77,23 @@ Corrected: the audit root is now hardcoded in two files, not three. New gap reco
 Committed the 0021 work (drafted 2026-10-06) as a HOT FIX with no issue link →
 [2026-10 commits](sources/commits/2026-10.md#hot-fix-2026-10-07-loopback-only-socket-and-audited-dispatch).
 0021 is now committed (current), and 0022 stays proposed.
+
+## [2026-10-07] ingest | The cem-aimodeler skill moves into the repo and learns the Cemengal add-ins
+
+The MCP usage skill was a claude.ai account skill; it is now `.claude/skills/cem-aimodeler/` (one copy, Codex entry, `.gitignore` exception),
+without the Recipes claims, and with `references/cemengal-tools.md`: which add-in does what, posting a ribbon button, and the CEM Swap,
+CEM Rules and Material Renamer engines through `send_code_to_revit` → [2026-10 commits](sources/commits/2026-10.md),
+new [Cemengal add-ins through the MCP](concepts/cemengal-addins-via-mcp.md). Updated 0007, doc-drift (row resolved), send-code, index,
+`CLAUDE.md`, `AGENTS.md`, `CEM_RevitMCP.md` and `cem-revitmcp-dev` (rule 7 no longer cites the recipe corpus).
+
+## [2026-10-07] decision | 0025 The Cemengal add-ins are cem_* tools calling their own code through ProjectReferences
+Same day, superseding the snippet route the skill had first documented: six `cem_*` tools (126 commands), the command set ProjectReferencing
+CEM_RevitAPI_Extended, CEM_Rules and CEM_SwapManager → [0025](decisions/0025-cemengal-addins-as-tools-via-project-references.md),
+[Cemengal add-ins through the MCP](concepts/cemengal-addins-via-mcp.md) rewritten, [2026-10 commits](sources/commits/2026-10.md) section rewritten;
+counts and the `cem_*` domain updated on index, toolset, command registry, commandset, server, overview, four-part pattern, domains, 0004;
+build-and-deploy and doc-drift (Extended does not build for R26) updated.
+
+## [2026-10-07] ingest | Commit pass: HOT FIX - MCP Revit to include Cemengal tools
+Reviewed and committed the cem_* work → [2026-10 commits](sources/commits/2026-10.md). Fixed on the way: unused rename DTOs removed,
+0004 folder list, 0025 API list, stale 120/118 counts, and the compile-only build command (`-p:CemRibbonHostBuild=true`) on
+build-and-deploy and `cem-revitmcp-dev`. R24/R25 build, R26 blocked by CEM_RevitAPI_Extended, 46/46 tests; not run in a live Revit.

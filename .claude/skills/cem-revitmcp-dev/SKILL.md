@@ -17,6 +17,9 @@ the pages it names.** Search with qmd when the index is not enough (MCP tools, o
 `qmd query -c cem_revitmcp "..."`). The wiki holds the detail; this skill only holds the hard rules.
 Also read [CROSS_REPO.md](../../../../../CROSS_REPO.md).
 
+This skill is for **changing** the server. To **use** it on a live model (modelling, the Cemengal
+add-ins), load [cem-aimodeler](../cem-aimodeler/SKILL.md) instead.
+
 ## Hard rules
 
 1. A tool = `server/src/tools/<name>.ts` + `commandset/{Commands,Services,Models}/<Domain>/` + a `command.json` entry → [0001](../../../docs/decisions/0001-extend-via-four-part-pattern.md)
@@ -25,7 +28,7 @@ Also read [CROSS_REPO.md](../../../../../CROSS_REPO.md).
 4. Domains from API namespaces; tool prefix == folder == namespace suffix → [0003](../../../docs/decisions/0003-domains-from-api-namespaces.md), [0004](../../../docs/decisions/0004-prefix-equals-folder-equals-namespace.md)
 5. mm in/out, `AIResult<T>` with a readable `Message`, skip-and-warn batches, names and enums, idempotent → [0005](../../../docs/decisions/0005-ai-grade-tool-conventions.md)
 6. Create methods plus common edits, not parity; the long tail goes to `send_code_to_revit` → [0006](../../../docs/decisions/0006-create-methods-not-full-parity.md)
-7. Choose new tools from the recipe corpus → [0008](../../../docs/decisions/0008-parent-tools-from-recipe-corpus.md)
+7. Pick new tools from evidence of `send_code_to_revit` fallbacks, not wishlists; scripts themselves are never persisted → [0008](../../../docs/decisions/0008-parent-tools-from-recipe-corpus.md), [0023](../../../docs/decisions/0023-send-code-scripts-not-persisted.md)
 8. Family geometry on the family doc; small tools; no blend/sweep → [0009](../../../docs/decisions/0009-small-composable-family-tools.md), [0010](../../../docs/decisions/0010-no-newblend-use-sloped-extrusions.md)
 9. CEM_RibbonUI owns deployment; rebuild it with Revit closed → [0011](../../../docs/decisions/0011-cem-ribbonui-hosts-deployment.md)
 10. The code wins over `CEM_RevitMCP.md` (legacy, partly stale) → [doc drift](../../../docs/concepts/doc-drift.md)
@@ -41,7 +44,7 @@ cd server && npm run build       # build/index.js, what the MCP client runs
 ```
 
 ```powershell
-dotnet build commandset\CEM_IAModeler_CommandSet.csproj -c "Debug R24" -p:Platform=x64 -p:DeployRevitAddin=false
+dotnet build commandset\CEM_IAModeler_CommandSet.csproj -c "Debug R24" -p:Platform=x64 -p:DeployRevitAddin=false -p:CemRibbonHostBuild=true
 ```
 
 Then rebuild CEM_RibbonUI with Revit closed and run the

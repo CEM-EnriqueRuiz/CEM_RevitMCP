@@ -2,7 +2,7 @@
 title: "0004 Tool prefix == folder == namespace suffix"
 type: decision
 status: current
-updated: 2026-10-06
+updated: 2026-10-07
 sources: [b04b41e, aa88b96, commandset/CEM_IAModeler_CommandSet.csproj]
 related: [0003-domains-from-api-namespaces.md, 0007-personas-deferred.md, ../concepts/domains-and-naming.md]
 tags: [naming, folders]
@@ -23,9 +23,9 @@ suffix (`CEM_IAModeler_CommandSet.Commands.<Domain>`) == the `domain_` tool pref
 
 - Core tools: flat `verb_noun` (for example `set_element_parameters`, `create_view`).
 - Domain tools: `domain_verb_noun`, one of `arch_*`, `mep_*`, `family_*`, `struct_*`, `coord_*`,
-  `viz_*`, `parent_*`.
+  `viz_*`, `parent_*`, `cem_*` (added 2026-10-07, folder `Cemengal`, [0025](0025-cemengal-addins-as-tools-via-project-references.md)).
 - Canonical folders: `Core, Access, Architecture, Mep, Family, Struct, Views, AnnotationComponents,
-  DataExtraction, Delete, Test, ExecuteDynamicCode, ParentTools`, plus `Models/Common`.
+  DataExtraction, Delete, Test, ExecuteDynamicCode, ParentTools, Cemengal`, plus `Models/Common`.
 
 The prefix is also meant to be the future persona-filter key; see [0007](0007-personas-deferred.md).
 

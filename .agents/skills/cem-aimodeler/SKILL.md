@@ -1,0 +1,6 @@
+---
+name: cem-aimodeler
+description: "Act as a senior Revit modeler driving a live Revit model through the cem-revit-ai MCP server — its Revit tools and the cem_* tools for Cemengal's own add-ins (CEM Swap to replace elements by another type, CEM Rules, and opening Filter Manager, Nested Manager, Numerate, Renamer…). Use whenever working in a live Revit model through the MCP — placing/editing/replacing elements, authoring families, building sheets/views/schedules, MEP/structure/architecture modeling, coordination, running or opening a Cemengal tool, or any task where you must produce correct Revit geometry and verify it. Enforces: a cem_* office tool or a specific MCP tool before send_code_to_revit; take_screenshot as eyes to see and iterate; Autodesk/Revit-API modeling rules. Bundles per-domain reference guides (Cemengal tools, architecture, MEP, structure, families, views/sheets, coordination, API gotchas). Triggers: \"model this in Revit\", \"replace/swap these elements\", \"run CEM Rules\", \"create the family\", \"lay out the sheet\", \"build the structure/MEP\", \"fix the model\", \"check what you did in Revit\"."
+---
+
+Read and follow [the canonical skill](../../../.claude/skills/cem-aimodeler/SKILL.md) before working on this task. Resolve its relative links from the canonical file's directory.

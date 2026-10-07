@@ -1,7 +1,7 @@
 ---
 title: Build and deploy
 type: workflow
-updated: 2026-10-06
+updated: 2026-10-07
 sources: [commandset/CEM_IAModeler_CommandSet.csproj, plugin/CEM_IAModeler.csproj, server/package.json, CEM_RevitMCP.sln]
 related: [../decisions/0011-cem-ribbonui-hosts-deployment.md, ../modules/server.md, ../modules/commandset.md, smoke-test.md]
 tags: [build, deploy]
@@ -21,18 +21,31 @@ npm run bundle     # optional: dist/index.js single self-contained file
 ## C# command set (compile only)
 
 ```powershell
-dotnet build commandset\CEM_IAModeler_CommandSet.csproj -c "Debug R24" -p:Platform=x64 -p:DeployRevitAddin=false
+dotnet build commandset\CEM_IAModeler_CommandSet.csproj -c "Debug R24" -p:Platform=x64 -p:DeployRevitAddin=false -p:CemRibbonHostBuild=true
 ```
+
+`-p:CemRibbonHostBuild=true` is what makes it compile-only: the command set's `DeployCommandSet` target keys only on
+that flag, so without it a Debug build still copies the output (since 2026-10-07 the add-in DLLs too) to
+`plugin\bin\AddIn …` and `%AppData%\Autodesk\Revit\Addins\<ver>\CEM_IAModeler\Commands\`. The add-in
+ProjectReferences drop the flag (`GlobalPropertiesToRemove`) but keep `DeployRevitAddin=false`, so they do not
+deploy their own manifests either.
 
 **Use a modern .NET SDK.** On this machine the default `dotnet` on PATH is SDK 5.0.103 (C# 9), which fails
 on `CEM_RevitAuth`'s file-scoped namespaces ("Se esperaba }" / CS1513). Use the Cemengal-provisioned
-SDK: `%LOCALAPPDATA%\Cemengal\dotnet\dotnet.exe` (SDK 10.0.401 at 2026-10-06). The plugin builds with
+SDK: `%LOCALAPPDATA%\Cemengal\dotnet\dotnet.exe` (SDK 10.0.401 at 2026-10-06). Machines differ: on 2026-10-07 a
+workstation without that SDK built R24 and R25 with SDK 9.0.203 from PATH (nothing pins the SDK; the repo's
+`global.json` only sets the test runner). The plugin builds with
 `... build plugin\CEM_IAModeler.csproj -c "Debug R24" -p:Platform=x64 -p:CemRibbonHostBuild=true`
 (no deploy).
 
 Older docs say `RevitMCPCommandSet.csproj`, but that project no longer exists. Configurations:
 `Debug|Release R20…R26`. The plugin (`plugin\CEM_IAModeler.csproj`) needs the sibling
-`CEM_RevitAPI` checkout for `CEM_RevitAuth` ([0014](../decisions/0014-license-gated-listener.md)).
+`CEM_RevitAPI` checkout for `CEM_RevitAuth` ([0014](../decisions/0014-license-gated-listener.md)), and since
+2026-10-07 the command set needs it too: it builds `CEM_RevitAPI_Extended`, `CEM_Rules` and `CEM_SwapManager`
+for the `cem_*` tools and copies them into its output, so `Commands\` carries them
+([0025](../decisions/0025-cemengal-addins-as-tools-via-project-references.md)). Pass `-p:DeployRevitAddin=false`
+when building the command set alone, or the add-ins it builds deploy their own standalone manifests. R20 builds
+without the `cem_*` tools; R26 does not build while `CEM_RevitAPI_Extended` does not (below).
 The solution is `CEM_RevitMCP.sln` (plugin, command set and test projects).
 
 ## Deploy (normal path: hosted by CEM_RibbonUI)

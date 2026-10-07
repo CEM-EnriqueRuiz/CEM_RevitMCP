@@ -1,15 +1,15 @@
 ---
-title: The toolset (120 commands by domain)
+title: The toolset (126 commands by domain)
 type: module
-updated: 2026-10-06
+updated: 2026-10-07
 sources: [command.json, commandset/Commands, server/src/tools, 86cf705]
 related: [../concepts/domains-and-naming.md, ../decisions/0006-create-methods-not-full-parity.md, ../concepts/upstream-and-fork.md]
 tags: [toolset, catalog]
 ---
 
-# The toolset (120 commands by domain)
+# The toolset (126 commands by domain)
 
-`command.json` is the source of truth: 120 entries, all matched by a C# `CommandName`. **118 have a
+`command.json` is the source of truth: 126 entries, all matched by a C# `CommandName`. **124 have a
 TS tool.** `tag_walls` and `tag_rooms` are registered in C# but have no TS wrapper. This is **deliberate**: they were
 consolidated into the single `tag_elements` tool, and the C# side still serves both names (user note in
 `CEM_RevitMCP.md`, `29b3fba`). Regenerate with `grep -o '"commandName"[^,]*' command.json`.
@@ -20,6 +20,7 @@ else was added by Cemengal.
 | Folder | n | Commands |
 |---|---|---|
 | `Access` | 8 | ai_element_filter†, get_available_family_types†, get_current_view_elements†, get_current_view_info†, get_selected_elements†, operate_element†, get_element_parameters, get_warnings |
+| `Cemengal` | 6 | cem_open_tool, cem_swap_find_types, cem_swap_list_presets, cem_swap_run, cem_swap_remove_trial, cem_rules_apply: the Cemengal add-ins' own code, by ProjectReference ([concept](../concepts/cemengal-addins-via-mcp.md), [0025](../decisions/0025-cemengal-addins-as-tools-via-project-references.md)) |
 | `AnnotationComponents` | 5 | create_dimensions†, tag_rooms† (no TS), tag_walls† (no TS), tag_elements, take_screenshot |
 | `Architecture` | 14 | arch_create_wall, arch_create_floor, arch_create_ceiling, arch_create_roof, arch_create_curtain_wall, arch_create_opening, arch_create_room, arch_create_stairs, arch_create_railing, arch_create_area, arch_create_area_plan, arch_create_separator, arch_join_geometry, arch_unjoin_geometry |
 | `Core`: geometry base | 7 | create_grid†, create_level†, create_room†, create_point_based_element†, create_line_based_element†, create_surface_based_element†, color_splash† |
@@ -62,6 +63,7 @@ else was added by Cemengal.
    curtain-grid edit, image, parts)
 10. ParentTools
 11. Family-edit session and geometry upgrade, 2026-06-14
+12. Cemengal add-ins (`cem_*`), 2026-10-07
 
 Steps 1–4 landed in `b04b41e`; the rest in `aa88b96`. What's deferred and why:
 [0006](../decisions/0006-create-methods-not-full-parity.md). Persona filtering:

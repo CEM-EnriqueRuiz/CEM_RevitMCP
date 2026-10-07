@@ -2,7 +2,7 @@
 title: "0007 Specialist personas are deferred; all tools stay exposed"
 type: decision
 status: current
-updated: 2026-10-06
+updated: 2026-10-07
 sources: [b04b41e, aa88b96, server/src/tools/register.ts]
 related: [0004-prefix-equals-folder-equals-namespace.md, 0006-create-methods-not-full-parity.md]
 tags: [personas, design]
@@ -38,5 +38,6 @@ The reason the #2 threshold (~40 tools) was passed without filtering is not reco
 ## Consequences
 
 - The domain-to-specialist mapping is still undecided.
-- The AI-behaviour side ("act as a senior Revit modeler") lives in the `CEM_AIModeler` Claude skill,
-  outside this repo.
+- The AI-behaviour side ("act as a senior Revit modeler") lives in the `cem-aimodeler` skill,
+  `.claude/skills/cem-aimodeler/` (outside this repo, as a claude.ai account skill, until 2026-10-07;
+  see [Cemengal add-ins through the MCP](../concepts/cemengal-addins-via-mcp.md)).
