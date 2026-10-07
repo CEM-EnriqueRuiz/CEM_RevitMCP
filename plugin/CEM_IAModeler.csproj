@@ -82,10 +82,33 @@
     <ItemGroup>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
     </ItemGroup>
+    <!--
+        Is this build hosted by CEM_RibbonUI?
+
+        CemRibbonHostBuild=true is passed by CEM_RibbonUI's ProjectReference, but that only covers
+        the case where MSBuild reaches this project THROUGH that reference. This project is also a
+        first-class member of CEM_RevitAPI.sln, so `dotnet build CEM_RevitAPI.sln` builds it
+        DIRECTLY, with the flag unset - and the standalone deploy below would then fire and drop a
+        CEM_IAModeler.addin into the Revit Addins folder.
+
+        That manifest is actively harmful in a Cemengal checkout: it registers a second
+        IExternalApplication that opens the same MCP socket, and the plugin resolves Commands/
+        relative to ITS OWN dll, so it serves an EMPTY commandRegistry.json (PathManager creates one
+        when none exists). The result is a connection that succeeds and then answers every call with
+        "Method not found" - the exact symptom, and it silently returns on every solution build.
+
+        So detect the sibling host directly as a fallback: if CEM_RibbonUI is next door, this is a
+        Cemengal checkout and the host owns deployment no matter how the build was entered.
+    -->
+    <PropertyGroup>
+        <CemRibbonHostPresent Condition="Exists('$(MSBuildThisFileDirectory)..\..\..\CEM_RevitAPI\CEM_RibbonUI\CEM_RibbonUI.csproj')">true</CemRibbonHostPresent>
+        <CemStandaloneDeploy Condition="'$(CemRibbonHostBuild)' != 'true' AND '$(CemRibbonHostPresent)' != 'true'">true</CemStandaloneDeploy>
+    </PropertyGroup>
+
     <!-- Only ship the standalone addin manifest in the fork's own build. When CEM_RibbonUI
          hosts the plugin, the MCP UI is provided by the Cemengal ribbon and this manifest
          (which would register a now-empty IExternalApplication) must not be deployed. -->
-    <ItemGroup Condition="'$(CemRibbonHostBuild)' != 'true'">
+    <ItemGroup Condition="'$(CemStandaloneDeploy)' == 'true'">
         <None Update="CEM_IAModeler.addin">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
@@ -93,7 +116,7 @@
     <!-- When built as a dependency of CEM_RibbonUI, that host project owns deployment
          (it stages everything under its own output and Nice3point publishes it). Skip the
          fork's own copy/deploy logic so files are not scattered to the wrong folders. -->
-    <Target Name="CopyFiles" AfterTargets="CoreBuild" Condition="'$(CemRibbonHostBuild)' != 'true'">
+    <Target Name="CopyFiles" AfterTargets="CoreBuild" Condition="'$(CemStandaloneDeploy)' == 'true'">
         <ItemGroup>
             <RootItem Include="$(ProjectDir)*.addin"/>
             <AddinItem Include="$(TargetDir)*.dll"/>

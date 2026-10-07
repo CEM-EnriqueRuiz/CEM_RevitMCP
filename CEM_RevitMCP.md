@@ -9,7 +9,11 @@ Goal: grow this command set into a tool surface broad and generic enough that Cl
 with eyes (`take_screenshot`) to evaluate and iterate.
 
 > **Authoritative tool count = entries in `command.json`** (each has a matching C# `CommandName` and a
-> TS `server.tool`). Today: **120 wired commands.** To regenerate the list: `grep -o '"commandName"[^,]*' command.json`.
+> TS `server.tool`). Today: **120 entries in `command.json`, but the server exposes 118 MCP tools.**
+> The gap is real, not a miscount: `tag_walls` and `tag_rooms` were consolidated into the single
+> `tag_elements` tool, and `command.json` still carries their old names. The C# side still serves
+> both command names; they are simply no longer separate MCP tools. To regenerate the list:
+> `grep -o '"commandName"[^,]*' command.json`.
 
 ---
 
