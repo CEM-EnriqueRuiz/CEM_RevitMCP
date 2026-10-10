@@ -1,7 +1,7 @@
 ---
 title: CEM_RevitMCP wiki index
 type: index
-updated: 2026-10-07
+updated: 2026-10-08
 sources: [command.json, CEM_RevitMCP.md, .claude/skills/cem-revitmcp-dev/SKILL.md, .claude/skills/cem-aimodeler/SKILL.md]
 related: [overview.md, log.md]
 tags: [index]
@@ -112,7 +112,7 @@ add-ins → [Cemengal add-ins through the MCP](concepts/cemengal-addins-via-mcp.
 - [0017](decisions/0017-elementid-extensions-over-preprocessor.md): ElementIdExtensions over `#if` (current, upstream)
 - [0018](decisions/0018-send-code-transaction-mode.md): `send_code_to_revit` transactionMode (current, upstream)
 - [0019](decisions/0019-single-authoritative-doc.md): one authoritative doc (superseded by 0020)
-- [0020](decisions/0020-wiki-is-the-knowledge-base.md): `docs/` wiki is the knowledge base (current)
+- [0020](decisions/0020-wiki-is-the-knowledge-base.md): `docs/` wiki is the knowledge base, searched through the machine's shared qmd server (current)
 - [0021](decisions/0021-loopback-only-socket.md): loopback-only socket, client pinned to 127.0.0.1, audited dispatch (current, our divergence)
 - [0022](decisions/0022-local-shared-secret-handshake.md): local shared-secret handshake (proposed)
 - [0023](decisions/0023-send-code-scripts-not-persisted.md): no `send_code_to_revit` script persistence; two audit trails (current)

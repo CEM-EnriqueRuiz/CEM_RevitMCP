@@ -1,7 +1,7 @@
 ---
 title: "CEM-EnriqueRuiz/CEM_API#68 LLM wiki bootstrap and per-commit ingest workflow"
 type: source
-updated: 2026-10-06
+updated: 2026-10-08
 sources: ["https://github.com/CEM-EnriqueRuiz/CEM_API/issues/68", CLAUDE.md, AGENTS.md, .claude/skills/cem-revitmcp-dev/SKILL.md, .claude/settings.json, .mcp.json]
 related: [../../decisions/0020-wiki-is-the-knowledge-base.md, ../../decisions/0019-single-authoritative-doc.md, ../../workflows/finish-a-change.md, ../../concepts/doc-drift.md]
 tags: [issue, wiki, process, cross-repo]
@@ -44,7 +44,9 @@ tags: [issue, wiki, process, cross-repo]
   agent's own knowledge of the change, not from `gh`, because the decisions are made in the session
   that writes the code.
 - **qmd is the search tool** (MCP server in `.mcp.json`, `qmd query -c cem_revitmcp` CLI for other
-  providers). It is local, hybrid BM25/vector, and has both an MCP and a CLI interface.
+  providers). It is local, hybrid BM25/vector, and has both an MCP and a CLI interface. At bootstrap
+  `.mcp.json` started a stdio `qmd mcp` per session; since 2026-10-08 it connects to the machine's one shared
+  HTTP server ([0020](../../decisions/0020-wiki-is-the-knowledge-base.md), root decision 0020).
 - **Rejected by the user:** Obsidian, Marp, Web Clipper, scheduled jobs, and periodic issue
   re-sync. Reason not recorded beyond the user's choice.
 

@@ -1,5 +1,5 @@
 {
   "mcpServers": {
-    "qmd": { "command": "cmd", "args": ["/c", "qmd", "mcp"] }
+    "qmd": { "type": "http", "url": "http://127.0.0.1:8181/mcp" }
   }
 }

@@ -2,8 +2,8 @@
 title: "0020 docs/ wiki is the knowledge base; schema files are short entry points"
 type: decision
 status: current
-updated: 2026-10-06
-sources: [CLAUDE.md, AGENTS.md, .claude/skills/cem-revitmcp-dev/SKILL.md]
+updated: 2026-10-08
+sources: [CLAUDE.md, AGENTS.md, .claude/skills/cem-revitmcp-dev/SKILL.md, .mcp.json]
 related: [0019-single-authoritative-doc.md, ../workflows/finish-a-change.md]
 tags: [documentation, wiki, process]
 ---
@@ -30,6 +30,15 @@ code ([0019](0019-single-authoritative-doc.md)). The root schema
 ## Consequences
 
 - Finish every change with [finish a change](../workflows/finish-a-change.md).
+- Search the wiki with qmd. Since 2026-10-08 the `qmd` entry in `.mcp.json` is
+  `{ "type": "http", "url": "http://127.0.0.1:8181/mcp" }`: it connects to the machine's one shared qmd
+  server (a logon task, loopback only), not a stdio server started per session, which loaded 2 to 3.5 GB
+  of models in every session
+  ([root decision 0020](../../../../docs/decisions/0020-one-shared-qmd-server-per-machine.md)). Scope
+  questions about this repo to its collection (`collections: ["cem_revitmcp"]` in the MCP `query` tool,
+  `qmd query -c cem_revitmcp` in the CLI) and search every collection only for cross-repo questions; start
+  with `lex` sub-queries. If the server is down, the next session start restarts it; the `qmd` CLI keeps
+  working meanwhile because it reads the index directly.
 - `.gitignore` now ignores `.claude/*` except `agents/` and `skills/cem-revitmcp-dev/` (`29b3fba`).
   `.claude/settings.json` is still matched by the ignore rule, but it is tracked (force-added at bootstrap), so
   later edits stage normally. Any **new** file under `.claude/` outside those two needs `git add -f`, or a

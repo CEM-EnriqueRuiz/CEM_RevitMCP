@@ -1,7 +1,7 @@
 ---
 title: CEM_RevitMCP wiki log
 type: log
-updated: 2026-10-07
+updated: 2026-10-08
 sources: []
 related: [index.md]
 tags: [log]
@@ -97,3 +97,11 @@ build-and-deploy and doc-drift (Extended does not build for R26) updated.
 Reviewed and committed the cem_* work → [2026-10 commits](sources/commits/2026-10.md). Fixed on the way: unused rename DTOs removed,
 0004 folder list, 0025 API list, stale 120/118 counts, and the compile-only build command (`-p:CemRibbonHostBuild=true`) on
 build-and-deploy and `cem-revitmcp-dev`. R24/R25 build, R26 blocked by CEM_RevitAPI_Extended, 46/46 tests; not run in a live Revit.
+
+## [2026-10-08] ingest | qmd MCP through the machine's shared server (root decision 0020)
+`.mcp.json`'s `qmd` entry no longer starts a stdio `qmd mcp` per session; it is
+`{ "type": "http", "url": "http://127.0.0.1:8181/mcp" }`, the machine's one shared server (root decision 0020: per-session
+servers loaded 2 to 3.5 GB of models each and exhausted RAM). The name stays `qmd`, so `enabledMcpjsonServers` is unchanged.
+Recorded in [0020](decisions/0020-wiki-is-the-knowledge-base.md) (how to search: scope to `cem_revitmcp`, `lex` first, the CLI
+as fallback), the [CEM_API#68 source](sources/issues/CEM-EnriqueRuiz-CEM_API-68.md) (bootstrap stdio wiring, now superseded)
+and the index.
