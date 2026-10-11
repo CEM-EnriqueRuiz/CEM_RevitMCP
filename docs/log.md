@@ -105,3 +105,6 @@ servers loaded 2 to 3.5 GB of models each and exhausted RAM). The name stays `qm
 Recorded in [0020](decisions/0020-wiki-is-the-knowledge-base.md) (how to search: scope to `cem_revitmcp`, `lex` first, the CLI
 as fallback), the [CEM_API#68 source](sources/issues/CEM-EnriqueRuiz-CEM_API-68.md) (bootstrap stdio wiring, now superseded)
 and the index.
+
+## [2026-10-11] ingest | CEM-EnriqueRuiz/CEM_API#74 the request-layer rule in the cem-revitmcp-dev skill
+The 2026-10-11 review found no CEM_API request in this repo. At the user's request, hard rule 12 records that any future call goes through CEM_CSharpExtended's `Api` (root 0023). Source page: [CEM_API#74](sources/issues/CEM-EnriqueRuiz-CEM_API-74.md).
