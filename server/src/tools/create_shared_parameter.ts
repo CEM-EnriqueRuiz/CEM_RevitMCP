@@ -58,7 +58,7 @@ const sharedParameter = z
 export function registerCreateSharedParameterTool(server: McpServer) {
   server.tool(
     "create_shared_parameter",
-    "Create shared parameter definitions in the shared parameter file (auto-creates a temp file if none is configured) and bind them to categories as instance or type parameters. Existing definitions and bindings are reused instead of failing. Returns per-parameter results including whether each already existed.",
+    "Create shared parameter definitions in the shared parameter file (auto-creates a local temp file if none is configured; if the configured file is the team's on ACC, which is never written from here, works on a local copy and leaves the ACC file untouched) and bind them to categories as instance or type parameters. Existing definitions and bindings are reused instead of failing. Returns per-parameter results including whether each already existed.",
     {
       data: z.array(sharedParameter).min(1).describe("List of shared parameters to create"),
     },

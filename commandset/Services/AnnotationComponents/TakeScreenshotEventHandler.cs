@@ -5,7 +5,9 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Autodesk.Revit.UI;
+using CEM_CSharpExtended.Hosting;
 using CEM_IAModeler_CommandSet.Models.Common;
+using CEM_IAModeler_CommandSet.Utils;
 using RevitMCPSDK.API.Interfaces;
 // System.Drawing 与 Autodesk.Revit.DB 都有 Rectangle/Color 等同名类型，
 // 这里用别名明确指向 GDI 类型，避免歧义。
@@ -29,12 +31,6 @@ namespace CEM_IAModeler_CommandSet.Services.AnnotationComponents
         // Max longest-edge in pixels; larger captures are scaled down to keep the
         // base64 payload reasonable over the socket transport.
         private const int MaxEdge = 1920;
-
-        // 可选：把每张截图另存为带时间戳的PNG，作为审计/调试记录。
-        // 留空则不落盘。TODO: 改为可配置项。
-        // Optional on-disk copy (audit trail). Empty = don't save. TODO: make configurable.
-        private const string ScreenshotSaveDirectory =
-            @"C:\DC\ACCDocs\Cemengal\CMGL-TechnicalOffice\Project Files\01-Shared\02-Software\00-Revit\00-RevitAPI\05-CEMAIModeler\Screenshots";
 
         // 输入参数
         private bool _saveToDisk;
@@ -151,18 +147,16 @@ namespace CEM_IAModeler_CommandSet.Services.AnnotationComponents
             return scaled;
         }
 
+        /// <summary>
+        /// 把截图另存为带时间戳的PNG（审计/调试记录），写入本机自清理的临时目录（根决策0031）。
+        /// Saves the timestamped PNG copy (audit/debug record) to the local, self-cleaning
+        /// %TEMP%\Cemengal\RevitMCP\Screenshots (root decision 0031). Returns its path, or empty on failure.
+        /// </summary>
         private static string TrySavePng(byte[] png)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(ScreenshotSaveDirectory))
-                    return string.Empty;
-
-                if (!Directory.Exists(ScreenshotSaveDirectory))
-                    Directory.CreateDirectory(ScreenshotSaveDirectory);
-
-                string fileName = $"screenshot_{DateTime.Now:yyyyMMdd_HHmmss_fff}.png";
-                string filePath = Path.Combine(ScreenshotSaveDirectory, fileName);
+                string filePath = CemTempFolder.NewArtifactFile(McpLocalFiles.App, "Screenshots", "screenshot", ".png");
                 File.WriteAllBytes(filePath, png);
                 return filePath;
             }

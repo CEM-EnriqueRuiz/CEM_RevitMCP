@@ -22,7 +22,7 @@ export function registerTakeScreenshotTool(server: McpServer) {
         .optional()
         .default(true)
         .describe(
-          "Also save a timestamped PNG copy on the Revit machine as an audit/debug record. The image is always returned inline regardless of this flag."
+          "Also save a timestamped PNG copy on the Revit machine as an audit/debug record, in the local temp folder %TEMP%\\Cemengal\\RevitMCP\\Screenshots (pruned after 7 days). The image is always returned inline regardless of this flag."
         ),
     },
     async (args, extra) => {

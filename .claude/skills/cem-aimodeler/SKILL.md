@@ -102,6 +102,8 @@ list): an API with no public tool
 no tool combination covers. When you use it: keep the snippet minimal, wrap geometry in a transaction on
 the **correct document** (family doc vs project), and screenshot afterward to verify.
 
-Nothing keeps your snippet: the action log (`…\05-CEMAIModeler\Log\`) records each call with the script
-body omitted. If you need it again, keep it in the conversation; if you find yourself writing the same
+Nothing keeps your snippet: the action log (`%TEMP%\Cemengal\RevitMCP\actions-<date>.jsonl`, local and kept 7 days)
+records each call with the script body omitted. A snippet that writes a file writes it under
+`%TEMP%\Cemengal\RevitMCP\`, never under ACC (`C:\DC\ACCDocs\…`, synced to every colleague) nor next to the add-in
+(root decision 0031). If you need it again, keep it in the conversation; if you find yourself writing the same
 snippet twice, say so — a repeated snippet is the signal that a real tool should be built.

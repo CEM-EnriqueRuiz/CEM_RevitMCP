@@ -1037,31 +1037,5 @@ namespace CEM_IAModeler_CommandSet.Utils
         //    }
         //}
 
-        /// <summary>
-        /// 将指定的消息保存到桌面的指定文件中（默认覆盖文件）
-        /// </summary>
-        /// <param name="message">要保存的消息内容</param>
-        /// <param name="fileName">目标文件名</param>
-        public static void SaveToDesktop(this string message, string fileName = "temp.json", bool isAppend = false)
-        {
-            // 确保 logName 包含后缀
-            if (!Path.HasExtension(fileName))
-            {
-                fileName += ".txt"; // 默认添加 .txt 后缀
-            }
-
-            // 获取桌面路径
-            string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-
-            // 组合完整的文件路径
-            string filePath = Path.Combine(desktopPath, fileName);
-
-            // 写入文件（覆盖模式）
-            using (StreamWriter sw = new StreamWriter(filePath, isAppend))
-            {
-                sw.WriteLine($"{message}");
-            }
-        }
-
     }
 }

@@ -1,7 +1,7 @@
 ---
 title: CEM_RevitMCP wiki index
 type: index
-updated: 2026-10-08
+updated: 2026-10-25
 sources: [command.json, CEM_RevitMCP.md, .claude/skills/cem-revitmcp-dev/SKILL.md, .claude/skills/cem-aimodeler/SKILL.md]
 related: [overview.md, log.md]
 tags: [index]
@@ -30,6 +30,7 @@ add-ins → [Cemengal add-ins through the MCP](concepts/cemengal-addins-via-mcp.
 8. Family geometry: small tools, on the family doc, no blend/sweep → [0009](decisions/0009-small-composable-family-tools.md), [0010](decisions/0010-no-newblend-use-sloped-extrusions.md)
 9. CEM_RibbonUI (sibling `CEM_RevitAPI`) owns deployment; rebuild it with Revit closed → [0011](decisions/0011-cem-ribbonui-hosts-deployment.md)
 10. The code wins over `CEM_RevitMCP.md`, which is legacy and partly stale → [0019](decisions/0019-single-authoritative-doc.md), [doc drift](concepts/doc-drift.md)
+11. Nothing writes under ACC or beside the DLL: logs and temp artefacts go through `CemTempFolder` to `%TEMP%\Cemengal\RevitMCP`; the guard test inventories every writer → [0026](decisions/0026-logs-and-artefacts-in-local-temp.md)
 
 **Before you change X, read Y**
 
@@ -44,6 +45,7 @@ add-ins → [Cemengal add-ins through the MCP](concepts/cemengal-addins-via-mcp.
 | `parent_*` / IFC-link reconstruction | [parent tools](modules/parent-tools.md) |
 | `send_code_to_revit` | [send code](modules/send-code-to-revit.md) |
 | TS server, registration, bundle | [server](modules/server.md), [0015](decisions/0015-single-file-bundle.md) |
+| Logs, screenshots, any file the plugin or a tool writes | [audit trails](concepts/audit-trails.md), [0026](decisions/0026-logs-and-artefacts-in-local-temp.md) |
 | Plugin, socket, dispatch, logging, security | [plugin](modules/plugin.md), [0021](decisions/0021-loopback-only-socket.md), [0013](decisions/0013-hardcoded-failsoft-audit-trails.md), [0014](decisions/0014-license-gated-listener.md), [0022](decisions/0022-local-shared-secret-handshake.md) |
 | `command.json` | [command registry](modules/command-registry.md) |
 | Csproj, build, deploy, CEM_RibbonUI | [build and deploy](workflows/build-and-deploy.md), [0011](decisions/0011-cem-ribbonui-hosts-deployment.md), [0024](decisions/0024-standalone-deploy-only-without-ribbon-host.md) |
@@ -78,7 +80,7 @@ add-ins → [Cemengal add-ins through the MCP](concepts/cemengal-addins-via-mcp.
 - [AI-grade conventions](concepts/ai-grade-conventions.md): helpers to use, message style, batches.
 - [domains and naming](concepts/domains-and-naming.md): namespace → prefix → folder map.
 - [upstream and fork](concepts/upstream-and-fork.md): what is upstream, what we changed, divergence.
-- [audit trails](concepts/audit-trails.md): Screenshots and the JSONL action log (no script persistence).
+- [audit trails](concepts/audit-trails.md): the action log, plugin log and Screenshots in `%TEMP%\Cemengal\RevitMCP` (no script persistence).
 - [doc drift and latent issues](concepts/doc-drift.md): stale claims and unfixed code issues found at bootstrap.
 - [Cemengal add-ins through the MCP](concepts/cemengal-addins-via-mcp.md): the `cem_*` tools, the add-in code each runs, what stays the user's.
 
@@ -115,9 +117,10 @@ add-ins → [Cemengal add-ins through the MCP](concepts/cemengal-addins-via-mcp.
 - [0020](decisions/0020-wiki-is-the-knowledge-base.md): `docs/` wiki is the knowledge base, searched through the machine's shared qmd server (current)
 - [0021](decisions/0021-loopback-only-socket.md): loopback-only socket, client pinned to 127.0.0.1, audited dispatch (current, our divergence)
 - [0022](decisions/0022-local-shared-secret-handshake.md): local shared-secret handshake (proposed)
-- [0023](decisions/0023-send-code-scripts-not-persisted.md): no `send_code_to_revit` script persistence; two audit trails (current)
+- [0023](decisions/0023-send-code-scripts-not-persisted.md): no `send_code_to_revit` script persistence; two audit trails (current; their location superseded by 0026)
 - [0024](decisions/0024-standalone-deploy-only-without-ribbon-host.md): standalone deploy only without a CEM_RibbonUI sibling (current)
 - [0025](decisions/0025-cemengal-addins-as-tools-via-project-references.md): the Cemengal add-ins are `cem_*` tools calling their own code through ProjectReferences (current)
+- [0026](decisions/0026-logs-and-artefacts-in-local-temp.md): logs and temp artefacts in `%TEMP%\Cemengal\RevitMCP`; nothing writes under ACC or beside the DLL (current, root 0031)
 
 ## Sources
 
@@ -125,6 +128,7 @@ Issues:
 
 - [CEM-EnriqueRuiz/CEM_API#50](sources/issues/CEM-EnriqueRuiz-CEM_API-50.md): Implement TDD system methodology (`0556fb0`).
 - [CEM-EnriqueRuiz/CEM_API#68](sources/issues/CEM-EnriqueRuiz-CEM_API-68.md): LLM wiki bootstrap and per-commit ingest workflow.
+- [CEM-EnriqueRuiz/CEM_API#82](sources/issues/CEM-EnriqueRuiz-CEM_API-82.md): nothing writes under ACC or beside the DLL; logs and temp artefacts in `%TEMP%\Cemengal\RevitMCP` ([0026](decisions/0026-logs-and-artefacts-in-local-temp.md)).
 
 Commits without an issue:
 

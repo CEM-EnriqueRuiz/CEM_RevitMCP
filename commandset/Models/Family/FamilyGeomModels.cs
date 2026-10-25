@@ -148,7 +148,8 @@ public class FamilySaveSessionRequest
     /// </summary>
     [JsonProperty("familyTitle")] public string FamilyTitle { get; set; } = "";
 
-    /// <summary>Save the family before loading/closing. Default true. Uses Save() when it has a path, else SaveAs to %TEMP%.</summary>
+    /// <summary>Save the family before loading/closing. Default true. Uses Save() on the user's own path; with no path, or
+    /// a path on ACC (never written from an MCP call), SaveAs to %TEMP%\Cemengal\RevitMCP\Families (root decision 0031).</summary>
     [JsonProperty("save")] public bool Save { get; set; } = true;
 
     /// <summary>Load the (saved) family back into the active project, overwriting an existing one. Default false.</summary>

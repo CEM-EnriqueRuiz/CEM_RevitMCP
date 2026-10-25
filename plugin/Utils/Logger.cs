@@ -1,19 +1,12 @@
-﻿using RevitMCPSDK.API.Interfaces;
+﻿using CEM_CSharpExtended.Hosting;
+using RevitMCPSDK.API.Interfaces;
 using System;
-using System.IO;
 
 namespace CEM_IAModeler.Utils
 {
     public class Logger : ILogger
     {
-        private readonly string _logFilePath;
         private LogLevel _currentLogLevel = LogLevel.Info;
-
-        public Logger()
-        {
-            _logFilePath = Path.Combine(PathManager.GetLogsDirectoryPath(), $"mcp_{DateTime.Now:yyyyMMdd}.log");
-
-        }
 
         public void Log(LogLevel level, string message, params object[] args)
         {
@@ -27,17 +20,10 @@ namespace CEM_IAModeler.Utils
             // Output to debug window.
             System.Diagnostics.Debug.WriteLine(logEntry);
 
-            // 写入日志文件
-            // Write to the logfile.
-            try
-            {
-                File.AppendAllText(_logFilePath, logEntry + Environment.NewLine);
-            }
-            catch
-            {
-                // 如果写入日志文件失败，不抛出异常
-                // If writing to the logfile fails, do not throw an exception.
-            }
+            // 写入日志文件：本机自清理的临时目录（根决策0031），不写在DLL旁边。失败不抛出异常。
+            // Write to today's mcp-yyyyMMdd.log in %TEMP%\Cemengal\RevitMCP (root decision 0031), never next to
+            // this DLL, which loads from ACC on colleagues' machines. AppendLog never throws.
+            CemTempFolder.AppendLog(McpLocalFiles.App, "mcp", logEntry);
         }
 
         public void Debug(string message, params object[] args)

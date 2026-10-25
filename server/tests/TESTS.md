@@ -75,3 +75,9 @@ this file only records it for anyone reading the test suite later.
 | File | Verifies | Why |
 |---|---|---|
 | `utils/connection.test.ts` | `ConnectionManager` pins `REVIT_HOST`=`127.0.0.1`, `REVIT_PORT`=8080, and `withRevitConnection` reaches a listener bound only to `127.0.0.1:8080` (skipped if 8080 is busy) | The Revit plugin binds IPv4 loopback only (`docs/decisions/0021-loopback-only-socket.md`); `localhost` may resolve to `::1` first. Mutation-checked: reverting the host to `localhost` fails the first test. |
+
+## No writes under ACC or beside the DLL (root decision 0031)
+
+| File | Verifies | Why |
+|---|---|---|
+| `guards/no-acc-writes.test.ts` | no ACC path in `plugin/`, `commandset/`, `server/src` or the csproj; no write to the raw `%TEMP%`, Desktop or Documents; no Node file write; no writer that derives its path from the add-in folder (`Assembly.Location`, `PathManager.`); every C# writer is on the inventory and takes its path from `CemTempFolder`; the action log, plugin log and screenshots in `%TEMP%\Cemengal\RevitMCP`; `create_project_parameter` restores the user's shared parameter file in `finally`; `family_save_session` never saves in place under ACC; `create_shared_parameter` works on a copy of a team shared parameter file on ACC and restores it; both projects reference `CEM_CSharpExtended` | The plugin loads from the ACC menu on colleagues' machines, so any write beside it or under ACC is synced to everyone (`docs/decisions/0026-logs-and-artefacts-in-local-temp.md`). The C# runs only in Revit (exempt), so the guard reads its source. Written first: 14 of 15 red, one per write found in the 2026-10-24 audit; the 16th (shared parameter file on ACC) was found later, added with its fix, and shown red by removing the ACC check. Mutation-checked: a planted writer with an ACC path and a `PathManager` path fails three tests; dropping the ACC check in `family_save_session` fails one. |

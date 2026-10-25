@@ -1,7 +1,7 @@
 ---
 title: commandset/ — the Revit command set (CEM_IAModeler_CommandSet)
 type: module
-updated: 2026-10-07
+updated: 2026-10-24
 sources: [commandset/CEM_IAModeler_CommandSet.csproj, commandset/Commands, commandset/Services, commandset/Models, commandset/Utils, command.json]
 related: [../concepts/four-part-tool-pattern.md, ../concepts/domains-and-naming.md, ../concepts/ai-grade-conventions.md, toolset.md]
 tags: [commandset, csharp]
@@ -53,8 +53,9 @@ cross-cutting request/result models: `CoreEditModels`, `GetParametersModels`, `P
 | `McpParameterUtils.cs` | parameter read/write by name/enum, storage types |
 | `McpFamilyUtils.cs` | `OverwriteFamilyLoadOptions`, structural-type parsing |
 | `McpMepUtils.cs` | MEP system/type helpers |
+| `McpLocalFiles.cs` | `App` (`RevitMCP`, the `%TEMP%\Cemengal\RevitMCP` folder) and `IsUnderAcc(path)`: every file the command set writes takes its path from `CemTempFolder`, never ACC ([0026](../decisions/0026-logs-and-artefacts-in-local-temp.md)) |
 | `ElementIdExtensions.cs` | `GetValue()`/`GetIntValue()` across versions ([0017](../decisions/0017-elementid-extensions-over-preprocessor.md)) |
-| `GeometryUtils`, `ProjectUtils`, `TransactionUtils`, `DeleteWarningSuperUtils`, `HandleDuplicateTypeUtils`, `JsonSchemaGenerator` | upstream helpers |
+| `GeometryUtils`, `ProjectUtils`, `TransactionUtils`, `DeleteWarningSuperUtils`, `HandleDuplicateTypeUtils`, `JsonSchemaGenerator` | upstream helpers (`ProjectUtils.SaveToDesktop`, an unused Desktop writer, was deleted in 0026) |
 | `2024.chm`, `RevitAPI_2024_namespaces.md`, `RevitAPI_2024_classes_by_namespace.txt` | API reference for domain mapping ([0003](../decisions/0003-domains-from-api-namespaces.md)); never shipped |
 
 ## Build facts
@@ -64,6 +65,10 @@ cross-cutting request/result models: `CoreEditModels`, `GetParametersModels`, `P
   `net8.0-windows10.0.19041.0`.
 - Packages: `RevitMCPSDK`, `Nice3point.Revit.*`, `Newtonsoft.Json`, `Microsoft.CodeAnalysis.CSharp`
   (Roslyn, for `send_code_to_revit`), and `System.Drawing.Common` on net8 (for `take_screenshot`).
+- `ProjectReference` to `CEM_CSharpExtended` (its `Hosting.CemTempFolder` places screenshots, shared parameter
+  files and families saved to be reloaded in `%TEMP%\Cemengal\RevitMCP\<Kind>`,
+  [0026](../decisions/0026-logs-and-artefacts-in-local-temp.md)). The CEM_RibbonUI stage copies `CEM_CSharpExtended.dll`
+  into `Commands\` with the rest of the output.
 - Standalone build: the `DeployCommandSet` target copies DLLs and `command.json` into
   `plugin/bin/AddIn <ver> <cfg>/CEM_IAModeler/Commands/CEM_IAModeler_CommandSet/` and, on Debug,
   into `%AppData%\Autodesk\Revit\Addins\<ver>\...`. Hosted build: skipped

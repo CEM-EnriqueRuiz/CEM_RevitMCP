@@ -1,6 +1,7 @@
 using System.IO;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using CEM_CSharpExtended.Hosting;
 using CEM_IAModeler_CommandSet.Models.Common;
 using CEM_IAModeler_CommandSet.Utils;
 using RevitMCPSDK.API.Interfaces;
@@ -33,13 +34,15 @@ namespace CEM_IAModeler_CommandSet.Services.Core
         public void Execute(UIApplication uiapp)
         {
             uiApp = uiapp;
+            string accFile = null;
 
             try
             {
                 var results = new List<SharedParameterResultInfo>();
                 var warnings = new List<string>();
+                var createdDefinitions = new List<string>();
 
-                DefinitionFile defFile = EnsureSharedParameterFile(warnings);
+                DefinitionFile defFile = EnsureSharedParameterFile(warnings, out accFile);
                 if (defFile == null)
                     throw new Exception("Could not open or create a shared parameter file");
 
@@ -78,6 +81,7 @@ namespace CEM_IAModeler_CommandSet.Services.Core
                             }
 
                             extDef = defGroup.Definitions.Create(options) as ExternalDefinition;
+                            if (extDef != null) createdDefinitions.Add(info.Name);
                         }
 
                         if (extDef == null)
@@ -181,6 +185,14 @@ namespace CEM_IAModeler_CommandSet.Services.Core
                     }
                 }
 
+                if (accFile != null)
+                    warnings.Add($"The shared parameter file is on ACC ({accFile}), where an MCP call never writes: this call " +
+                                 $"used a local copy ({app.SharedParametersFilename}) and Revit points at the ACC file again. " +
+                                 (createdDefinitions.Count > 0
+                                     ? $"New definitions ({string.Join(", ", createdDefinitions)}) are in the copy and the project, " +
+                                       "not in the team file; add them there from Revit's Shared Parameters dialog if the team needs them."
+                                     : "No definition was added; existing ones kept their GUIDs."));
+
                 string message = $"Successfully processed {results.Count} shared parameter(s).";
                 if (warnings.Count > 0)
                     message += "\n\n⚠ Warnings:\n  • " + string.Join("\n  • ", warnings);
@@ -202,19 +214,37 @@ namespace CEM_IAModeler_CommandSet.Services.Core
             }
             finally
             {
+                // The team file on ACC stays the configured one; only this call used the copy.
+                if (accFile != null)
+                {
+                    try { app.SharedParametersFilename = accFile; } catch { /* Revit keeps the copy until the user resets it */ }
+                }
                 _resetEvent.Set();
             }
         }
 
         /// <summary>
-        /// Opens the configured shared parameter file, creating a temporary one if none exists
+        /// Opens the configured shared parameter file, creating a temporary one if none exists. A configured file on ACC
+        /// (shared team data, never written from an MCP call, root decision 0031) is copied to the pruned SharedParameters
+        /// folder and the copy is opened: <paramref name="accFile"/> is then the original, which the caller restores.
         /// </summary>
-        private DefinitionFile EnsureSharedParameterFile(List<string> warnings)
+        private DefinitionFile EnsureSharedParameterFile(List<string> warnings, out string accFile)
         {
+            accFile = null;
             string current = app.SharedParametersFilename;
-            if (string.IsNullOrWhiteSpace(current) || !File.Exists(current))
+            if (!string.IsNullOrWhiteSpace(current) && File.Exists(current) && McpLocalFiles.IsUnderAcc(current))
             {
-                string tempPath = Path.Combine(Path.GetTempPath(), "RevitMCP_SharedParameters.txt");
+                string copy = CemTempFolder.NewArtifactFile(McpLocalFiles.App, "SharedParameters", "acc_copy", ".txt");
+                File.Copy(current, copy);
+                accFile = current;
+                app.SharedParametersFilename = copy;
+            }
+            else if (string.IsNullOrWhiteSpace(current) || !File.Exists(current))
+            {
+                // One fixed file in the pruned SharedParameters folder (root decision 0031). Revit keeps pointing at it
+                // (and remembers it in Revit.ini), so later calls reuse it; once pruned, the next call makes a new one.
+                string tempPath = Path.Combine(CemTempFolder.ArtifactFolder(McpLocalFiles.App, "SharedParameters"),
+                    "RevitMCP_SharedParameters.txt");
                 if (!File.Exists(tempPath))
                     File.WriteAllText(tempPath, string.Empty);
 

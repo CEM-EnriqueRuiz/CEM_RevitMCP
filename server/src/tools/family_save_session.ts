@@ -5,7 +5,7 @@ import { withRevitConnection } from "../utils/ConnectionManager.js";
 export function registerFamilySaveSessionTool(server: McpServer) {
   server.tool(
     "family_save_session",
-    "Finish a family-edit session: save the open family (Save in place, or SaveAs to a temp .rfa if it has no path), optionally load it back into the project overwriting the existing one, and optionally close it. Pair with family_open_session.",
+    "Finish a family-edit session: save the open family (Save in place on the user's own path; SaveAs to a local temp .rfa, %TEMP%\\Cemengal\\RevitMCP\\Families, if it has no path or its file is on ACC, which is never written from here), optionally load it back into the project overwriting the existing one, and optionally close it. Pair with family_open_session.",
     {
       familyTitle: z.string().optional().describe("Title of the open family to act on; omit if only one family is open"),
       save: z.boolean().optional().describe("Save the family before loading/closing. Default true"),

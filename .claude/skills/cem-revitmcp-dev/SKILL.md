@@ -34,6 +34,7 @@ add-ins), load [cem-aimodeler](../cem-aimodeler/SKILL.md) instead.
 10. The code wins over `CEM_RevitMCP.md` (legacy, partly stale) → [doc drift](../../../docs/concepts/doc-drift.md)
 11. `send_code_to_revit` scripts are not persisted: no `Recipes\` dump (removed as noise, don't reintroduce), and the action log omits the body → [0023](../../../docs/decisions/0023-send-code-scripts-not-persisted.md)
 12. No CEM_API calls here today (the server talks to Revit only); any future one goes through CEM_CSharpExtended's `Api`, never a route or URL in this repo → root [0023](../../../../../docs/decisions/0023-one-shared-request-layer.md)
+13. Nothing writes under ACC or beside the DLL: logs and temporary artefacts go through CEM_CSharpExtended's `CemTempFolder` to `%TEMP%\Cemengal\RevitMCP` (`McpLocalFiles.App`); a new writer goes on the inventory of `server/tests/guards/no-acc-writes.test.ts` → [0026](../../../docs/decisions/0026-logs-and-artefacts-in-local-temp.md), root [0031](../../../../../docs/decisions/0031-nothing-writes-under-acc-logs-in-local-temp.md)
 
 The step-by-step procedure is in [add a tool](../../../docs/workflows/add-a-tool.md).
 

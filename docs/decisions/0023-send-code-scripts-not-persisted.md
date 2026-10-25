@@ -2,15 +2,19 @@
 title: "0023 send_code_to_revit scripts are not persisted; two audit trails remain"
 type: decision
 status: current
-updated: 2026-10-07
+updated: 2026-10-24
 sources: [fe06b6c, plugin/Utils/ActionLogger.cs, commandset/Commands/ExecuteDynamicCode/ExecuteCodeEventHandler.cs]
-related: [0013-hardcoded-failsoft-audit-trails.md, 0008-parent-tools-from-recipe-corpus.md, ../concepts/audit-trails.md, ../modules/send-code-to-revit.md]
+related: [0026-logs-and-artefacts-in-local-temp.md, 0013-hardcoded-failsoft-audit-trails.md, 0008-parent-tools-from-recipe-corpus.md, ../concepts/audit-trails.md, ../modules/send-code-to-revit.md]
 tags: [audit, logging, send-code]
 ---
 
 # 0023 send_code_to_revit scripts are not persisted; two audit trails remain
 
 Supersedes [0013](0013-hardcoded-failsoft-audit-trails.md) (three trails, including `Recipes\`).
+
+**Location superseded by [0026](0026-logs-and-artefacts-in-local-temp.md) (2026-10-24):** the two trails no
+longer live under the hard-coded ACC `…\05-CEMAIModeler\` root but in `%TEMP%\Cemengal\RevitMCP` (root decision
+0031). The rest of this decision (no script persistence, `"<omitted>"` bodies) stands.
 
 ## Context
 

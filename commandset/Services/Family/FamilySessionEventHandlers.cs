@@ -1,6 +1,7 @@
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using CEM_CSharpExtended.Hosting;
 using CEM_IAModeler_CommandSet.Models.Common;
 using CEM_IAModeler_CommandSet.Models.Family;
 using CEM_IAModeler_CommandSet.Utils;
@@ -142,18 +143,32 @@ namespace CEM_IAModeler_CommandSet.Services.Family
 
                 string savedPath = famDoc.PathName;
 
-                // 1) Save (in place if it has a path, else SaveAs to %TEMP%).
+                // 1) Save: in place on the user's own path; otherwise SaveAs to the pruned Families temp folder
+                //    (root decision 0031). That covers a family with no path and one whose file is on ACC: an MCP call
+                //    never writes under ACC, where a library .rfa is shared team data. The family's name is its file
+                //    name, so the copy keeps it; SaveAs moves the document onto the copy, which later saves and the
+                //    load below use.
                 if (Request.Save)
                 {
-                    if (!string.IsNullOrEmpty(savedPath))
+                    if (!string.IsNullOrEmpty(savedPath) && !McpLocalFiles.IsUnderAcc(savedPath))
                     {
                         famDoc.Save();
                     }
                     else
                     {
-                        string safe = string.Concat(famDoc.Title.Split(System.IO.Path.GetInvalidFileNameChars()));
-                        savedPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), safe + ".rfa");
+                        string accOriginal = savedPath;
+                        string name = !string.IsNullOrEmpty(accOriginal)
+                            ? System.IO.Path.GetFileNameWithoutExtension(accOriginal)
+                            : famDoc.Title.EndsWith(".rfa", StringComparison.OrdinalIgnoreCase)
+                                ? famDoc.Title.Substring(0, famDoc.Title.Length - 4)
+                                : famDoc.Title;
+                        string safe = string.Concat(name.Split(System.IO.Path.GetInvalidFileNameChars()));
+                        savedPath = System.IO.Path.Combine(CemTempFolder.ArtifactFolder(McpLocalFiles.App, "Families"), safe + ".rfa");
                         famDoc.SaveAs(savedPath, new SaveAsOptions { OverwriteExistingFile = true });
+                        if (!string.IsNullOrEmpty(accOriginal))
+                            res.Warnings.Add($"The family's file is on ACC ({accOriginal}), where an MCP call never writes: " +
+                                             $"the ACC original is untouched, and the family was saved as a copy to {savedPath}, " +
+                                             "which the open document now uses. To update the shared library, save it there from Revit yourself.");
                     }
                     res.Saved = true;
                     res.SavedPath = savedPath;

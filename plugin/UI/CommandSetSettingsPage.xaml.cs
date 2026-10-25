@@ -44,8 +44,10 @@ namespace CEM_IAModeler.UI
                 // 1. First load all command set folders, establish available command collections
                 Dictionary<string, CommandSet> availableCommandSets = new Dictionary<string, CommandSet>();
                 HashSet<string> availableCommandNames = new HashSet<string>();
-                // Get all command set directories
-                string[] commandSetDirectories = Directory.GetDirectories(commandsDirectory);
+                // Get all command set directories (Commands\ is the deploy's; it is never created here)
+                string[] commandSetDirectories = Directory.Exists(commandsDirectory)
+                    ? Directory.GetDirectories(commandsDirectory)
+                    : new string[0];
                 foreach (var directory in commandSetDirectories)
                 {
                     // Skip special folders or hidden folders
@@ -147,20 +149,20 @@ namespace CEM_IAModeler.UI
                         }
                     }
                 }
-                // 2. Load registry, update command enabled status, and clean up non-existent commands
+                // 2. Load registry and update command enabled status. Read only: the registry is the one the deploy
+                //    shipped next to the add-in (the ACC menu on colleagues' machines), so it is never rewritten here
+                //    (root decision 0031). The upstream "clean up" rewrite found no command sets in the Cemengal
+                //    layout and emptied the registry.
                 if (File.Exists(registryFilePath))
                 {
                     string registryJson = File.ReadAllText(registryFilePath);
                     var registry = JsonConvert.DeserializeObject<CommandRegistryJson>(registryJson);
                     if (registry?.Commands != null)
                     {
-                        // Keep only valid commands
-                        List<CommandConfig> validCommands = new List<CommandConfig>();
                         foreach (var registryItem in registry.Commands)
                         {
                             if (availableCommandNames.Contains(registryItem.CommandName))
                             {
-                                validCommands.Add(registryItem);
                                 // Update the enabled status of this command in all command sets
                                 foreach (var commandSet in availableCommandSets.Values)
                                 {
@@ -171,13 +173,6 @@ namespace CEM_IAModeler.UI
                                     }
                                 }
                             }
-                        }
-                        // If there are invalid commands, update the registry file
-                        if (validCommands.Count != registry.Commands.Count)
-                        {
-                            registry.Commands = validCommands;
-                            string updatedJson = JsonConvert.SerializeObject(registry, Formatting.Indented);
-                            File.WriteAllText(registryFilePath, updatedJson);
                         }
                     }
                 }
@@ -266,102 +261,13 @@ namespace CEM_IAModeler.UI
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                string registryFilePath = PathManager.GetCommandRegistryFilePath();
-                // 读取现有的注册表以保留完整的命令信息
-                Dictionary<string, CommandConfig> existingCommandsDict = new Dictionary<string, CommandConfig>();
-                if (File.Exists(registryFilePath))
-                {
-                    string registryJson = File.ReadAllText(registryFilePath);
-                    var existingRegistry = JsonConvert.DeserializeObject<CommandRegistryJson>(registryJson);
-                    if (existingRegistry?.Commands != null)
-                    {
-                        foreach (var cmd in existingRegistry.Commands)
-                        {
-                            existingCommandsDict[cmd.CommandName] = cmd;
-                        }
-                    }
-                }
-                // 创建新的registry对象
-                CommandRegistryJson registry = new CommandRegistryJson();
-                registry.Commands = new List<CommandConfig>();
-                // 收集所有"已启用"的命令
-                foreach (var commandSet in commandSets)
-                {
-                    // 尝试从command.json中获取开发者信息
-                    var commandSetDeveloper = new DeveloperInfo { Name = "Unspecified", Email = "Unspecified" };
-                    string commandJsonPath = Path.Combine(PathManager.GetCommandsDirectoryPath(),
-                        commandSet.Name, "command.json");
-                    if (File.Exists(commandJsonPath))
-                    {
-                        try
-                        {
-                            string commandJson = File.ReadAllText(commandJsonPath);
-                            var commandSetData = JsonConvert.DeserializeObject<CommandJson>(commandJson);
-                            if (commandSetData != null)
-                            {
-                                commandSetDeveloper = commandSetData.Developer ?? commandSetDeveloper;
-                            }
-                        }
-                        catch { /* 如果解析失败，使用默认值 */ }
-                    }
-
-                    foreach (var command in commandSet.Commands)
-                    {
-                        // 只添加启用的命令到注册表
-                        if (command.Enabled)
-                        {
-                            CommandConfig newConfig;
-                            // 检查命令是否已经存在于之前的注册表中
-                            if (existingCommandsDict.ContainsKey(command.CommandName))
-                            {
-                                // 如果存在，保留原有信息，只更新启用状态和路径模板
-                                newConfig = existingCommandsDict[command.CommandName];
-                                newConfig.Enabled = true;
-                                newConfig.AssemblyPath = command.AssemblyPath;
-                                newConfig.SupportedRevitVersions = command.SupportedRevitVersions;
-                            }
-                            else
-                            {
-                                // 如果是新命令，创建新配置
-                                newConfig = new CommandConfig
-                                {
-                                    CommandName = command.CommandName,
-                                    AssemblyPath = command.AssemblyPath ?? "",
-                                    Enabled = true,
-                                    Description = command.Description,
-                                    SupportedRevitVersions = command.SupportedRevitVersions,
-                                    Developer = commandSetDeveloper
-                                };
-                            }
-                            registry.Commands.Add(newConfig);
-                        }
-                    }
-                }
-                // 构建摘要以显示
-                string enabledFeaturesText = "";
-                int enabledCount = registry.Commands.Count;
-                foreach (var command in registry.Commands)
-                {
-                    string commandSetName = commandSets
-                        .FirstOrDefault(cs => cs.Commands.Any(c => c.CommandName == command.CommandName))?.Name ?? "Unknown";
-                    string versions = command.SupportedRevitVersions != null && command.SupportedRevitVersions.Any()
-                        ? $" (Revit {string.Join(", ", command.SupportedRevitVersions)})"
-                        : "";
-                    enabledFeaturesText += $"• {commandSetName}: {command.CommandName}\n";
-                }
-                // 序列化并保存到文件
-                string json = JsonConvert.SerializeObject(registry, Formatting.Indented);
-                File.WriteAllText(registryFilePath, json);
-                MessageBox.Show($"Command set settings successfully saved!\n\nEnabled {enabledCount} commands:\n{enabledFeaturesText}",
-                              "Settings Saved", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error saving settings: {ex.Message}", "Error",
-                              MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            // Read only (root decision 0031): the registry is the one the deploy shipped next to the add-in, which
+            // loads from the ACC menu on colleagues' machines, so a save here would be synced to the whole team.
+            // A tool is enabled or disabled in command.json (CEM_RevitMCP) and shipped by the next deploy.
+            MessageBox.Show("The command registry ships with the add-in and is read-only here: it is never written " +
+                            "next to the add-in, which loads from ACC on colleagues' machines.\n\n" +
+                            "To enable or disable a tool, change command.json in CEM_RevitMCP and redeploy.",
+                            "Read-only", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void OpenFolderButton_Click(object sender, RoutedEventArgs e)

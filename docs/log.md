@@ -1,7 +1,7 @@
 ---
 title: CEM_RevitMCP wiki log
 type: log
-updated: 2026-10-08
+updated: 2026-10-25
 sources: []
 related: [index.md]
 tags: [log]
@@ -108,3 +108,13 @@ and the index.
 
 ## [2026-10-11] ingest | CEM-EnriqueRuiz/CEM_API#74 the request-layer rule in the cem-revitmcp-dev skill
 The 2026-10-11 review found no CEM_API request in this repo. At the user's request, hard rule 12 records that any future call goes through CEM_CSharpExtended's `Api` (root 0023). Source page: [CEM_API#74](sources/issues/CEM-EnriqueRuiz-CEM_API-74.md).
+
+## [2026-10-25] ingest | CEM-EnriqueRuiz/CEM_API#82 Nothing writes under ACC or beside the DLL; logs in %TEMP%\Cemengal\RevitMCP
+Root decision 0031 applied here as [0026](decisions/0026-logs-and-artefacts-in-local-temp.md) (current). The action log, the plugin
+log, screenshots and the shared-parameter and family temp files go through CEM_CSharpExtended's `CemTempFolder` to
+`%TEMP%\Cemengal\RevitMCP`. `PathManager` creates nothing beside the DLL, and the settings page is read-only.
+`family_save_session` and `create_shared_parameter` never write a file on ACC. The `create_project_parameter` restore moved into
+`finally`. A vitest guard inventories every writer (62/62). Live in Revit 2024 the files landed in the user's temp after
+CEM_CSharpExtended's `UserTempPath` fix, and the watcher saw 0 ACC events. Source page:
+[CEM_API#82](sources/issues/CEM-EnriqueRuiz-CEM_API-82.md). Updated 0023, 0026, audit trails, doc drift, plugin, commandset, tests,
+test, smoke test (Claude Desktop now runs the repo build), index, and both skills.

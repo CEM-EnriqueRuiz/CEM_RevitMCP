@@ -71,6 +71,12 @@
     <ItemGroup>
         <ProjectReference Include="..\..\..\CEM_RevitAPI\CEM_RevitAuth\CEM_RevitAuth.csproj"/>
     </ItemGroup>
+    <!-- Logs go to the local, self-cleaning %TEMP%\Cemengal\RevitMCP through CemTempFolder, never next to this DLL,
+         which loads from the ACC menu on colleagues' machines (root decision 0031, docs/decisions/0026).
+         CEM_CSharpExtended.dll ships beside CEM_IAModeler.dll (CEM_RevitAuth already brings it). -->
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\CEM_CSharpExtended\CEM_CSharpExtended\CEM_CSharpExtended.csproj"/>
+    </ItemGroup>
     <ItemGroup>
         <Resource Include="Core\Ressources\icon-16.png"/>
         <Resource Include="Core\Ressources\icon-32.png"/>

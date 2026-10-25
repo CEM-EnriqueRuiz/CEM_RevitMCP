@@ -1,5 +1,6 @@
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using CEM_CSharpExtended.Hosting;
 using CEM_IAModeler_CommandSet.Models.Common;
 using CEM_IAModeler_CommandSet.Utils;
 using RevitMCPSDK.API.Interfaces;
@@ -177,38 +178,47 @@ namespace CEM_IAModeler_CommandSet.Services.Core
                 if (catSet.IsEmpty) { Fail(res, "No valid categories to bind."); return; }
 
                 // Use a temporary shared parameter file to define the parameter, then bind as project param.
+                // It lives for this call only, in the pruned SharedParameters folder (root decision 0031); the user's
+                // own file is restored in finally, whatever happens.
                 string original = app.SharedParametersFilename;
-                string tmp = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"mcp_proj_{Guid.NewGuid():N}.txt");
-                System.IO.File.WriteAllText(tmp, "");
-                app.SharedParametersFilename = tmp;
-
-                using (var tx = new Transaction(doc, "Create Project Parameter"))
+                string tmp = CemTempFolder.NewArtifactFile(McpLocalFiles.App, "SharedParameters", "project_parameter", ".txt");
+                try
                 {
-                    tx.Start();
-                    var defFile = app.OpenSharedParameterFile();
-                    var group = defFile.Groups.Create("MCP");
-                    var opts = new ExternalDefinitionCreationOptions(Request.Name,
-#if REVIT2022_OR_GREATER
-                        McpParameterUtils.GetSpecTypeId(Request.DataType)
-#else
-                        McpParameterUtils.GetParameterType(Request.DataType)
-#endif
-                        );
-                    var extDef = group.Definitions.Create(opts) as ExternalDefinition;
+                    System.IO.File.WriteAllText(tmp, "");
+                    app.SharedParametersFilename = tmp;
 
-                    Binding binding = Request.IsInstance
-                        ? (Binding)app.Create.NewInstanceBinding(catSet)
-                        : (Binding)app.Create.NewTypeBinding(catSet);
+                    using (var tx = new Transaction(doc, "Create Project Parameter"))
+                    {
+                        tx.Start();
+                        var defFile = app.OpenSharedParameterFile();
+                        var group = defFile.Groups.Create("MCP");
+                        var opts = new ExternalDefinitionCreationOptions(Request.Name,
+#if REVIT2022_OR_GREATER
+                            McpParameterUtils.GetSpecTypeId(Request.DataType)
+#else
+                            McpParameterUtils.GetParameterType(Request.DataType)
+#endif
+                            );
+                        var extDef = group.Definitions.Create(opts) as ExternalDefinition;
+
+                        Binding binding = Request.IsInstance
+                            ? (Binding)app.Create.NewInstanceBinding(catSet)
+                            : (Binding)app.Create.NewTypeBinding(catSet);
 
 #if REVIT2022_OR_GREATER
-                    doc.ParameterBindings.Insert(extDef, binding, McpParameterUtils.GetGroupTypeId(Request.Group));
+                        doc.ParameterBindings.Insert(extDef, binding, McpParameterUtils.GetGroupTypeId(Request.Group));
 #else
-                    doc.ParameterBindings.Insert(extDef, binding, McpParameterUtils.GetParameterGroup(Request.Group));
+                        doc.ParameterBindings.Insert(extDef, binding, McpParameterUtils.GetParameterGroup(Request.Group));
 #endif
-                    res.Count = 1;
-                    tx.Commit();
+                        res.Count = 1;
+                        tx.Commit();
+                    }
                 }
-                app.SharedParametersFilename = original ?? "";
+                finally
+                {
+                    app.SharedParametersFilename = original ?? "";
+                    try { System.IO.File.Delete(tmp); } catch { /* pruned with the folder */ }
+                }
                 Result = new AIResult<CoreEditResult> { Success = true, Message = $"Created project parameter '{Request.Name}' bound to {catSet.Size} category(ies).", Response = res };
             }
             catch (Exception ex) { Fail(res, ex.Message); }

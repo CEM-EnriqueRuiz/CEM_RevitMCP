@@ -1,9 +1,9 @@
 ---
 title: Known doc drift and latent issues
 type: concept
-updated: 2026-10-07
+updated: 2026-10-24
 sources: [CEM_RevitMCP.md, server/tests/TESTS.md, server/manifest.json, server/src/tools/register.ts, .github/workflows/release.yml, README.md, command.json]
-related: [../decisions/0019-single-authoritative-doc.md, ../decisions/0012-drop-sqlite-store-pack.md, ../decisions/0015-single-file-bundle.md]
+related: [../decisions/0026-logs-and-artefacts-in-local-temp.md, ../decisions/0019-single-authoritative-doc.md, ../decisions/0012-drop-sqlite-store-pack.md, ../decisions/0015-single-file-bundle.md]
 tags: [drift, gotchas, todo]
 ---
 
@@ -47,11 +47,24 @@ the truth.** None of these were fixed in code; each needs its own change with an
   host, cannot build R26 for that reason, and since [0025](../decisions/0025-cemengal-addins-as-tools-via-project-references.md)
   neither can the command set. A fix belongs in CEM_RevitAPI (it needs a version-dependent call, which that
   repo flags before adding).
+- ~~**Revit's per-session temp folder**~~ **resolved** 2026-10-24 (found live the same day): Revit 2024 sets its process
+  TMP/TEMP to `%TEMP%\<session-guid>\`, so `Path.GetTempPath()` inside Revit lands there. CEM_CSharpExtended's
+  `CemTempFolder` now resolves `UserTempPath` (the user's TEMP) instead, and a live re-check confirmed it
+  ([0026](../decisions/0026-logs-and-artefacts-in-local-temp.md)). Any other code in Revit that calls `Path.GetTempPath()`
+  directly still gets the session folder.
 - **`CommandManager` instantiates every command type per registry entry** (126 × ~126 reflection
   constructions at startup; upstream design). It works but is wasteful. Its success log line also
   says "Failed to create command instance", an upstream copy-paste typo.
-- **Hardcoded audit root**, now in two files (`ActionLogger`, `TakeScreenshotEventHandler`). The
+- ~~**Hardcoded audit root**~~ **resolved** 2026-10-24 by [0026](../decisions/0026-logs-and-artefacts-in-local-temp.md):
+  `ActionLogger` and `TakeScreenshotEventHandler` wrote under ACC; both now go to `%TEMP%\Cemengal\RevitMCP`. The
   third (Recipes) was removed in `fe06b6c` ([0023](../decisions/0023-send-code-scripts-not-persisted.md)).
+- ~~**The settings page empties the shipped registry**~~ **resolved** 2026-10-24 by
+  [0026](../decisions/0026-logs-and-artefacts-in-local-temp.md) (found then): the upstream `CommandSetSettingsPage`
+  "cleaned" `commandRegistry.json` on load. In the Cemengal layout it finds no `Commands\<set>\command.json`, so it
+  rewrote the registry empty, beside the DLL. The page is read-only now.
+- ~~**`create_project_parameter` leaves Revit on a temp shared parameter file**~~ **resolved** 2026-10-24
+  ([0026](../decisions/0026-logs-and-artefacts-in-local-temp.md)): on an exception it skipped restoring
+  `SharedParametersFilename`; the restore is in `finally` now.
 - ~~**`.gitignore` ignores `.claude/`**~~ **resolved** in `29b3fba`: `.claude/*` is ignored except
   `agents/` and `skills/cem-revitmcp-dev/`. `.claude/settings.json` is tracked (force-added) even
   though the rule still matches it.
@@ -62,3 +75,13 @@ the truth.** None of these were fixed in code; each needs its own change with an
 - **Remote agent definition drifted from the wiki** (resolved at the 2026-10-07 DOCS catch-up):
   `.claude/agents/cem-revitmcp-dev.md` (`29b3fba`) called `CEM_RevitMCP.md` authoritative and said
   to update its §5/§7. It now points to `docs/index.md`.
+
+## Found 2026-10-24 (the [0026](../decisions/0026-logs-and-artefacts-in-local-temp.md) pass; reported, not fixed)
+
+| Where | Claim | Reality |
+|---|---|---|
+| `CEM_RevitMCP.md` (intro, lines 37 and 277) | two logs under `…\05-CEMAIModeler\`, `Log\actions_*.jsonl` | `%TEMP%\Cemengal\RevitMCP\actions-yyyyMMdd.jsonl` and `Screenshots\` ([audit trails](audit-trails.md)) |
+| [0008](../decisions/0008-parent-tools-from-recipe-corpus.md), [0021](../decisions/0021-loopback-only-socket.md), `sources/commits/2026-10.md` | `Log\actions_*.jsonl` | the same log, now `%TEMP%\Cemengal\RevitMCP\actions-<date>.jsonl`; these record history and were left as written |
+| [0024](../decisions/0024-standalone-deploy-only-without-ribbon-host.md), Context | "`PathManager` creates one [registry] when none exists" | true then; since 0026 `PathManager` creates nothing and a missing registry loads no commands |
+| [build and deploy](../workflows/build-and-deploy.md) | use the Cemengal-provisioned SDK `%LOCALAPPDATA%\Cemengal\dotnet\dotnet.exe` | absent on the development machine on 2026-10-24; `dotnet` on PATH (SDK 10.0.402) built R24 |
+| [build and deploy](../workflows/build-and-deploy.md), [smoke test](../workflows/smoke-test.md) | the ribbon button is **CEM_RevitAI** | CEM_RibbonUI adds it as `CEM_AIModeler` (`AddPushButton<MCPServiceConnection>("CEM_AIModeler")`), as the `cem-aimodeler` skill says |

@@ -38,13 +38,19 @@ namespace CEM_IAModeler.Configuration
                 }
                 else
                 {
-                    _logger.Error("未找到配置文件\nNo configuration file found.");
+                    // The deploy ships the registry; it is never created here, beside the DLL (root decision 0031).
+                    _logger.Error("未找到配置文件\nNo configuration file found: {0}", _configPath);
                 }
             }
             catch (Exception ex)
             {
                 _logger.Error("加载配置文件失败: {0}\nFailed to load configuration file: {0}", ex.Message);
             }
+
+            // 没有或无法读取配置时不加载任何命令。
+            // A missing or unreadable registry loads no commands.
+            if (Config == null)
+                Config = new FrameworkConfig();
 
             // 记录加载时间
             // Register load time.
