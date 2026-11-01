@@ -1,15 +1,15 @@
 ---
-title: The toolset (126 commands by domain)
+title: The toolset (127 commands by domain)
 type: module
-updated: 2026-10-07
-sources: [command.json, commandset/Commands, server/src/tools, 86cf705]
+updated: 2026-11-01
+sources: [https://github.com/CEMENGAL/CEM_Workspace/issues/5, command.json, commandset/Commands, server/src/tools, 86cf705, commandset/Services/Views/ExportViewImageEventHandler.cs, server/tests/guards/modeller-pins.test.ts]
 related: [../concepts/domains-and-naming.md, ../decisions/0006-create-methods-not-full-parity.md, ../concepts/upstream-and-fork.md]
 tags: [toolset, catalog]
 ---
 
-# The toolset (126 commands by domain)
+# The toolset (127 commands by domain)
 
-`command.json` is the source of truth: 126 entries, all matched by a C# `CommandName`. **124 have a
+`command.json` is the source of truth: 127 entries, all matched by a C# `CommandName`. **125 have a
 TS tool.** `tag_walls` and `tag_rooms` are registered in C# but have no TS wrapper. This is **deliberate**: they were
 consolidated into the single `tag_elements` tool, and the C# side still serves both names (user note in
 `CEM_RevitMCP.md`, `29b3fba`). Regenerate with `grep -o '"commandName"[^,]*' command.json`.
@@ -19,7 +19,7 @@ else was added by Cemengal.
 
 | Folder | n | Commands |
 |---|---|---|
-| `Access` | 8 | ai_element_filter†, get_available_family_types†, get_current_view_elements†, get_current_view_info†, get_selected_elements†, operate_element†, get_element_parameters, get_warnings |
+| `Access` | 8 | ai_element_filter†, get_available_family_types†, get_current_view_elements†, get_current_view_info†, get_selected_elements†, operate_element†, get_element_parameters, get_warnings. **`Access` is not a read-only folder:** `operate_element` deletes, hides, colours and makes section boxes |
 | `Cemengal` | 6 | cem_open_tool, cem_swap_find_types, cem_swap_list_presets, cem_swap_run, cem_swap_remove_trial, cem_rules_apply: the Cemengal add-ins' own code, by ProjectReference ([concept](../concepts/cemengal-addins-via-mcp.md), [0025](../decisions/0025-cemengal-addins-as-tools-via-project-references.md)) |
 | `AnnotationComponents` | 5 | create_dimensions†, tag_rooms† (no TS), tag_walls† (no TS), tag_elements, take_screenshot |
 | `Architecture` | 14 | arch_create_wall, arch_create_floor, arch_create_ceiling, arch_create_roof, arch_create_curtain_wall, arch_create_opening, arch_create_room, arch_create_stairs, arch_create_railing, arch_create_area, arch_create_area_plan, arch_create_separator, arch_join_geometry, arch_unjoin_geometry |
@@ -37,7 +37,16 @@ else was added by Cemengal.
 | `ParentTools` | 4 | parent_link_extract_geometry, parent_solid_to_member_params, parent_reconstruct_native, parent_validate_deviation ([module](parent-tools.md)) |
 | `Struct` | 5 | create_structural_framing_system†, struct_create_beam, struct_create_brace, struct_create_column, struct_create_foundation |
 | `Test` | 1 | say_hello† |
-| `Views` | 12 | create_view, duplicate_view, set_view_properties, create_sheet, place_viewport, create_schedule, create_legend, create_view_filter, apply_filter_to_view, place_text, create_filled_region, create_revision |
+| `Views` | 13 | create_view, duplicate_view, set_view_properties, create_sheet, place_viewport, create_schedule, create_legend, create_view_filter, apply_filter_to_view, place_text, create_filled_region, create_revision, export_view_image (read: one view to a PNG in `images\`; its detail level is set in a rolled-back transaction group. An unsafe view name (`/`, `..`) is replaced inside that group, and the file Revit will write must be directly in `images\` (`ImageExportOptions.GetFileName`) before it exports: SEC-2, CWE-22. Revit 2024's own name already turns `/` and `.` into `-`, so this is defence in depth) |
+
+## Access tags (read / write)
+
+`command.json` entries may carry `"access": "read"` or `"access": "write"`, for the read-only supervisor profile that
+is planned but not built (per-client exposure and enforcement are later work;
+[0007](../decisions/0007-personas-deferred.md) deferred personas). Today only `export_view_image` is tagged `read`.
+`server/tests/guards/modeller-pins.test.ts` requires its tag and allows no other values. The plugin ignores the field
+(Newtonsoft skips unknown properties). An untagged entry is unclassified, not read. The folder is no guide:
+`operate_element`, in `Access`, writes.
 
 ## Overlaps to know about
 
@@ -64,6 +73,7 @@ else was added by Cemengal.
 10. ParentTools
 11. Family-edit session and geometry upgrade, 2026-06-14
 12. Cemengal add-ins (`cem_*`), 2026-10-07
+13. `export_view_image`, for the modelling agent's visual checks, 2026-11-01
 
 Steps 1–4 landed in `b04b41e`; the rest in `aa88b96`. What's deferred and why:
 [0006](../decisions/0006-create-methods-not-full-parity.md). Persona filtering:

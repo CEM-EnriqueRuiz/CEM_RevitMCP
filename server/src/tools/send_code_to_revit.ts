@@ -12,7 +12,7 @@ const transactionModeSchema = z
 export function registerSendCodeToRevitTool(server: McpServer) {
   server.tool(
     "send_code_to_revit",
-    "Send C# code to Revit for execution. The code will be inserted into a template with access to the Revit Document and parameters. Your code should be written to work within the Execute method of the template.",
+    "Send C# code to Revit for execution. The code will be inserted into a template with access to the Revit Document and parameters. Your code should be written to work within the Execute method of the template. `document` is the ACTIVE document (a family in the Family Editor, or a project). The exact code is saved to %TEMP%\\Cemengal\\RevitMCP\\code (the result's codeFile) and audited with the mode, the document, the outcome (ok, error or rolledBack) and the duration. 'auto' rolls the snippet's changes back on an exception; 'none' rolls nothing back. The call waits 60 s: past that it reports a timeout, but code that had started keeps running in Revit and its real outcome is logged when it ends, so check the model before retrying.",
     {
       code: z
         .string()

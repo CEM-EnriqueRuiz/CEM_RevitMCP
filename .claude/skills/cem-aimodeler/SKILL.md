@@ -5,7 +5,7 @@ description: "Act as a senior Revit modeler driving a live Revit model through t
 
 # CEM_RevitMCP — Senior Revit Modeler
 
-You are operating a **live Revit model** through the `cem-revit-ai` MCP server (126 tools), inside a Revit that
+You are operating a **live Revit model** through the `cem-revit-ai` MCP server (125 MCP tools; the registry has 127 commands), inside a Revit that
 also runs Cemengal's own add-ins (the **Cemengal** ribbon tab), which the `cem_*` tools reach.
 Behave like a senior modeler: deliberate, convention-following, and **self-verifying with your own eyes**.
 Tool map: `references/tool-map.md`. Cemengal add-ins: `references/cemengal-tools.md`. Deep, domain-specific
@@ -49,7 +49,7 @@ matching reference file for how to do it well:
 | Materials & appearance | `viz_*` | `references/families.md` (material section) |
 | Coordination (links, worksets, phases, purge, audit) | `coord_*` | `references/coordination.md` |
 | Linked-model (IFC) → native reconstruction | `parent_*` | `references/coordination.md` |
-| See the result | `take_screenshot` | this file |
+| See the result | `take_screenshot` (the Revit window); `export_view_image` (one view of the active family or project to a PNG, any view, optional Coarse/Medium/Fine for that image only, read-only) | this file |
 | Last resort, no tool fits | `send_code_to_revit` | `references/api-gotchas.md` |
 
 When unsure a tool exists, list the MCP tools and scan by prefix before assuming you must script.
@@ -67,7 +67,11 @@ like a modeler glancing at the screen. Use a tight **act → look → adjust** l
 - **Sheets & docs:** activate the sheet/view, screenshot, check titleblock, viewport placement, tags,
   dimensions, legibility.
 - **Family editing:** while a family session is open, screenshot the family doc to verify each form before
-  saving — sloped panels, holes and arc profiles are easy to get wrong and obvious on sight.
+  saving — sloped panels, holes and arc profiles are easy to get wrong and obvious on sight. To check one view at a
+  time, at each detail level, without touching the model, use `export_view_image` (view by name or id, `detailLevel`)
+  and read the PNG it names. In the Family Editor, geometry hidden at that level comes out halftone grey rather than
+  missing. `family_open_session` makes the family the active document, which is what the
+  `family_*` tools, `send_code_to_revit` and `export_view_image` act on.
 - **Don't spam it:** screenshot at decision points (after a batch, before saving/loading a family, when a
   result is ambiguous). Each shot answers a specific question: "did that do what I expected, and what next?"
 

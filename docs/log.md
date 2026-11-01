@@ -1,7 +1,7 @@
 ---
 title: CEM_RevitMCP wiki log
 type: log
-updated: 2026-10-25
+updated: 2026-11-01
 sources: []
 related: [index.md]
 tags: [log]
@@ -118,3 +118,57 @@ log, screenshots and the shared-parameter and family temp files go through CEM_C
 CEM_CSharpExtended's `UserTempPath` fix, and the watcher saw 0 ACC events. Source page:
 [CEM_API#82](sources/issues/CEM-EnriqueRuiz-CEM_API-82.md). Updated 0023, 0026, audit trails, doc drift, plugin, commandset, tests,
 test, smoke test (Claude Desktop now runs the repo build), index, and both skills.
+
+## [2026-11-01] ingest | CEMENGAL/CEM_Workspace#5 the Revit MCP made ready for the modelling agent; decision 0027
+
+From the 2026-11-01 inventory for CEM_Modeler, approved by the user («1. ok»). The source page is
+[CEMENGAL/CEM_Workspace#5](sources/issues/CEMENGAL-CEM_Workspace-5.md), an umbrella issue across repos.
+
+- **`family_open_session` activates the family** (`FamilySessionHelpers.Activate`, `OpenAndActivateDocument`). A
+  pathless `EditFamily` doc is saved to `Families\` first. `family_save_session` re-activates the project before it
+  closes the family → [family editing](modules/family-editing.md).
+- **`send_code_to_revit`:**
+  - the exact code goes to `code\` before the run;
+  - the result and the log line carry the mode, document, outcome and duration;
+  - a run that outlives its 60 s timeout adds a `late` line, and one Revit never started never runs;
+  - decision [0027](decisions/0027-send-code-scripts-traced-to-local-temp.md) supersedes
+    [0023](decisions/0023-send-code-scripts-not-persisted.md)'s no-persistence clause;
+  - [0018](decisions/0018-send-code-transaction-mode.md) and [send code](modules/send-code-to-revit.md) now document
+    the rollback and timeout semantics.
+- **New tool `export_view_image`** (`Views`, Core flat name): one view to a PNG in `images\`, with the detail level in
+  an always-rolled-back transaction group. It is tagged `"access": "read"` in `command.json`, the first access tag. The
+  counts are now 127 commands and 125 TS tools → [toolset](modules/toolset.md),
+  [command registry](modules/command-registry.md).
+- **Tests:** `guards/modeller-pins.test.ts` (14) and `tools/export_view_image.test.ts` (7), red first; the
+  no-acc-writes inventory gains two writers. 83 tests pass.
+- **Wiki:** the counts, the skills (`cem-revitmcp-dev` rules 7, 11 and its counts; `cem-aimodeler` gains
+  `export_view_image`), [audit trails](concepts/audit-trails.md), [doc drift](concepts/doc-drift.md).
+- **The review fix batch, the same day** (the QA and security quick reviews; 0 blocking):
+  - **QA-2:** `family_open_session(familyName)` resolves the family in the open project, or in `hostDocument`, not
+    in the active family.
+  - **QA-5:** family copies go to a new folder each, never overwritten (0026 amended).
+  - **SEC-2 (CWE-22):** `export_view_image` replaces an unsafe view name inside its rolled-back group, and refuses a
+    file outside `images\`.
+  - **QA-3:** `export_view_image` no longer loses a fast completion as a false timeout.
+  - **0027:** a "never ran" line no longer lost when a newer call replaces the run.
+  - **Path reuse:** `familyPath` reuses an open document only when it is the same file.
+  - **Skills:** both counts given as 125 MCP tools and 127 commands, pinned against the registry.
+  - **Tests:** `tools/family_open_session.test.ts` (4) and 10 more pins, which take the suite to 97 tests. 11 were red
+    first; the trace-id pin already passed and now locks that behaviour in.
+- **SEC-8 consumer follow-up:** CEM_CSharpExtended's `CemTempFolder` now refuses reparse points; that fix is in its
+  working tree, not committed. This repo refuses a junction or link at the paths it derives itself:
+  - the `Families\<name>_<stamp>\` copy folder (before and after creating it) and its file;
+  - the fixed `RevitMCP_SharedParameters.txt` and its folder.
+  `family_open_session` reports a refusal clearly. There are 4 pins, red first, and the suite is 103 tests. It was
+  built against the local CEM_CSharpExtended working tree, not deployed, and not driven live.
+- **QA-7 (the QA recheck, Medium):** with no `hostDocument`, the host is now the active document if it is a project,
+  then the open project, then the active document. Before, with two projects open, the first in
+  `Application.Documents` won. 2 pins, red first, take the suite to 99 tests. Not driven live: it needs two projects
+  open.
+- **Second live check (12:57-13:00):** SEC-2, QA-2 with `hostDocument`, QA-5 and the reuse by path passed.
+  - Revit 2024's own file name already sanitises `a/../../x`, so the guard is defence in depth.
+  - The project-default host is not driven.
+  - Details in the [smoke test](workflows/smoke-test.md).
+- **Live check, the same day (Revit 2024, after a Debug R24 deploy):** all three fixes passed. The project
+  re-activation before a close is the one part not driven. The details are in the
+  [smoke test](workflows/smoke-test.md).

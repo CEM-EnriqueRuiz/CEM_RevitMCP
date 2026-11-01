@@ -1,7 +1,7 @@
 ---
 title: CEM_RevitMCP wiki index
 type: index
-updated: 2026-10-25
+updated: 2026-11-01
 sources: [command.json, CEM_RevitMCP.md, .claude/skills/cem-revitmcp-dev/SKILL.md, .claude/skills/cem-aimodeler/SKILL.md]
 related: [overview.md, log.md]
 tags: [index]
@@ -12,7 +12,7 @@ tags: [index]
 ## Start here
 
 CEM_RevitMCP is a **fork of `mcp-servers-for-revit`**: a TS MCP server (`server/`) that drives Revit
-over TCP :8080 through a C# plugin (`plugin/`) and command set (`commandset/`), with 126 commands.
+over TCP :8080 through a C# plugin (`plugin/`) and command set (`commandset/`), with 127 commands.
 Read [overview.md](overview.md) first. Upstream vs our parts: [upstream and fork](concepts/upstream-and-fork.md).
 To **use** the MCP on a live model (not change it), load the
 [`cem-aimodeler` skill](../.claude/skills/cem-aimodeler/SKILL.md); it also covers reaching the Cemengal
@@ -26,7 +26,7 @@ add-ins → [Cemengal add-ins through the MCP](concepts/cemengal-addins-via-mcp.
 4. Domains come from API namespaces; prefix == folder == namespace suffix → [0003](decisions/0003-domains-from-api-namespaces.md), [0004](decisions/0004-prefix-equals-folder-equals-namespace.md)
 5. mm in/out, `AIResult<T>` with a readable `Message`, never hard-fail a batch, names and enums accepted, idempotent by name → [0005](decisions/0005-ai-grade-tool-conventions.md)
 6. No full API parity; the long tail goes to `send_code_to_revit` → [0006](decisions/0006-create-methods-not-full-parity.md)
-7. Pick new tools from evidence of `send_code_to_revit` fallbacks, not wishlists; scripts themselves are never persisted → [0008](decisions/0008-parent-tools-from-recipe-corpus.md), [0023](decisions/0023-send-code-scripts-not-persisted.md)
+7. Pick new tools from evidence of `send_code_to_revit` fallbacks, not wishlists; the exact code of each call is traced to `%TEMP%\Cemengal\RevitMCP\code` (never ACC, never in the JSONL) → [0008](decisions/0008-parent-tools-from-recipe-corpus.md), [0027](decisions/0027-send-code-scripts-traced-to-local-temp.md)
 8. Family geometry: small tools, on the family doc, no blend/sweep → [0009](decisions/0009-small-composable-family-tools.md), [0010](decisions/0010-no-newblend-use-sloped-extrusions.md)
 9. CEM_RibbonUI (sibling `CEM_RevitAPI`) owns deployment; rebuild it with Revit closed → [0011](decisions/0011-cem-ribbonui-hosts-deployment.md)
 10. The code wins over `CEM_RevitMCP.md`, which is legacy and partly stale → [0019](decisions/0019-single-authoritative-doc.md), [doc drift](concepts/doc-drift.md)
@@ -43,7 +43,7 @@ add-ins → [Cemengal add-ins through the MCP](concepts/cemengal-addins-via-mcp.
 | Decide what to build next / scope | [0006](decisions/0006-create-methods-not-full-parity.md), [0008](decisions/0008-parent-tools-from-recipe-corpus.md), [audit trails](concepts/audit-trails.md) |
 | `family_*` tools | [family editing](modules/family-editing.md) |
 | `parent_*` / IFC-link reconstruction | [parent tools](modules/parent-tools.md) |
-| `send_code_to_revit` | [send code](modules/send-code-to-revit.md) |
+| `send_code_to_revit` | [send code](modules/send-code-to-revit.md), [0018](decisions/0018-send-code-transaction-mode.md), [0027](decisions/0027-send-code-scripts-traced-to-local-temp.md) |
 | TS server, registration, bundle | [server](modules/server.md), [0015](decisions/0015-single-file-bundle.md) |
 | Logs, screenshots, any file the plugin or a tool writes | [audit trails](concepts/audit-trails.md), [0026](decisions/0026-logs-and-artefacts-in-local-temp.md) |
 | Plugin, socket, dispatch, logging, security | [plugin](modules/plugin.md), [0021](decisions/0021-loopback-only-socket.md), [0013](decisions/0013-hardcoded-failsoft-audit-trails.md), [0014](decisions/0014-license-gated-listener.md), [0022](decisions/0022-local-shared-secret-handshake.md) |
@@ -67,7 +67,7 @@ add-ins → [Cemengal add-ins through the MCP](concepts/cemengal-addins-via-mcp.
 - [plugin](modules/plugin.md): CEM_IAModeler add-in; socket, registry, dispatch, audit hook.
 - [commandset](modules/commandset.md): CEM_IAModeler_CommandSet; domain layout, Models/Common, Utils.
 - [command registry](modules/command-registry.md): `command.json`, the source of truth.
-- [toolset](modules/toolset.md): all 126 commands by folder, upstream marked, overlaps, build order.
+- [toolset](modules/toolset.md): all 127 commands by folder, upstream marked, access tags, overlaps, build order.
 - [parent tools](modules/parent-tools.md): the `parent_*` IFC-link → native pipeline.
 - [family editing](modules/family-editing.md): `family_*` tools and the edit session.
 - [send_code_to_revit](modules/send-code-to-revit.md): the Roslyn escape hatch.
@@ -112,15 +112,16 @@ add-ins → [Cemengal add-ins through the MCP](concepts/cemengal-addins-via-mcp.
 - [0015](decisions/0015-single-file-bundle.md): single-file esbuild bundle (current)
 - [0016](decisions/0016-schema-only-ts-unit-tests.md): schema-only TS unit tests (current)
 - [0017](decisions/0017-elementid-extensions-over-preprocessor.md): ElementIdExtensions over `#if` (current, upstream)
-- [0018](decisions/0018-send-code-transaction-mode.md): `send_code_to_revit` transactionMode (current, upstream)
+- [0018](decisions/0018-send-code-transaction-mode.md): `send_code_to_revit` transactionMode, with its rollback and timeout semantics (current, upstream)
 - [0019](decisions/0019-single-authoritative-doc.md): one authoritative doc (superseded by 0020)
 - [0020](decisions/0020-wiki-is-the-knowledge-base.md): `docs/` wiki is the knowledge base, searched through the machine's shared qmd server (current)
 - [0021](decisions/0021-loopback-only-socket.md): loopback-only socket, client pinned to 127.0.0.1, audited dispatch (current, our divergence)
 - [0022](decisions/0022-local-shared-secret-handshake.md): local shared-secret handshake (proposed)
-- [0023](decisions/0023-send-code-scripts-not-persisted.md): no `send_code_to_revit` script persistence; two audit trails (current; their location superseded by 0026)
+- [0023](decisions/0023-send-code-scripts-not-persisted.md): no `send_code_to_revit` script persistence; two audit trails (superseded by 0027; location by 0026)
 - [0024](decisions/0024-standalone-deploy-only-without-ribbon-host.md): standalone deploy only without a CEM_RibbonUI sibling (current)
 - [0025](decisions/0025-cemengal-addins-as-tools-via-project-references.md): the Cemengal add-ins are `cem_*` tools calling their own code through ProjectReferences (current)
 - [0026](decisions/0026-logs-and-artefacts-in-local-temp.md): logs and temp artefacts in `%TEMP%\Cemengal\RevitMCP`; nothing writes under ACC or beside the DLL (current, root 0031)
+- [0027](decisions/0027-send-code-scripts-traced-to-local-temp.md): `send_code_to_revit` traces its exact code to `code\`; outcome, document and duration in the log; a late completion logged as such (current)
 
 ## Sources
 
@@ -129,6 +130,7 @@ Issues:
 - [CEM-EnriqueRuiz/CEM_API#50](sources/issues/CEM-EnriqueRuiz-CEM_API-50.md): Implement TDD system methodology (`0556fb0`).
 - [CEM-EnriqueRuiz/CEM_API#68](sources/issues/CEM-EnriqueRuiz-CEM_API-68.md): LLM wiki bootstrap and per-commit ingest workflow.
 - [CEM-EnriqueRuiz/CEM_API#82](sources/issues/CEM-EnriqueRuiz-CEM_API-82.md): nothing writes under ACC or beside the DLL; logs and temp artefacts in `%TEMP%\Cemengal\RevitMCP` ([0026](decisions/0026-logs-and-artefacts-in-local-temp.md)).
+- [CEMENGAL/CEM_Workspace#5](sources/issues/CEMENGAL-CEM_Workspace-5.md): the MCP made ready for the modelling agent. It covers family activation and `hostDocument`, the `send_code_to_revit` code trace and late lines ([0027](decisions/0027-send-code-scripts-traced-to-local-temp.md)), `export_view_image`, and the review fixes, including the SEC-8 reparse guards.
 
 Commits without an issue:
 

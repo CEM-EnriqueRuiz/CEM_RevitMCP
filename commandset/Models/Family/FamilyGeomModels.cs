@@ -135,6 +135,13 @@ public class FamilyOpenSessionRequest
 
     /// <summary>Absolute path to an .rfa → opened with Application.OpenDocumentFile. Used when familyName is empty.</summary>
     [JsonProperty("familyPath")] public string FamilyPath { get; set; } = "";
+
+    /// <summary>
+    ///     With familyName: the open document whose loaded family is edited (a family, for a nested one). Empty = the
+    ///     active document if it is a project, else the open project, else the active document. Never the active family
+    ///     by accident while a project is open.
+    /// </summary>
+    [JsonProperty("hostDocument")] public string HostDocument { get; set; } = "";
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -166,6 +173,9 @@ public class FamilySessionResult
 
     /// <summary>How it was opened: "editfamily" | "path" | "active".</summary>
     [JsonProperty("opened")] public string Opened { get; set; }
+
+    /// <summary>The document the family was edited from (familyName only).</summary>
+    [JsonProperty("hostTitle")] public string HostTitle { get; set; }
 
     [JsonProperty("isFamilyDocument")] public bool IsFamilyDocument { get; set; }
 

@@ -47,7 +47,9 @@ const WRITERS: Record<string, string> = {
   "commandset/Services/AnnotationComponents/TakeScreenshotEventHandler.cs": "take_screenshot's PNG copy, Screenshots kind",
   "commandset/Services/Core/CoreParamQueryEventHandlers.cs": "create_project_parameter's one-call shared parameter file",
   "commandset/Services/Core/CreateSharedParameterEventHandler.cs": "the fallback shared parameter file Revit keeps for the session",
-  "commandset/Services/Family/FamilySessionEventHandlers.cs": "family_save_session: in place on the user's own path, else a copy in Families",
+  "commandset/Services/Family/FamilySessionEventHandlers.cs": "family_save_session: in place on the user's own path, else a copy in Families; family_open_session: a pathless family to Families, to activate it",
+  "commandset/Commands/ExecuteDynamicCode/ExecuteCodeCommand.cs": "send_code_to_revit's exact code, code kind (0027)",
+  "commandset/Services/Views/ExportViewImageEventHandler.cs": "export_view_image's PNG, images kind (Revit's export renamed to the new artefact name)",
 };
 
 describe("0031: no write under ACC", () => {

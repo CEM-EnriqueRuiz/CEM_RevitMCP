@@ -1,7 +1,7 @@
 ---
 title: command.json — the command registry
 type: module
-updated: 2026-10-07
+updated: 2026-11-01
 sources: [command.json, plugin/Core/CommandManager.cs, plugin/Configuration/CommandConfig.cs]
 related: [../concepts/four-part-tool-pattern.md, ../decisions/0011-cem-ribbonui-hosts-deployment.md, toolset.md]
 tags: [registry]
@@ -10,7 +10,7 @@ tags: [registry]
 # command.json — the command registry
 
 The hand-maintained list of every C# command, at the repo root. **It is the source of truth for
-what exists** (126 entries).
+what exists** (127 entries).
 
 ```json
 {
@@ -30,6 +30,9 @@ what exists** (126 entries).
   `RevitMCPCommandSet.dll`, as older docs say).
 - Optional per-entry fields from `CommandConfig`: `enabled` (skipped when false) and
   `supportedRevitVersions`.
+- `access` (`"read"` | `"write"`, Cemengal, 2026-11-01): not read by the plugin, which ignores unknown fields; it
+  tags a command for the planned read-only profile ([toolset](toolset.md#access-tags-read--write)). Only
+  `export_view_image` has it so far.
 
 ## How it reaches Revit
 

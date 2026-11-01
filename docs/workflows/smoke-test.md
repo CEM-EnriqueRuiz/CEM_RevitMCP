@@ -1,7 +1,7 @@
 ---
 title: Smoke test (full chain, live Revit)
 type: workflow
-updated: 2026-10-25
+updated: 2026-11-01
 sources: [CEM_RevitMCP.md, b04b41e, https://github.com/CEM-EnriqueRuiz/CEM_API/issues/82]
 related: [build-and-deploy.md, test.md, ../modules/family-editing.md, ../concepts/audit-trails.md]
 tags: [verify, smoke-test]
@@ -58,6 +58,64 @@ appear in Revit; family-editor tools succeed in an .rfa and fail clearly in a pr
 `%TEMP%\Cemengal\RevitMCP\actions-<date>.jsonl` shows `family_*`/`arch_*` calls rather than `send_code_to_revit`
 ([audit trails](../concepts/audit-trails.md)). Nothing new appears beside the deployed DLLs or under ACC
 ([0026](../decisions/0026-logs-and-artefacts-in-local-temp.md)).
+
+## Live check (2026-11-01, Revit 2024, after a CEM_RibbonUI Debug R24 deploy)
+
+The calls went over the plugin's socket with the server's own client. The documents were new families from
+`CMGL-GenericModel`; no project was opened, and nothing was saved beyond the temp copies below.
+
+- **`family_open_session`, path branch:** the family went from inactive to active, and `family_add_reference_plane`
+  then added its plane to that family only (4 planes against 3 in the other family).
+- **`EditFamily` branch:** a nested new family (no file) was copied to `Families\Familia2.rfa` and activated, with
+  the warning, and an editor tool acted on it.
+- **`OpenAndActivateDocument` works from an `ExternalEvent` handler.**
+- **`family_save_session close`:**
+  - a family that is not active closed;
+  - the active family, with no saved project open, stayed open with the warning;
+  - re-activating a project before the close is not checked live, because no project was opened.
+- **`send_code_to_revit`:**
+  - `ok`, `rolledBack` (an `auto` snippet that created a plane and then threw; the plane count was unchanged) and
+    `error` (a compile error, and a throw in `none` mode) each came back with their `codeFile`, and each file held
+    the exact snippet;
+  - a 75 s snippet got the "STILL RUNNING" timeout at 60.0 s. Its `"late": true` line followed at 75.4 s with
+    `outcome: ok`, and its plane was in the model.
+- **`export_view_image`** at Coarse, Medium and Fine, on a 3D view and on an elevation by id:
+  - with the family unmodified before, it was still unmodified after, and the view kept its own level (Medium);
+  - a box visible only at Fine came out halftone grey at Coarse and black at Fine. The Family Editor greys
+    geometry hidden at the view's level rather than hiding it.
+- **Nothing was written beside the deployed DLLs.**
+
+### Second live check: the review fix batch (2026-11-01, 12:57-13:00)
+
+The same setup: a CEM_RibbonUI Debug R24 deploy, the temporary starter, and new families from `CMGL-GenericModel`.
+- **SEC-2:**
+  - Revit 2024 accepts a view named `a/../../x`. Its own `ImageExportOptions.GetFileName` already sanitises the name to
+    ` - Alzado - a-------x`, so the escape did not reproduce on this version.
+  - `export_view_image` still replaced the name inside its rolled-back group, with the warning. The PNG landed in
+    `images\`, and no PNG appeared anywhere else under `%TEMP%\Cemengal`.
+  - Afterwards the view had its own name and detail level again.
+- **QA-2:** two new families were loaded into family A.
+  - `familyName` with `hostDocument: A` opened the first, which became active.
+  - A second open by name **without** `hostDocument` failed clearly: "not found in 'Familia2' … name it with
+    hostDocument". With `hostDocument` it opened.
+  - The project default is not driven live: no project was opened, because the allowed models are IFCs.
+- **QA-5:** each copy got its own `Families\<name>_<stamp>\` folder. The fixed-name copy from the first check was not
+  overwritten.
+- **Reuse by path:** `familyPath` of the open A reused that document and activated it.
+- **The rest:** nothing was written beside the deployed DLLs. Revit closed with one "No" to the save prompt, and the
+  starter was removed.
+
+**Starting it without a click** (used that day): a throwaway starter add-in, a temporary `.addin` deleted afterwards.
+It raises an `ExternalEvent` on the first `Idling`, which:
+1. makes the test families and activates one;
+2. posts `CustomCtrl_%CustomCtrl_%Cemengal%CEM_AI%CEM_IAModeler.Core.MCPServiceConnection`.
+
+Two things to expect:
+- **A redeploy re-prompts.** Revit asks "Seguridad - Complemento sin firma" again for every redeployed Cemengal add-in.
+  "Cargar una vez" answers it without storing trust.
+- **The notice's title** is `CEM_RibbonUI - revitMCP` ("Open Server", button `&Cerrar`).
+
+Revit's "Guardar archivo" prompt takes `BM_CLICK` on its `&No` button. UI Automation finds it but cannot invoke it.
 
 ## Triage
 

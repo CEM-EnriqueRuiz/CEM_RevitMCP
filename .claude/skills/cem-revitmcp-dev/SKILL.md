@@ -6,9 +6,9 @@ description: Add or modify tools in the CEM Revit MCP server — the 4-part patt
 # CEM_RevitMCP development
 
 CEM_RevitMCP is a **fork of `mcp-servers-for-revit`** that lets an AI agent drive Revit. A
-TypeScript MCP server (`server/`, 118 tools) talks JSON-RPC over TCP :8080 to a C# plugin
+TypeScript MCP server (`server/`, 125 MCP tools) talks JSON-RPC over TCP :8080 to a C# plugin
 (`plugin/`, CEM_IAModeler) that dispatches to a command set (`commandset/`,
-CEM_IAModeler_CommandSet, 120 commands registered in `command.json`). It is hosted and deployed by
+CEM_IAModeler_CommandSet, 127 commands registered in `command.json`). It is hosted and deployed by
 CEM_RibbonUI in the sibling `CEM_RevitAPI` repo. Upstream code is marked as such in the wiki; extend
 the fork through its four-part pattern rather than reworking upstream plumbing.
 
@@ -28,11 +28,11 @@ add-ins), load [cem-aimodeler](../cem-aimodeler/SKILL.md) instead.
 4. Domains from API namespaces; tool prefix == folder == namespace suffix → [0003](../../../docs/decisions/0003-domains-from-api-namespaces.md), [0004](../../../docs/decisions/0004-prefix-equals-folder-equals-namespace.md)
 5. mm in/out, `AIResult<T>` with a readable `Message`, skip-and-warn batches, names and enums, idempotent → [0005](../../../docs/decisions/0005-ai-grade-tool-conventions.md)
 6. Create methods plus common edits, not parity; the long tail goes to `send_code_to_revit` → [0006](../../../docs/decisions/0006-create-methods-not-full-parity.md)
-7. Pick new tools from evidence of `send_code_to_revit` fallbacks, not wishlists; scripts themselves are never persisted → [0008](../../../docs/decisions/0008-parent-tools-from-recipe-corpus.md), [0023](../../../docs/decisions/0023-send-code-scripts-not-persisted.md)
+7. Pick new tools from evidence of `send_code_to_revit` fallbacks, not wishlists; read the traced code in `code\` → [0008](../../../docs/decisions/0008-parent-tools-from-recipe-corpus.md), [0027](../../../docs/decisions/0027-send-code-scripts-traced-to-local-temp.md)
 8. Family geometry on the family doc; small tools; no blend/sweep → [0009](../../../docs/decisions/0009-small-composable-family-tools.md), [0010](../../../docs/decisions/0010-no-newblend-use-sloped-extrusions.md)
 9. CEM_RibbonUI owns deployment; rebuild it with Revit closed → [0011](../../../docs/decisions/0011-cem-ribbonui-hosts-deployment.md)
 10. The code wins over `CEM_RevitMCP.md` (legacy, partly stale) → [doc drift](../../../docs/concepts/doc-drift.md)
-11. `send_code_to_revit` scripts are not persisted: no `Recipes\` dump (removed as noise, don't reintroduce), and the action log omits the body → [0023](../../../docs/decisions/0023-send-code-scripts-not-persisted.md)
+11. `send_code_to_revit` writes the exact code to `%TEMP%\Cemengal\RevitMCP\code\` before it runs; the log line points at it (`"<see result.codeFile>"`) with the mode, document, outcome and duration, and a run that outlives its timeout adds a `late` line. No body in the JSONL, no `Recipes\` dump on ACC → [0027](../../../docs/decisions/0027-send-code-scripts-traced-to-local-temp.md) (superseding [0023](../../../docs/decisions/0023-send-code-scripts-not-persisted.md))
 12. No CEM_API calls here today (the server talks to Revit only); any future one goes through CEM_CSharpExtended's `Api`, never a route or URL in this repo → root [0023](../../../../../docs/decisions/0023-one-shared-request-layer.md)
 13. Nothing writes under ACC or beside the DLL: logs and temporary artefacts go through CEM_CSharpExtended's `CemTempFolder` to `%TEMP%\Cemengal\RevitMCP` (`McpLocalFiles.App`); a new writer goes on the inventory of `server/tests/guards/no-acc-writes.test.ts` → [0026](../../../docs/decisions/0026-logs-and-artefacts-in-local-temp.md), root [0031](../../../../../docs/decisions/0031-nothing-writes-under-acc-logs-in-local-temp.md)
 

@@ -41,7 +41,7 @@ command.json  →  { "commandName": "my_command", "description": "…", "assembl
   `CommandName` equals the config entry.
 
 ```bash
-grep -c '"commandName"' command.json           # the real count (126)
+grep -c '"commandName"' command.json           # the real count (127)
 grep -o '"commandName"[^,]*' command.json      # the list
 ```
 

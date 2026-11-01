@@ -1,10 +1,11 @@
 ---
 title: "0023 send_code_to_revit scripts are not persisted; two audit trails remain"
 type: decision
-status: current
-updated: 2026-10-24
+status: superseded
+superseded_by: 0027-send-code-scripts-traced-to-local-temp.md
+updated: 2026-11-01
 sources: [fe06b6c, plugin/Utils/ActionLogger.cs, commandset/Commands/ExecuteDynamicCode/ExecuteCodeEventHandler.cs]
-related: [0026-logs-and-artefacts-in-local-temp.md, 0013-hardcoded-failsoft-audit-trails.md, 0008-parent-tools-from-recipe-corpus.md, ../concepts/audit-trails.md, ../modules/send-code-to-revit.md]
+related: [0027-send-code-scripts-traced-to-local-temp.md, 0026-logs-and-artefacts-in-local-temp.md, 0013-hardcoded-failsoft-audit-trails.md, 0008-parent-tools-from-recipe-corpus.md, ../concepts/audit-trails.md, ../modules/send-code-to-revit.md]
 tags: [audit, logging, send-code]
 ---
 
@@ -15,6 +16,11 @@ Supersedes [0013](0013-hardcoded-failsoft-audit-trails.md) (three trails, includ
 **Location superseded by [0026](0026-logs-and-artefacts-in-local-temp.md) (2026-10-24):** the two trails no
 longer live under the hard-coded ACC `…\05-CEMAIModeler\` root but in `%TEMP%\Cemengal\RevitMCP` (root decision
 0031). The rest of this decision (no script persistence, `"<omitted>"` bodies) stands.
+
+**Status: superseded** by [0027](0027-send-code-scripts-traced-to-local-temp.md) (2026-11-01): the exact code of every
+call is now written to `%TEMP%\Cemengal\RevitMCP\code\`, local and pruned, and the log line points at it
+(`"<see result.codeFile>"`). What stays from this decision: no `Recipes\` dump on ACC, and no script body inside the
+JSONL. The reason given here, noise in a team-synced, never-cleaned folder, is weighed against traceability in 0027.
 
 ## Context
 

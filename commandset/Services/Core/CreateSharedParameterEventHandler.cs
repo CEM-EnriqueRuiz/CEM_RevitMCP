@@ -243,10 +243,14 @@ namespace CEM_IAModeler_CommandSet.Services.Core
             {
                 // One fixed file in the pruned SharedParameters folder (root decision 0031). Revit keeps pointing at it
                 // (and remembers it in Revit.ini), so later calls reuse it; once pruned, the next call makes a new one.
-                string tempPath = Path.Combine(CemTempFolder.ArtifactFolder(McpLocalFiles.App, "SharedParameters"),
-                    "RevitMCP_SharedParameters.txt");
+                // SEC-8: the name is fixed, so a planted link at the file or its folder would redirect the write (and Revit's
+                // later writes); refused before the write and again after it.
+                string folder = CemTempFolder.ArtifactFolder(McpLocalFiles.App, "SharedParameters");
+                string tempPath = Path.Combine(folder, "RevitMCP_SharedParameters.txt");
+                McpLocalFiles.RefuseReparsePoint(folder, tempPath);
                 if (!File.Exists(tempPath))
                     File.WriteAllText(tempPath, string.Empty);
+                McpLocalFiles.RefuseReparsePoint(folder, tempPath);
 
                 app.SharedParametersFilename = tempPath;
                 warnings.Add($"No shared parameter file was configured. Using temporary file: {tempPath}");

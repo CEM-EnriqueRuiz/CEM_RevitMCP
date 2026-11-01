@@ -124,6 +124,12 @@
       "assemblyPath": "CEM_IAModeler_CommandSet.dll"
     },
     {
+      "commandName": "export_view_image",
+      "description": "Export one view of the active document (family or project) to a PNG under %TEMP%\\Cemengal\\RevitMCP\\images, optionally at a detail level applied only for the export (always rolled back)",
+      "assemblyPath": "CEM_IAModeler_CommandSet.dll",
+      "access": "read"
+    },
+    {
       "commandName": "create_dimensions",
       "description": "Create dimension annotations between elements or points in the current view",
       "assemblyPath": "CEM_IAModeler_CommandSet.dll"

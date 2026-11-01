@@ -35,7 +35,7 @@ the [`cem-aimodeler` skill](../../.claude/skills/cem-aimodeler/references/cemeng
 - The staged copies are byte-identical to the add-ins CEM_RibbonUI loads at startup, so they bind to the
   same loaded assemblies (one `SwapManager`, one static state).
 - Add-in types appear only inside `Run` bodies, never in a base type, interface or value-type field: the
-  plugin calls `GetTypes()` on the command set, and a missing add-in must fail one call, not all 126.
+  plugin calls `GetTypes()` on the command set, and a missing add-in must fail one call, not all 127.
 
 ## What the tools deliberately do not do
 

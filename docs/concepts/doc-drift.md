@@ -1,7 +1,7 @@
 ---
 title: Known doc drift and latent issues
 type: concept
-updated: 2026-10-24
+updated: 2026-11-01
 sources: [CEM_RevitMCP.md, server/tests/TESTS.md, server/manifest.json, server/src/tools/register.ts, .github/workflows/release.yml, README.md, command.json]
 related: [../decisions/0026-logs-and-artefacts-in-local-temp.md, ../decisions/0019-single-authoritative-doc.md, ../decisions/0012-drop-sqlite-store-pack.md, ../decisions/0015-single-file-bundle.md]
 tags: [drift, gotchas, todo]
@@ -25,7 +25,7 @@ the truth.** None of these were fixed in code; each needs its own change with an
 | `CEM_RevitMCP.md` intro | AI-behaviour guide is the "`CEM_AIModeler` Claude skill" | **resolved 2026-10-07:** it was a claude.ai account skill outside this repo; it now lives here, `.claude/skills/cem-aimodeler/`, and the intro points to it ([Cemengal add-ins through the MCP](cemengal-addins-via-mcp.md)) |
 | old skill | "four older plan docs were consolidated" | git history has three (`TOOLSET_ROADMAP.md`, `SPECIALIST_ARCHITECTURE.md`, `SMOKE_TEST.md`) |
 | `server/tests/TESTS.md`, Traceability | no Cemengal commit touched `server/src/tools/*.ts` | `b04b41e` and `aa88b96` each touch 53 tool files |
-| `server/manifest.json` | "54 generic Revit tools" | 124 TS tools |
+| `server/manifest.json` | "54 generic Revit tools" | 125 TS tools (2026-11-01) |
 | `README.md` (upstream text) | Node 18+, "WebSocket" transport, upstream release ZIPs | `package.json` engines `node >=20`; transport is a raw TCP socket (`net.Socket`); no Cemengal releases |
 | `CEM_RevitMCP.md` §1 | `command.json` "copied to `Commands/commandRegistry.json` by the CEM_RibbonUI build" | true, and the fork's own `DeployCommandSet` target also copies it as `command.json` for standalone builds |
 
@@ -85,3 +85,24 @@ the truth.** None of these were fixed in code; each needs its own change with an
 | [0024](../decisions/0024-standalone-deploy-only-without-ribbon-host.md), Context | "`PathManager` creates one [registry] when none exists" | true then; since 0026 `PathManager` creates nothing and a missing registry loads no commands |
 | [build and deploy](../workflows/build-and-deploy.md) | use the Cemengal-provisioned SDK `%LOCALAPPDATA%\Cemengal\dotnet\dotnet.exe` | absent on the development machine on 2026-10-24; `dotnet` on PATH (SDK 10.0.402) built R24 |
 | [build and deploy](../workflows/build-and-deploy.md), [smoke test](../workflows/smoke-test.md) | the ribbon button is **CEM_RevitAI** | CEM_RibbonUI adds it as `CEM_AIModeler` (`AddPushButton<MCPServiceConnection>("CEM_AIModeler")`), as the `cem-aimodeler` skill says |
+
+## Found in the 2026-11-01 inventory (for the modelling agent)
+
+| Where | Claim | Reality and status |
+|---|---|---|
+| `cem-revitmcp-dev` skill | "118 tools … 120 commands" | **resolved 2026-11-01:** 125 TS tools, 127 commands |
+| [family editing](../modules/family-editing.md), session step 2, and `family_open_session`'s message | the editor tools act "on the open or active family document" | they act on the **active** one only. **Resolved 2026-11-01** in code: `family_open_session` now activates the family; the page and the message say so |
+| [0018](../decisions/0018-send-code-transaction-mode.md), Consequences | `ActionLogger` "replaces only the code body with a pointer" | it wrote `"<omitted>"` (0023); since [0027](../decisions/0027-send-code-scripts-traced-to-local-temp.md) it writes `"<see result.codeFile>"`. **Resolved** |
+| [send code](../modules/send-code-to-revit.md) | nothing on the 60 s / 120 s timeouts, the snippet running on after one, the active document as the only target, rollback in `auto` only, no failure preprocessor, the memory growth, the Chinese errors | **resolved 2026-11-01:** all documented there and in 0018 |
+| [toolset](../modules/toolset.md) | `operate_element` under `Access`, the read folder, with no note | it deletes, hides, colours and makes section boxes. **Resolved:** noted, and the access tags section says folders are no guide |
+
+Latent, not fixed:
+
+- **`WaitForCompletion` calls `_resetEvent.Reset()` before it waits** in every upstream-pattern handler (for example
+  `FamilySessionEventHandlers.cs`, `ExportViewImageEventHandler.cs`, which follows the pattern). A completion that
+  lands before the wait begins is lost as a false timeout. The window is small: the event runs on the UI thread after
+  `Raise`. Fixed in `send_code_to_revit` ([0027](../decisions/0027-send-code-scripts-traced-to-local-temp.md)), where the run
+  owns its event, and in `export_view_image` (2026-11-01), whose request setter re-arms the signal before the raise. The
+  other handlers keep it.
+- ~~**`OpenAndActivateDocument` from an external event**~~ **verified 2026-11-01:** it works from an `ExternalEvent`
+  handler in Revit 2024. The API forbids it only inside Revit's own event handlers and with a transaction open.

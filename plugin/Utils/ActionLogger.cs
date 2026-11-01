@@ -19,8 +19,9 @@ namespace CEM_IAModeler.Utils
     /// </summary>
     public static class ActionLogger
     {
-        // send_code_to_revit的脚本正文不记录（太嘈杂），只保留其余参数。
-        // send_code_to_revit script bodies are not recorded (too noisy); the other params are kept.
+        // send_code_to_revit的脚本正文写在code\文件中（决策0027），日志只指向它。
+        // send_code_to_revit script bodies go to their own file in code\ (decision 0027): the line points at it through
+        // the result's codeFile, and keeps the other params.
         private const string SendCodeCommand = "send_code_to_revit";
 
         /// <summary>
@@ -53,7 +54,7 @@ namespace CEM_IAModeler.Utils
         }
 
         /// <summary>
-        /// 对send_code_to_revit不保存脚本正文；其余工具记录完整输入。
+        /// 对send_code_to_revit不在日志中记录脚本正文（它在result.codeFile文件里）；其余工具记录完整输入。
         /// </summary>
         private static JToken BuildInputToken(string method, JObject paramsObject)
         {
@@ -62,12 +63,12 @@ namespace CEM_IAModeler.Utils
 
             if (string.Equals(method, SendCodeCommand, StringComparison.OrdinalIgnoreCase))
             {
-                // 保留除脚本正文外的参数（如transactionMode），脚本正文用占位符替代。
+                // 保留除脚本正文外的参数（如transactionMode），脚本正文用指向codeFile的占位符替代。
                 var redacted = (JObject)paramsObject.DeepClone();
                 foreach (var key in new[] { "code", "data" })
                 {
                     if (redacted[key] != null)
-                        redacted[key] = "<omitted>";
+                        redacted[key] = "<see result.codeFile>";
                 }
                 return redacted;
             }
