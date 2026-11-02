@@ -5,11 +5,13 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using Autodesk.Revit.UI;
+using Autodesk.Revit.UI.Events;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RevitMCPSDK.API.Models.JsonRPC;
 using RevitMCPSDK.API.Interfaces;
 using CEM_IAModeler.Configuration;
+using CEM_IAModeler.Security;
 using CEM_IAModeler.Utils;
 
 namespace CEM_IAModeler.Core
@@ -18,9 +20,11 @@ namespace CEM_IAModeler.Core
     {
         /// <summary>
         /// Interface the listener binds to. CEM divergence from upstream (which binds IPAddress.Any):
-        /// the socket accepts arbitrary C# through send_code_to_revit and has no authentication, so it
-        /// must never be reachable from the network. The TS server connects to 127.0.0.1 explicitly
+        /// the socket accepts arbitrary C# through send_code_to_revit, so it must never be reachable from
+        /// the network. The TS server connects to 127.0.0.1 explicitly
         /// (server/src/utils/ConnectionManager.ts) so it does not depend on how 'localhost' resolves.
+        /// Other local accounts can still reach it; each request must carry the listener's token
+        /// (decision 0022, <see cref="McpAuthToken"/>).
         /// </summary>
         public static readonly IPAddress BindAddress = IPAddress.Loopback;
 
@@ -30,6 +34,8 @@ namespace CEM_IAModeler.Core
         private bool _isRunning;
         private int _port = 8080;
         private UIApplication _uiApp;
+        // The UIApplication whose ApplicationClosing calls Stop (decision 0022); null when not subscribed.
+        private UIApplication _closingSource;
         private ICommandRegistry _commandRegistry;
         private ILogger _logger;
         private CommandExecutor _commandExecutor;
@@ -69,6 +75,7 @@ namespace CEM_IAModeler.Core
         public void Initialize(UIApplication uiApp)
         {
             _uiApp = uiApp;
+            HookShutdown(uiApp);
 
             // 初始化事件管理器
             // Initialize ExternalEventManager
@@ -106,7 +113,7 @@ namespace CEM_IAModeler.Core
                 _commandRegistry, _logger, configManager, _uiApp);
             commandManager.LoadCommands();
 
-            _logger.Info($"Socket service initialized on port {_port}");
+            _logger.Info("Socket service initialized on port {0}", _port);
         }
 
         public void Start()
@@ -117,22 +124,44 @@ namespace CEM_IAModeler.Core
             {
                 _isRunning = true;
                 _listener = new TcpListener(BindAddress, _port);
+                // CEM (SEC-5.2, CWE-605): no other socket, this user's included, may bind our port while we listen.
+                // Set on each new listener before it binds; Stop drops it, so the ribbon's stop/start sets it again.
+                _listener.ExclusiveAddressUse = true;
                 _listener.Start();
-
-                _listenerThread = new Thread(ListenForClients)
-                {
-                    IsBackground = true
-                };
-                _listenerThread.Start();              
             }
             catch (Exception)
             {
                 _isRunning = false;
+                return;
             }
+
+            // CEM (decision 0022): a fresh token for this listener, once the port is ours (a second Revit that cannot
+            // bind must not replace the first one's token) and before any client is accepted. Without it nobody could
+            // call, so the listener stops and says why.
+            try
+            {
+                McpAuthToken.Issue();
+            }
+            catch (Exception ex)
+            {
+                _isRunning = false;
+                _listener.Stop();
+                _listener = null;
+                _logger.Error("The MCP token file could not be written ({0}); the server is not started.", ex.Message);
+                throw new InvalidOperationException(
+                    $"The MCP server did not start: its token file {McpAuthToken.FilePath} could not be written ({ex.Message}).", ex);
+            }
+
+            _listenerThread = new Thread(ListenForClients)
+            {
+                IsBackground = true
+            };
+            _listenerThread.Start();
         }
 
         public void Stop()
         {
+            UnhookShutdown();
             if (!_isRunning) return;
 
             try
@@ -141,6 +170,9 @@ namespace CEM_IAModeler.Core
 
                 _listener?.Stop();
                 _listener = null;
+
+                // CEM (decision 0022): every request is refused from now on, and the file goes.
+                McpAuthToken.Revoke();
 
                 if(_listenerThread!=null && _listenerThread.IsAlive)
                 {
@@ -152,6 +184,31 @@ namespace CEM_IAModeler.Core
                 // log error
             }
         }
+
+        // CEM (decision 0022): the host may never call the plugin's OnShutdown (CEM_RibbonUI has none), which left the
+        // token file behind after Revit closed. Revit's own closing event stops the listener and revokes the token
+        // whatever the host does; the OnShutdown path then finds it stopped. One subscription at a time, removed on Stop.
+        private void HookShutdown(UIApplication uiApp)
+        {
+            if (_closingSource != null) return;
+            uiApp.ApplicationClosing += OnApplicationClosing;
+            _closingSource = uiApp;
+        }
+
+        private void UnhookShutdown()
+        {
+            var source = _closingSource;
+            if (source == null) return;
+            _closingSource = null;
+            try { source.ApplicationClosing -= OnApplicationClosing; }
+            catch (Exception ex)
+            {
+                // Outside an API context Revit refuses the change; the handler's Stop is a no-op once stopped.
+                _logger.Warning("The Revit closing handler could not be removed: {0}", ex.Message);
+            }
+        }
+
+        private void OnApplicationClosing(object sender, ApplicationClosingEventArgs e) => Stop();
 
         private void ListenForClients()
         {
@@ -212,7 +269,8 @@ namespace CEM_IAModeler.Core
                     }
 
                     string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                    System.Diagnostics.Trace.WriteLine($"收到消息: {message}\nReceived message: {message}");
+                    // CEM: the size only; the request carries the token (decision 0022).
+                    System.Diagnostics.Trace.WriteLine($"收到消息 / Received message: {bytesRead} bytes");
 
                     string response = ProcessJsonRPCRequest(message);
 
@@ -253,6 +311,18 @@ namespace CEM_IAModeler.Core
                     );
                 }
 
+                // CEM divergence (decision 0022, SEC-5): only a request with this listener's token runs. A missing
+                // or wrong one gets Unauthorized with no detail, and is logged by method only. The token is then
+                // removed, so no command, log or audit line ever holds it.
+                var parameters = request.Params as JObject;
+                var presented = parameters?[McpAuthToken.Param] as JValue;
+                if (!McpAuthToken.Matches(presented?.Value as string))
+                {
+                    _logger.Warning("Unauthorized request refused (missing or wrong token): {0}", Shorten(request.Method));
+                    return CreateErrorResponse(request.Id, JsonRPCErrorCodes.Unauthorized, "Unauthorized");
+                }
+                parameters.Remove(McpAuthToken.Param);
+
                 // CEM divergence: dispatch through CommandExecutor (the single chokepoint) so every
                 // call, including send_code_to_revit, reaches the ActionLogger audit log. Upstream
                 // executed the command directly here, which bypassed the log.
@@ -278,6 +348,15 @@ namespace CEM_IAModeler.Core
                     $"Internal error: {ex.Message}"
                 );
             }
+        }
+
+        // A refused caller's method name: escaped first (caller text, CWE-117; the Logger escapes it too), then kept
+        // short for the log.
+        private static string Shorten(string method)
+        {
+            if (method == null) return "(none)";
+            string escaped = LogText.Escape(method);
+            return escaped.Length <= 80 ? escaped : escaped.Substring(0, 80) + "…";
         }
 
         private string CreateSuccessResponse(string id, object result)

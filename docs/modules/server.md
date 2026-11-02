@@ -1,9 +1,9 @@
 ---
 title: server/ — the TypeScript MCP server
 type: module
-updated: 2026-10-07
+updated: 2026-11-01
 sources: [server/package.json, server/src/index.ts, server/src/index.bundle.ts, server/src/tools/register.ts, server/src/utils/ConnectionManager.ts, server/src/utils/SocketClient.ts, server/scripts/bundle.mjs, server/manifest.json]
-related: [../concepts/four-part-tool-pattern.md, ../decisions/0015-single-file-bundle.md, ../decisions/0016-schema-only-ts-unit-tests.md, ../workflows/build-and-deploy.md]
+related: [../decisions/0022-local-shared-secret-handshake.md, ../concepts/four-part-tool-pattern.md, ../decisions/0015-single-file-bundle.md, ../decisions/0016-schema-only-ts-unit-tests.md, ../workflows/build-and-deploy.md]
 tags: [server, typescript]
 ---
 
@@ -23,7 +23,7 @@ bundle scripts and the vitest suite. This is what the LLM sees: a stdio MCP serv
 | `src/tools/register.ts` | runtime discovery: `readdirSync` + dynamic import, calls the first `register*` export |
 | `src/tools/register.generated.ts` | **generated, gitignored**: static imports for esbuild |
 | `src/utils/ConnectionManager.ts` | `withRevitConnection(op)`: global mutex, new socket per call, 5 s connect timeout |
-| `src/utils/SocketClient.ts` | `RevitClientConnection`: `net.Socket` to `127.0.0.1:8080` (`REVIT_HOST`/`REVIT_PORT` in `ConnectionManager.ts`, [0021](../decisions/0021-loopback-only-socket.md)), JSON-RPC, buffers until JSON parses, 120 s timeout |
+| `src/utils/SocketClient.ts` | `RevitClientConnection`: `net.Socket` to `127.0.0.1:8080` (`REVIT_HOST`/`REVIT_PORT` in `ConnectionManager.ts`, [0021](../decisions/0021-loopback-only-socket.md)), JSON-RPC, buffers until JSON parses, 120 s timeout per attempt; adds the token from `%LOCALAPPDATA%\Cemengal\RevitMCP\token` as `params.auth` to every request, and on `Unauthorized` (-33200) reads the file again and retries once ([0022](../decisions/0022-local-shared-secret-handshake.md)) |
 | `scripts/generate-tool-registry.mjs` | writes `register.generated.ts` |
 | `scripts/bundle.mjs` | esbuild → `dist/index.js` (single ESM file, node20) |
 | `manifest.json` | `.mcpb` manifest (`cem-revit-ai`), entry `build/index.js` |
@@ -50,4 +50,9 @@ Dependencies: `@modelcontextprotocol/sdk`, `ws`, `zod` (no native modules since
 ## Gotchas
 
 - Calls are serialized by the mutex. A slow tool blocks every other tool call.
+- **Run the server as the Windows user who runs Revit** ([0022](../decisions/0022-local-shared-secret-handshake.md)).
+  Under another account, such as a sandbox, the token file is unreadable by design, and every call fails with
+  "Cannot read the Revit MCP token at …". The same message, with "(ENOENT)", means the MCP service is not started in
+  Revit.
+- Rebuild the server together with the plugin: an old build, or the upstream npm server, sends no token and is refused.
 - The `register.generated` double-registration issue: [0015](../decisions/0015-single-file-bundle.md).

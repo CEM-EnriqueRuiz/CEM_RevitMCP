@@ -2,7 +2,7 @@
 title: "0014 The MCP listener only starts for a licensed CEM user"
 type: decision
 status: current
-updated: 2026-10-06
+updated: 2026-11-01
 sources: [aa88b96, plugin/Core/MCPServiceConnection.cs, plugin/CEM_IAModeler.csproj]
 related: [0011-cem-ribbonui-hosts-deployment.md, ../modules/plugin.md]
 tags: [license, security, cross-repo]
@@ -28,5 +28,5 @@ with a valid CEM license. This is checked alongside the ribbon button's `Enabled
   coupling.
 - The plugin also needs `Nice3point.Revit.Toolkit`, because the base type is Nice3point's
   `ExternalCommand`.
-- Note: the listener used to bind `IPAddress.Any:8080` (upstream). Since [0021](0021-loopback-only-socket.md) it binds loopback only. There is still no per-request authentication ([0022](0022-local-shared-secret-handshake.md), proposed).
+- Note: the listener used to bind `IPAddress.Any:8080` (upstream). Since [0021](0021-loopback-only-socket.md) it binds loopback only. Since 2026-11-01 every request must carry the token the listener writes when it starts ([0022](0022-local-shared-secret-handshake.md)).
   The license gate controls *whether* it starts, not who can connect.

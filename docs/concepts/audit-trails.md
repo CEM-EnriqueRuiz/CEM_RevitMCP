@@ -2,8 +2,8 @@
 title: Audit trails and local files (Screenshots, action log, plugin log)
 type: concept
 updated: 2026-11-01
-sources: [https://github.com/CEM-EnriqueRuiz/CEM_API/issues/82, plugin/Utils/ActionLogger.cs, plugin/Utils/Logger.cs, plugin/Utils/McpLocalFiles.cs, plugin/Core/CommandExecutor.cs, commandset/Commands/ExecuteDynamicCode/ExecuteCodeEventHandler.cs, commandset/Commands/ExecuteDynamicCode/ExecuteCodeCommand.cs, commandset/Services/Views/ExportViewImageEventHandler.cs, commandset/Services/AnnotationComponents/TakeScreenshotEventHandler.cs, commandset/Utils/McpLocalFiles.cs, server/tests/guards/no-acc-writes.test.ts]
-related: [../decisions/0027-send-code-scripts-traced-to-local-temp.md, ../decisions/0026-logs-and-artefacts-in-local-temp.md, ../decisions/0023-send-code-scripts-not-persisted.md, ../decisions/0013-hardcoded-failsoft-audit-trails.md, ../decisions/0008-parent-tools-from-recipe-corpus.md]
+sources: [https://github.com/CEM-EnriqueRuiz/CEM_API/issues/82, plugin/Utils/ActionLogger.cs, plugin/Security/McpAuthToken.cs, plugin/Utils/Logger.cs, plugin/Utils/McpLocalFiles.cs, plugin/Core/CommandExecutor.cs, commandset/Commands/ExecuteDynamicCode/ExecuteCodeEventHandler.cs, commandset/Commands/ExecuteDynamicCode/ExecuteCodeCommand.cs, commandset/Services/Views/ExportViewImageEventHandler.cs, commandset/Services/AnnotationComponents/TakeScreenshotEventHandler.cs, commandset/Utils/McpLocalFiles.cs, server/tests/guards/no-acc-writes.test.ts]
+related: [../decisions/0022-local-shared-secret-handshake.md, ../decisions/0027-send-code-scripts-traced-to-local-temp.md, ../decisions/0026-logs-and-artefacts-in-local-temp.md, ../decisions/0023-send-code-scripts-not-persisted.md, ../decisions/0013-hardcoded-failsoft-audit-trails.md, ../decisions/0008-parent-tools-from-recipe-corpus.md]
 tags: [logging, audit, acc]
 ---
 
@@ -60,7 +60,21 @@ own `<name>.0001.rfa` backup beside it.
   corpus, where about 67% of recipes were link-geometry reconstruction
   ([0008](../decisions/0008-parent-tools-from-recipe-corpus.md)).
 
+**Not a trail: the socket's token.** `%LOCALAPPDATA%\Cemengal\RevitMCP\token` is the listener's secret
+([0022](../decisions/0022-local-shared-secret-handshake.md)), outside `%TEMP%` so it is never pruned while Revit runs.
+It is readable only by the user and SYSTEM, replaced at each start and deleted at stop.
+
 ## Rules when touching them
+
+- **The token never reaches a trail (0022).** `SocketService` removes `params.auth` before `CommandExecutor`, and
+  `ActionLogger` drops it too. No log, trace or exception names it: a refused request is logged by its method only, and
+  the socket traces a request's size, not its text.
+- **Caller text cannot forge a log line (0022, CWE-117).** `Logger` escapes every format argument of every
+  `mcp-*.log` line with `LogText`: CR, LF and tab become `\r`, `\n` and `\t`; the other C0 and C1 controls, DEL and
+  U+2028/U+2029 become `\uXXXX`. So a refused method, a command name or an exception message stays on its own line.
+  Don't build a logger message by interpolation: pass the values as arguments (`socket-auth-pins` fails otherwise).
+  `actions-*.jsonl` is JSON, which already escapes them. The pins in `server/tests/guards/socket-auth-pins.test.ts` fail
+  otherwise.
 
 - **No write through a junction or link (SEC-8, CWE-59, 2026-11-01).**
   - CEM_CSharpExtended's `CemTempFolder` refuses a reparse point in the folders it creates, with
@@ -76,7 +90,8 @@ own `<name>.0001.rfa` backup beside it.
 - Every file write goes through `CemTempFolder` (`AppendLog`, `NewArtifactFile`, `ArtifactFolder`). Never write
   under ACC (any `ACCDocs` path), next to the DLL (`PathManager` paths), to the raw `%TEMP%`, or to the Desktop.
   The guard `server/tests/guards/no-acc-writes.test.ts` fails otherwise. A new writer goes on its inventory,
-  with the reason.
+  with the reason. The one exception is the token writer (`McpAuthToken.cs`), listed apart and pinned to
+  `%LOCALAPPDATA%\Cemengal\RevitMCP`.
 - Keep them fail-soft. A logging exception must never fail a command (`AppendLog` never throws).
 - Change the action log in `plugin/Utils/ActionLogger.cs`. `PathManager` is read only: the deploy's `Commands\`
   and registry.

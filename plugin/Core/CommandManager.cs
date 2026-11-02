@@ -69,7 +69,7 @@ namespace CEM_IAModeler.Core
                         commandConfig.SupportedRevitVersions.Length > 0 &&
                         !_versionAdapter.IsVersionSupported(commandConfig.SupportedRevitVersions))
                     {
-                        _logger.Warning("命令 {0} 不支持当前 Revit 版本 {1}，已跳过\nThe command {0} is not supported by the current Revit version ({1}} and it has been skipped.",
+                        _logger.Warning("命令 {0} 不支持当前 Revit 版本 {1}，已跳过\nThe command {0} is not supported by the current Revit version ({1}) and it has been skipped.",
                             commandConfig.CommandName, currentVersion);
                         continue;
                     }

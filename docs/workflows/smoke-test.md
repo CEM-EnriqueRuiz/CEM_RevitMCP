@@ -105,6 +105,30 @@ The same setup: a CEM_RibbonUI Debug R24 deploy, the temporary starter, and new 
 - **The rest:** nothing was written beside the deployed DLLs. Revit closed with one "No" to the save prompt, and the
   starter was removed.
 
+### Third live check: the socket token, SEC-5 (2026-11-01, 20:08-20:13)
+
+The same setup, with the plugin and `server/build` carrying [0022](../decisions/0022-local-shared-secret-handshake.md).
+The token was never printed: the checks compared it in place, or by a hash.
+- **A normal call** through the server's own client (`send_code_to_revit`, read-only) succeeded on family A.
+- **Raw JSON-RPC to `127.0.0.1:8080`**, with no `auth`, a wrong 64-hex `auth`, an empty one and a number:
+  - each got `{"code":-33200,"message":"Unauthorized"}` with its own id;
+  - none ran: no line in `actions-*.jsonl`, no file in `code\`, and the marker the snippet returns appears nowhere;
+  - `mcp-*.log` has one line each: `Unauthorized request refused (missing or wrong token): send_code_to_revit`.
+- **`Get-Acl` on the live folder and file:** owner the user, inheritance off, only `NT AUTHORITY\SYSTEM` and the user
+  (`FullControl`, not inherited). No `CodexSandboxUsers` entry and no sandbox SID. The folder holds only `token`.
+- **The token is in no file** under `%TEMP%\Cemengal\RevitMCP` (logs, action log, code traces), checked after each step.
+- **A listener restart** (`Stop`, then `Start`, asked from a snippet) wrote a new token with the same ACL. The same
+  client process's next call succeeded after one refusal, the only one in the log: it read the file again and retried.
+- **A full Revit restart:** the same client process, with its stale cached token, succeeded on its first call after
+  the restart, again with one refusal.
+- **Found:** the token file **survives a Revit shutdown**. CEM_RibbonUI's `Application` has no `OnShutdown`, so the
+  plugin's own `Application.OnShutdown` (which stops the listener and revokes the token) never runs in the hosted
+  deployment. The file stays protected, and it is useless once the listener is gone; the next start replaces it.
+  **Closed in code since:** `SocketService` stops itself on Revit's `ApplicationClosing`
+  ([0022](../decisions/0022-local-shared-secret-handshake.md), decision 1). The next live run must show the file gone
+  after Revit closes.
+- **The rest:** no model change, so Revit closed both times without a save prompt. The starter was removed.
+
 **Starting it without a click** (used that day): a throwaway starter add-in, a temporary `.addin` deleted afterwards.
 It raises an `ExternalEvent` on the first `Idling`, which:
 1. makes the test families and activates one;
@@ -121,7 +145,10 @@ Revit's "Guardar archivo" prompt takes `BM_CLICK` on its `&No` button. UI Automa
 
 | Symptom | Cause |
 |---|---|
-| "connect to revit client failed" / 连接到Revit客户端失败 | server not started, or wrong port |
+| "connect to revit client failed" / 连接到Revit客户端失败 | server not started, or wrong port. A token file left while Revit is closed means a plugin from before the `ApplicationClosing` fix ([0022](../decisions/0022-local-shared-secret-handshake.md)), or a crash |
+| "Cannot read the Revit MCP token at … (ENOENT)" | the MCP service is not started in Revit, so there is no token file yet ([0022](../decisions/0022-local-shared-secret-handshake.md)) |
+| "Cannot read the Revit MCP token at … (EPERM/EACCES)" | the MCP server runs under another Windows account (a sandbox): by design it cannot read the token; run it as the Revit user |
+| "Revit refused the request: the token … does not match" | the server read a stale or foreign token twice; restart the MCP service in Revit. An old server build, which sends no token, gets a bare "Unauthorized" |
 | tools missing in the client | client on the npm package or a stale build; use local `build/index.js`, `npm run build` |
 | "Method not found" / command not found | registry not deployed, or a name mismatch among the three strings |
 | "No <X>Type available" | the project lacks that type |

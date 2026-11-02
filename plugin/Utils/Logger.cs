@@ -13,7 +13,9 @@ namespace CEM_IAModeler.Utils
             if (level < _currentLogLevel)
                 return;
 
-            string formattedMessage = args.Length > 0 ? string.Format(message, args) : message;
+            // CEM (decision 0022, CWE-117): the format strings are ours, the arguments may be caller text (a refused
+            // method, an exception message), so each is escaped and cannot start a forged line.
+            string formattedMessage = args.Length > 0 ? string.Format(message, LogText.EscapeArgs(args)) : message;
             string logEntry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} [{level}] {formattedMessage}";
 
             // 输出到 Debug 窗口

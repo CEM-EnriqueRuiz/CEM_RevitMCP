@@ -1,8 +1,8 @@
 ---
 title: Test suites (server/tests and tests/commandset)
 type: module
-updated: 2026-11-01
-sources: [server/tests/TESTS.md, server/tests/guards/no-acc-writes.test.ts, server/tests/guards/modeller-pins.test.ts, server/tests/tools/export_view_image.test.ts, server/tests/helpers/captureToolSchema.ts, server/vitest.config.ts, tests/commandset/CEM_IAModeler_Test.csproj, ea54485, 0556fb0]
+updated: 2026-11-02
+sources: [server/tests/TESTS.md, server/tests/guards/no-acc-writes.test.ts, server/tests/guards/modeller-pins.test.ts, server/tests/guards/socket-auth-pins.test.ts, server/tests/guards/log-format.test.ts, server/tests/utils/auth.test.ts, server/tests/tools/export_view_image.test.ts, server/tests/helpers/captureToolSchema.ts, server/vitest.config.ts, tests/commandset/CEM_IAModeler_Test.csproj, ea54485, 0556fb0]
 related: [../decisions/0016-schema-only-ts-unit-tests.md, ../workflows/test.md]
 tags: [testing]
 ---
@@ -22,7 +22,39 @@ tags: [testing]
 - `tools/`: `create_level`, `family_add_parameter`, `arch_create_wall`, `mep_create_duct`,
   `viz_create_material`, one per representative domain; `cem_tools`; `export_view_image` and `family_open_session` (2026-11-01).
 - `utils/connection.test.ts`: the client is pinned to `127.0.0.1:8080` and reaches an IPv4-loopback-only
-  listener ([0021](../decisions/0021-loopback-only-socket.md)). The second test skips if port 8080 is busy.
+  listener ([0021](../decisions/0021-loopback-only-socket.md)). The second test skips if port 8080 is busy; it
+  points `LOCALAPPDATA` at a scratch token, since every request carries one.
+- `utils/auth.test.ts` (2026-11-01, 9 tests): the real `RevitClientConnection` against a fake plugin on an ephemeral
+  port ([0022](../decisions/0022-local-shared-secret-handshake.md)). It covers:
+  - the token sent with every request;
+  - a restart re-read and retried once;
+  - a wrong token refused after one retry;
+  - a missing or empty file that sends nothing and says why;
+  - the token never in an error or on the console;
+  - the 120 s timeout, not retried;
+  - the default path.
+  8 were red first. The timeout test already passed and now locks that path in.
+- `guards/socket-auth-pins.test.ts` (2026-11-01, 22 tests): the plugin's side of 0022, read from the source. It pins
+  the CSPRNG, the path, the user-and-SYSTEM ACL, the owner check, the temp file then the move, the reparse checks,
+  Revit's `ApplicationClosing` calling `Stop` (two pins, red first, added after the live check), the replace with its
+  POSIX rename and bounded retry, the escaped log arguments with no interpolated logger message (three pins, red first,
+  2026-11-02), the exclusive port set before each bind (SEC-5.2, red first, 2026-11-02; 23 tests now), the
+  check before `CommandExecutor`, the constant-time compare, the stripped param, and no token variable in any log,
+  trace or exception. 14 of the first 16 were red first. The loopback pin and the no-leak scan already passed (the
+  scan was mutation-checked against sample leaks), and the owner pin came with its code.
+- `plugin/runtime.test.ts` (2026-11-02, 6 tests): plugin code that never touches Revit, run for real. It loads the
+  built `plugin\bin\Debug\2024\CEM_IAModeler.dll` into Windows PowerShell (`tests/fixtures/plugin-runtime.ps1`).
+  - `LogText` escapes caller text (0022, CWE-117).
+  - 200 `McpAuthToken` writes into a scratch folder all succeed under two readers: the TS client's `readFileSync` in
+    a Node loop (`tests/fixtures/token-reader.cjs`), and a scanner-like reader that does not share delete. No read is
+    partial, and the file never vanishes.
+  - It skips when the DLL is not built and fails when it is older than its sources: rebuild plugin Debug R24 first.
+  - Red first: `LogText` did not exist, and 199 of 200 writes failed with Win32 error 5. The atomicity test already
+    passed and locks that in. Both halves of the fix were mutation-checked (no POSIX rename, or no retry: red).
+- `guards/log-format.test.ts` (2026-11-02, 3 tests): every `_logger` message in `plugin/` is a valid .NET composite
+  format string for its argument count (`{{`/`}}`, `{index[,alignment][:format]}`, no lone brace), read from the source.
+  Red first on `CommandManager`'s `({1}}`, which would have thrown `FormatException`
+  ([0022](../decisions/0022-local-shared-secret-handshake.md)).
 - `guards/no-acc-writes.test.ts`: the root-0031 guard ([0026](../decisions/0026-logs-and-artefacts-in-local-temp.md)).
   It reads the C# source of `plugin/` and `commandset/` (and `server/src`) and fails on an ACC path, a write
   beside the DLL or to the raw temp/Desktop, a Node file write, or a C# writer missing from its inventory. It
@@ -51,7 +83,9 @@ tags: [testing]
   - the copy folder, checked before and after it is created;
   - `Activate`'s clear error;
   - the shared-parameter file, checked before and after the write.
-  The suite is 103 tests in 11 files.
+  The suite was 103 tests in 11 files. With 0022's two files, and the token writer's pin in `no-acc-writes` (17
+  tests now), it is 132 tests in 13 files. With the fix batch of 2026-11-02 (the runtime test, and three pins), 141 tests in 14 files. With the
+  second batch (the exclusive-port pin and `log-format`), 145 tests in 15 files.
 - `TESTS.md`: the traceability note. Add one line per new test. (Its "Traceability" paragraph has a
   factual error; see [doc drift](../concepts/doc-drift.md).)
 

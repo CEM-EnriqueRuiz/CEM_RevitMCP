@@ -14,7 +14,10 @@ domain.**
 
 Before the first call: Revit must be open **with a model**, and the **CEM_AIModeler** button (Cemengal tab,
 CEM_AI panel) pressed. "connect to revit client failed" means one of the two is missing — tell the user; it
-does not mean the tools don't exist.
+does not mean the tools don't exist. "Cannot read the Revit MCP token" means the same when it says ENOENT. When it
+says EPERM or EACCES, the MCP server runs under another Windows account (a sandbox), which by design cannot drive
+Revit: tell the user, and don't retry. "Revit refused the request" means the server's token is stale: the user
+restarts the MCP service in Revit.
 
 ## The three laws
 

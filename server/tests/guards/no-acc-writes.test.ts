@@ -52,6 +52,13 @@ const WRITERS: Record<string, string> = {
   "commandset/Services/Views/ExportViewImageEventHandler.cs": "export_view_image's PNG, images kind (Revit's export renamed to the new artefact name)",
 };
 
+// The one writer outside CemTempFolder: the socket's token (decision 0022) is a secret, not a temporary artefact. It goes
+// to %LOCALAPPDATA%\Cemengal\RevitMCP, local and per user like %TEMP%, but never pruned while Revit runs, and ACL'd to
+// the user and SYSTEM (pinned in socket-auth-pins.test.ts).
+const SECRET_WRITERS: Record<string, string> = {
+  "plugin/Security/McpAuthToken.cs": "the socket's token file, %LOCALAPPDATA%\\Cemengal\\RevitMCP\\token (0022)",
+};
+
 describe("0031: no write under ACC", () => {
   it("no source or project file holds an ACC path", () => {
     const accPath = /ACCDocs[\\/]|05-CEMAIModeler|C:\\{1,2}DC\\{1,2}/i;
@@ -102,8 +109,17 @@ describe("0031: no write beside the DLL", () => {
 describe("0031: every write goes through CemTempFolder", () => {
   it("only the inventoried files write, and each takes its path from CemTempFolder", () => {
     const writers = csharp.filter((f) => WRITE_API.test(code(readFileSync(f, "utf8")))).map(rel).sort();
-    expect(writers).toEqual(Object.keys(WRITERS).sort());
-    for (const file of writers) expect(code(read(file)), file).toMatch(/CemTempFolder\.(NewArtifactFile|ArtifactFolder)\(\s*McpLocalFiles\.App,/);
+    expect(writers).toEqual([...Object.keys(WRITERS), ...Object.keys(SECRET_WRITERS)].sort());
+    for (const file of Object.keys(WRITERS))
+      expect(code(read(file)), file).toMatch(/CemTempFolder\.(NewArtifactFile|ArtifactFolder)\(\s*McpLocalFiles\.App,/);
+  });
+
+  it("the token writer writes only under %LOCALAPPDATA%\\Cemengal\\RevitMCP", () => {
+    for (const file of Object.keys(SECRET_WRITERS)) {
+      const text = code(read(file));
+      expect(text, file).toMatch(/Environment\.SpecialFolder\.LocalApplicationData\s*\),\s*"Cemengal",\s*McpLocalFiles\.App\s*\)/);
+      expect(text, file).not.toMatch(/CemTempFolder|GetTempPath|ACCDocs/);
+    }
   });
 
   it("both projects name the same app folder, RevitMCP", () => {

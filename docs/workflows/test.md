@@ -24,6 +24,10 @@ From the Cemengal root, the same suite runs with `.\.claude\run-tests.ps1 -Repos
 - C# EventHandler logic needs a live `Document`. That is the stated TDD exemption ("Revit-bound").
   Say so in your report rather than skipping silently. The coordinator accepted it again on 2026-10-24 for
   the [0026](../decisions/0026-logs-and-artefacts-in-local-temp.md) handlers.
+- **Plugin code that never touches Revit runs for real:** `tests/plugin/runtime.test.ts` loads the built
+  `plugin\bin\Debug\2024\CEM_IAModeler.dll` into Windows PowerShell (`LogText`, the token write under readers,
+  [0022](../decisions/0022-local-shared-secret-handshake.md)). Build plugin Debug R24 before `npx vitest run`: the test
+  skips without the DLL and fails when it is older than its sources.
 - **Where C# writes is pinned from the TS side:** `tests/guards/no-acc-writes.test.ts` reads the plugin and
   command-set source and fails when anything writes under ACC, beside the DLL, to the raw `%TEMP%` or the
   Desktop, or when a file not on its inventory writes at all. A new file write means a new inventory line, with

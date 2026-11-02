@@ -1,9 +1,9 @@
 ---
 title: "CEMENGAL/CEM_Workspace#5: the Revit MCP made ready for the modelling agent (family activation, send_code trace, export_view_image)"
 type: source
-updated: 2026-11-01
-sources: [https://github.com/CEMENGAL/CEM_Workspace/issues/5, "the user, 2026-11-01 («1. ok», «sí, que instale y abra Revit», «Sí, dale permiso»)", commandset/Services/Family/FamilySessionEventHandlers.cs, commandset/Models/Family/FamilyGeomModels.cs, commandset/Commands/ExecuteDynamicCode/ExecuteCodeCommand.cs, commandset/Commands/ExecuteDynamicCode/ExecuteCodeEventHandler.cs, commandset/Commands/Views/ExportViewImageCommand.cs, commandset/Services/Views/ExportViewImageEventHandler.cs, commandset/Models/Views/ExportViewImageModels.cs, commandset/Services/Core/CreateSharedParameterEventHandler.cs, commandset/Utils/McpLocalFiles.cs, plugin/Utils/ActionLogger.cs, command.json, server/src/tools/export_view_image.ts, server/src/tools/send_code_to_revit.ts, server/src/tools/family_open_session.ts, server/tests/guards/modeller-pins.test.ts, server/tests/guards/no-acc-writes.test.ts, server/tests/tools/export_view_image.test.ts, server/tests/tools/family_open_session.test.ts]
-related: [../../decisions/0027-send-code-scripts-traced-to-local-temp.md, ../../decisions/0023-send-code-scripts-not-persisted.md, ../../decisions/0026-logs-and-artefacts-in-local-temp.md, ../../decisions/0018-send-code-transaction-mode.md, ../../modules/family-editing.md, ../../modules/send-code-to-revit.md, ../../modules/toolset.md, ../../concepts/audit-trails.md, ../../workflows/smoke-test.md]
+updated: 2026-11-02
+sources: [https://github.com/CEMENGAL/CEM_Workspace/issues/5, "the user, 2026-11-01 («1. ok», «sí, que instale y abra Revit», «Sí, dale permiso»)", commandset/Services/Family/FamilySessionEventHandlers.cs, commandset/Models/Family/FamilyGeomModels.cs, commandset/Commands/ExecuteDynamicCode/ExecuteCodeCommand.cs, commandset/Commands/ExecuteDynamicCode/ExecuteCodeEventHandler.cs, commandset/Commands/Views/ExportViewImageCommand.cs, commandset/Services/Views/ExportViewImageEventHandler.cs, commandset/Models/Views/ExportViewImageModels.cs, commandset/Services/Core/CreateSharedParameterEventHandler.cs, commandset/Utils/McpLocalFiles.cs, plugin/Utils/ActionLogger.cs, command.json, server/src/tools/export_view_image.ts, server/src/tools/send_code_to_revit.ts, server/src/tools/family_open_session.ts, server/tests/guards/modeller-pins.test.ts, server/tests/guards/no-acc-writes.test.ts, server/tests/tools/export_view_image.test.ts, server/tests/tools/family_open_session.test.ts, "the user, 2026-11-01/02 on SEC-5 («Con la SEG5 hacemos lo que recomiendas», «respecto a SEC-5 hacemos lo que propones», «2. sí»)", plugin/Security/McpAuthToken.cs, plugin/Core/SocketService.cs, plugin/Utils/LogText.cs, server/src/utils/SocketClient.ts]
+related: [../../decisions/0022-local-shared-secret-handshake.md, ../../decisions/0027-send-code-scripts-traced-to-local-temp.md, ../../decisions/0023-send-code-scripts-not-persisted.md, ../../decisions/0026-logs-and-artefacts-in-local-temp.md, ../../decisions/0018-send-code-transaction-mode.md, ../../modules/family-editing.md, ../../modules/send-code-to-revit.md, ../../modules/toolset.md, ../../concepts/audit-trails.md, ../../workflows/smoke-test.md]
 tags: [issue, family, send-code, export, audit, security, modeller]
 ---
 # CEM_Workspace#5: the Revit MCP made ready for the modelling agent
@@ -120,3 +120,55 @@ read-only, and saved nothing beyond our own temp copies.
 - **Nothing was written beside the DLLs.**
 
 The details are in the [smoke test](../../workflows/smoke-test.md).
+
+## SEC-5: the Revit socket's shared secret (the second commit, 2026-11-02)
+
+The security review of this issue found SEC-5: any local account (here, the Codex sandbox) could reach
+`127.0.0.1:8080` and run C# through `send_code_to_revit`. The user: «Con la SEG5 hacemos lo que recomiendas». The
+contract is [0022](../../decisions/0022-local-shared-secret-handshake.md), now current.
+
+**Decisions and why**
+
+- **A token per listener start,** 32 CSPRNG bytes in `%LOCALAPPDATA%\Cemengal\RevitMCP\token`, readable only by the
+  user and SYSTEM. It is issued after the bind, so a second Revit that cannot bind does not replace the first one's
+  token, and revoked on `Stop`.
+  - Rejected: a fixed secret in config (it never rotates); `%TEMP%` (pruned, shared); named pipes with an ACL (they
+    replace upstream's transport on both ends); rotation within a session (per-start rotation covers a restart).
+- **`params.auth` on every request,** checked in constant time in `SocketService` before `CommandExecutor`, and
+  stripped before the command and the action log see it. A refusal gets -33200 "Unauthorized" with no detail.
+  Rejected: a first-line handshake, which changes upstream's framing.
+- **The TS client re-reads the file and retries once,** so a Revit or service restart recovers without restarting the
+  MCP server. The server must run as the Revit user.
+- **Revit's `ApplicationClosing` calls `Stop`** (found live: CEM_RibbonUI has no `OnShutdown`, so the token file
+  outlived Revit). Fixed in the plugin, not the host, so no host has to remember it.
+- **The fix batch (the user: «respecto a SEC-5 hacemos lo que propones»):**
+  - every `Logger` format argument escaped by `LogText` (CWE-117);
+  - the token write: a POSIX-semantics rename, then `MoveFileEx` where unsupported, retried for about 1.3 s.
+    Rejected: a plain retry (199 of 200 writes still failed under a reading loop) and `ReplaceFile` (the same failure).
+  - A cancelled close of Revit still stops the service: recorded as a known limitation, since it fails safe.
+- **Batch 2 (the user: «2. sí»):** `ExclusiveAddressUse` before each bind (SEC-5.2, CWE-605), and `CommandManager`'s
+  malformed `({1}}` log format fixed, with a guard over every plugin log message.
+
+**Findings and their end state**
+
+| Finding | End state |
+|---|---|
+| SEC-5 (any local account could call the socket) | fixed: [0022](../../decisions/0022-local-shared-secret-handshake.md); verified live |
+| The token file outlived Revit (found live) | fixed: `ApplicationClosing`; proved live by both reviewers (QA L4, security C) |
+| SEC-5.1 (Low, CWE-117): a refused method forged `mcp-*.log` lines | fixed: `LogText`; runtime-tested |
+| QA-1 (Low): the token write failed while a reader held the file | fixed: POSIX rename and bounded retry; runtime-tested, mutation-checked |
+| A cancelled close stops the service | recorded as a known limitation in 0022 |
+| SEC-5.2 (Info, CWE-605): the port not held exclusively | fixed: `ExclusiveAddressUse`; pinned |
+| `CommandManager`'s `({1}}` format (an older upstream bug) | fixed; `log-format` guard |
+| SEC-5.3 (Info, CWE-940): the listener does not prove itself to the client | **open design question** for the user, recorded in 0022 |
+
+**What changed**
+
+| Area | Change |
+|---|---|
+| `plugin/Security/McpAuthToken.cs` (new), `plugin/Core/SocketService.cs` | the token's issue, check, revoke and write; the closing hook; the exclusive port; the escaped refusal line |
+| `plugin/Utils/LogText.cs` (new), `Logger.cs`, `ActionLogger.cs`, `McpLocalFiles.cs`, `ExternalEventManager.cs`, `CommandManager.cs` | escaping; `auth` dropped from the action log; the reparse helpers; no interpolated logger message; the format fix |
+| `server/src/utils/SocketClient.ts` | the token sent, re-read and retried once; never in an error |
+| tests | `utils/auth.test.ts` (9), `guards/socket-auth-pins.test.ts` (23), `plugin/runtime.test.ts` (6, the built DLL in PowerShell), `guards/log-format.test.ts` (3), `no-acc-writes` and `connection.test.ts` updated. All red first except the noted locks. 145 tests in 15 files pass |
+| skills | `cem-revitmcp-dev` rule 14; `cem-aimodeler`: what the token errors mean |
+| wiki | [0022](../../decisions/0022-local-shared-secret-handshake.md) current; [0021](../../decisions/0021-loopback-only-socket.md), [0014](../../decisions/0014-license-gated-listener.md), [plugin](../../modules/plugin.md), [server](../../modules/server.md), [tests](../../modules/tests.md), [audit trails](../../concepts/audit-trails.md), [smoke test](../../workflows/smoke-test.md), [test](../../workflows/test.md), [index](../../index.md) |

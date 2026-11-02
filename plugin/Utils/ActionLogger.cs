@@ -61,19 +61,23 @@ namespace CEM_IAModeler.Utils
             if (paramsObject == null)
                 return JValue.CreateNull();
 
+            // 套接字令牌从不写入日志（决策0022）。SocketService已去掉它；这里再保险一次。
+            // The socket's token never reaches the log (decision 0022). SocketService already removed it; this is
+            // the second line of defence.
+            var redacted = (JObject)paramsObject.DeepClone();
+            redacted.Remove("auth");
+
             if (string.Equals(method, SendCodeCommand, StringComparison.OrdinalIgnoreCase))
             {
                 // 保留除脚本正文外的参数（如transactionMode），脚本正文用指向codeFile的占位符替代。
-                var redacted = (JObject)paramsObject.DeepClone();
                 foreach (var key in new[] { "code", "data" })
                 {
                     if (redacted[key] != null)
                         redacted[key] = "<see result.codeFile>";
                 }
-                return redacted;
             }
 
-            return paramsObject;
+            return redacted;
         }
 
         private static string Truncate(string s, int max)

@@ -31,6 +31,7 @@ add-ins → [Cemengal add-ins through the MCP](concepts/cemengal-addins-via-mcp.
 9. CEM_RibbonUI (sibling `CEM_RevitAPI`) owns deployment; rebuild it with Revit closed → [0011](decisions/0011-cem-ribbonui-hosts-deployment.md)
 10. The code wins over `CEM_RevitMCP.md`, which is legacy and partly stale → [0019](decisions/0019-single-authoritative-doc.md), [doc drift](concepts/doc-drift.md)
 11. Nothing writes under ACC or beside the DLL: logs and temp artefacts go through `CemTempFolder` to `%TEMP%\Cemengal\RevitMCP`; the guard test inventories every writer → [0026](decisions/0026-logs-and-artefacts-in-local-temp.md)
+12. Every socket request carries the listener's token (`params.auth`), checked in `SocketService` before `CommandExecutor` and never logged; the MCP server runs as the Revit user → [0022](decisions/0022-local-shared-secret-handshake.md)
 
 **Before you change X, read Y**
 
@@ -116,7 +117,7 @@ add-ins → [Cemengal add-ins through the MCP](concepts/cemengal-addins-via-mcp.
 - [0019](decisions/0019-single-authoritative-doc.md): one authoritative doc (superseded by 0020)
 - [0020](decisions/0020-wiki-is-the-knowledge-base.md): `docs/` wiki is the knowledge base, searched through the machine's shared qmd server (current)
 - [0021](decisions/0021-loopback-only-socket.md): loopback-only socket, client pinned to 127.0.0.1, audited dispatch (current, our divergence)
-- [0022](decisions/0022-local-shared-secret-handshake.md): local shared-secret handshake (proposed)
+- [0022](decisions/0022-local-shared-secret-handshake.md): local shared-secret handshake: a token per listener start in `%LOCALAPPDATA%\Cemengal\RevitMCP\token` (user and SYSTEM only), sent as `params.auth` and checked before dispatch (current, our divergence)
 - [0023](decisions/0023-send-code-scripts-not-persisted.md): no `send_code_to_revit` script persistence; two audit trails (superseded by 0027; location by 0026)
 - [0024](decisions/0024-standalone-deploy-only-without-ribbon-host.md): standalone deploy only without a CEM_RibbonUI sibling (current)
 - [0025](decisions/0025-cemengal-addins-as-tools-via-project-references.md): the Cemengal add-ins are `cem_*` tools calling their own code through ProjectReferences (current)

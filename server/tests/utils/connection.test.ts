@@ -3,7 +3,10 @@
 // SocketService.BindAddress = IPAddress.Loopback (127.0.0.1 only), so the client must connect
 // to 127.0.0.1 explicitly; 'localhost' may resolve to ::1 first and miss the listener.
 import * as net from "net";
-import { afterEach, describe, expect, it } from "vitest";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { REVIT_HOST, REVIT_PORT, withRevitConnection } from "../../src/utils/ConnectionManager.js";
 
 let server: net.Server | undefined;
@@ -11,6 +14,7 @@ let server: net.Server | undefined;
 afterEach(async () => {
   await new Promise<void>((resolve) => (server ? server.close(() => resolve()) : resolve()));
   server = undefined;
+  vi.unstubAllEnvs();
 });
 
 // A stand-in for the Revit plugin: answers each JSON-RPC request with the method name and the
@@ -49,6 +53,12 @@ describe("Revit connection target", () => {
       return;
     }
     server = s;
+    // Every request carries the listener's token (0022); point the client at a scratch one.
+    const local = mkdtempSync(join(tmpdir(), "revitmcp-conn-"));
+    mkdirSync(join(local, "Cemengal", "RevitMCP"), { recursive: true });
+    writeFileSync(join(local, "Cemengal", "RevitMCP", "token"), "c".repeat(64));
+    vi.stubEnv("LOCALAPPDATA", local);
+    ctx.onTestFinished(() => rmSync(local, { recursive: true, force: true }));
 
     const result = await withRevitConnection((client) => client.sendCommand("say_hello", {}));
 

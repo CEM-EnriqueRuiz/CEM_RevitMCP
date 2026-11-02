@@ -172,3 +172,106 @@ From the 2026-11-01 inventory for CEM_Modeler, approved by the user («1. ok»).
 - **Live check, the same day (Revit 2024, after a Debug R24 deploy):** all three fixes passed. The project
   re-activation before a close is the one part not driven. The details are in the
   [smoke test](workflows/smoke-test.md).
+
+## [2026-11-01] decision | 0022 the Revit socket's shared secret (SEC-5), now current
+
+From the security review of CEMENGAL/CEM_Workspace#5 (SEC-5): the Codex sandbox accounts on this machine could reach
+`127.0.0.1:8080`, so they could run `send_code_to_revit` as the user. The user approved it before the CEM_Modeler pilot
+(«Con la SEG5 hacemos lo que recomiendas»). Not committed yet.
+
+- **[0022](decisions/0022-local-shared-secret-handshake.md) is now current, with its open points decided:**
+  - a token per listener start (32 CSPRNG bytes) in `%LOCALAPPDATA%\Cemengal\RevitMCP\token`;
+  - the folder and file readable by the user and SYSTEM only, with inheritance off;
+  - written atomically, never through a link, and never into a folder another account owns;
+  - sent as `params.auth`;
+  - checked in constant time before `CommandExecutor`, answered with the SDK's `Unauthorized` (-33200) and no
+    detail, then removed;
+  - re-read and retried once by the TS client after a restart;
+  - an MCP server under another account is refused, clearly;
+  - the 120 s timeout is unchanged.
+- **Code:** `plugin/Security/McpAuthToken.cs` (new), `SocketService.cs`, `ActionLogger.cs` and `McpLocalFiles.cs` in the
+  plugin; `server/src/utils/SocketClient.ts`.
+- **Tests:** `utils/auth.test.ts` (9) and `guards/socket-auth-pins.test.ts` (17), red first, with four exceptions:
+  - three lock existing behaviour in (the timeout, the loopback bind, the leak scan);
+  - the owner pin came with its code.
+  `no-acc-writes` lists the token writer apart. 130 tests pass.
+- **Built** for R24 and R25 without deploying. **Checked without Revit:**
+  - the R24 DLL's `Issue`, `Matches` and `Revoke`;
+  - `Get-Acl` showed only the user and SYSTEM, inheritance off, the user as owner, and no sandbox SID;
+  - a planted junction was refused.
+- **Checked live in Revit 2024** (a CEM_RibbonUI Debug R24 deploy, a new family from `CMGL-GenericModel`, nothing
+  saved): a normal call worked; raw requests without the right token got -33200 and ran nothing; the live ACL held only
+  the user and SYSTEM; the token was in no log; a listener restart and a Revit restart were each re-read with one retry.
+  **Found:** the token file survived a Revit shutdown, because CEM_RibbonUI has no `OnShutdown` to stop the listener.
+- **Closed in code (the architect's choice, in this repo):**
+  - `SocketService.Initialize` subscribes `UIApplication.ApplicationClosing`, which calls the idempotent `Stop`, so
+    the token is revoked whatever the host does;
+  - there is one subscription at a time, removed on `Stop`;
+  - the plugin's `OnShutdown` path is unchanged.
+  Two new pins were red first; 132 tests pass, and R24 and R25 build. Not deployed: the live proof is pending, for QA's
+  acceptance run.
+- **Wiki:** [0021](decisions/0021-loopback-only-socket.md), [0014](decisions/0014-license-gated-listener.md),
+  [plugin](modules/plugin.md), [server](modules/server.md), [audit trails](concepts/audit-trails.md),
+  [tests](modules/tests.md), [smoke test](workflows/smoke-test.md) (triage), the index (hard rule 12), and both skills
+  (`cem-revitmcp-dev` rule 14; `cem-aimodeler`, the token errors).
+
+## [2026-11-02] decision | 0022 the SEC-5 fix batch: log forging, the token write under readers, a recorded limitation
+
+After the SEC-5 live acceptance run with both reviewers (phases A to C, 2026-11-02), the user decided «respecto a SEC-5
+hacemos lo que propones»: fix two findings, record a third. Not committed.
+
+- **Log forging (security, Low, CWE-117):**
+  - **The defect:** a refused caller's method went into `mcp-*.log` as sent; CR/LF in it wrote forged lines.
+  - **The fix:** `plugin/Utils/LogText.cs` (new) escapes CR, LF, tab, the other C0 and C1 controls, DEL and
+    U+2028/U+2029. `Logger` applies it to every format argument. `Shorten` escapes the refused method before cutting
+    it to 80 characters. The two interpolated logger calls (`SocketService`, `ExternalEventManager`) now pass
+    arguments.
+  - `actions-*.jsonl` was already safe: JSON escapes them.
+- **The token write under readers (QA, Low):**
+  - **The defect:** the one `MoveFileEx(REPLACE_EXISTING)` failed with Win32 error 5 while another handle held the
+    token, and the listener did not start.
+  - **The fix:** `McpAuthToken.ReplaceWithRetry`. It tries a POSIX-semantics rename first (`SetFileInformationByHandle`,
+    `FileRenameInfoEx`), which replaces the file while a delete-sharing reader holds it (the TS client's
+    `readFileSync`); it falls back to `MoveFileEx` where that is unsupported, and retries `ERROR_ACCESS_DENIED` and
+    `ERROR_SHARING_VIOLATION` for about 1.3 s, for readers that do not share delete.
+  - Still one atomic rename. The ACL, the owner check and the reparse refusals are unchanged. `Write` now takes the
+    folder, so the runtime test can use a scratch one; `Issue` passes `Folder`, which is pinned.
+- **Recorded, not fixed:** a cancelled close of Revit still stops the MCP service, because `ApplicationClosing` is
+  cancellable and `Stop` runs on its first notice. It fails safe: the ribbon toggle restarts it. The record is in
+  0022's consequences; the repo keeps no known-gaps page.
+- **Tests, red first:** `tests/plugin/runtime.test.ts` (6, new) runs the built DLL in Windows PowerShell with no Revit.
+  `LogText` did not exist, and 199 of 200 writes failed under readers. Three new pins in `socket-auth-pins`.
+  - Mutation-checked: without the POSIX rename, or without the retry, the 200 writes fail.
+  - One run: 200 writes in 1.07 s, with 15,396 Node reads (none partial, no errors) and 28 .NET reads.
+  - 141 tests in 14 files pass.
+- **Built** for R24 and R25 without deploying. No Revit was opened.
+- **Wiki:** [0022](decisions/0022-local-shared-secret-handshake.md) (§3, §5, the tests, the limitation),
+  [audit trails](concepts/audit-trails.md), [plugin](modules/plugin.md), [tests](modules/tests.md),
+  [test](workflows/test.md), `server/tests/TESTS.md`, and the `cem-revitmcp-dev` skill (rule 14: log values as arguments).
+
+## [2026-11-02] decision | 0022 the second SEC-5 batch: the exclusive port, and a malformed log format
+
+The user approved two more changes before the SEC-5 commit («2. sí»). Not committed, not deployed.
+
+- **SEC-5.2 (hardening, CWE-605):** `SocketService.Start` sets `ExclusiveAddressUse = true` on each new listener
+  before `Start()`, so no other socket, this user's included, can bind the port while it listens.
+  - Checked with plain `TcpListener`s in Windows PowerShell: three stop/start cycles with up to 15 connections in
+    TIME_WAIT all restarted, so the ribbon toggle still works.
+  - On this Windows 11, a second bind of `127.0.0.1` was already refused without the option; the option makes it
+    explicit. A wildcard bind still succeeds, but all 20 test connections to `127.0.0.1` reached our listener.
+  - Pinned in `socket-auth-pins`, red first.
+- **A malformed log format (an older upstream bug):** `CommandManager`'s unsupported-version warning had `({1}}`,
+  which throws `FormatException`; it is now `({1})`. `tests/guards/log-format.test.ts` (3, new) checks every
+  `_logger` message in `plugin/` against .NET's format rules and its argument count; red first on that line only.
+- **Tests:** 145 in 15 files pass. **Built** for R24 and R25 without deploying. No Revit was opened.
+- **Wiki:** [0022](decisions/0022-local-shared-secret-handshake.md) (decision 1, the tests, two consequences),
+  [plugin](modules/plugin.md), [tests](modules/tests.md), `server/tests/TESTS.md`.
+
+## [2026-11-02] ingest | CEMENGAL/CEM_Workspace#5 SEC-5: the Revit socket's shared secret, with its two fix batches
+
+Both reviewers' rechecks are green (0 blocking). One commit for all of SEC-5: the token handshake
+([0022](decisions/0022-local-shared-secret-handshake.md)), the fix batch and batch 2.
+- The [source page](sources/issues/CEMENGAL-CEM_Workspace-5.md) gains a SEC-5 section: the decisions and the rejected
+  alternatives, each finding's end state, and what changed.
+- 0022: the closing fix proved live by both reviewers (2026-11-02); SEC-5.3 (Info, CWE-940, the listener does not
+  prove itself to the client) recorded as an open design question for the user.

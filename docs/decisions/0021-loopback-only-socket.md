@@ -2,7 +2,7 @@
 title: "0021 Loopback-only socket, pinned client host, and audited dispatch"
 type: decision
 status: current
-updated: 2026-10-06
+updated: 2026-11-01
 sources: [plugin/Core/SocketService.cs, server/src/utils/ConnectionManager.ts, server/tests/utils/connection.test.ts, plugin/Core/CommandExecutor.cs]
 related: [0014-license-gated-listener.md, 0013-hardcoded-failsoft-audit-trails.md, 0022-local-shared-secret-handshake.md, ../concepts/threading-and-external-events.md, ../concepts/upstream-and-fork.md]
 tags: [security, socket, audit, divergence]
@@ -19,7 +19,7 @@ directly). Drafted on 2026-10-06 and committed on 2026-10-07 as a HOT FIX with n
 - `SocketService.Start` bound `TcpListener(IPAddress.Any, 8080)`. While CEM_RevitAI was on, **any
   machine on the network** could send JSON-RPC to Revit. That includes `send_code_to_revit`
   (arbitrary C# through Roslyn), which amounts to remote code execution on the user's PC. The
-  socket has **no authentication** of any kind. The license gate
+  socket had **no authentication** of any kind (until [0022](0022-local-shared-secret-handshake.md), 2026-11-01). The license gate
   ([0014](0014-license-gated-listener.md)) controls whether the listener starts, not who may
   connect.
 - The TS client connected to `"localhost"`. Node ≥ 17 resolves `localhost` in OS order (often
@@ -46,11 +46,13 @@ directly). Drafted on 2026-10-06 and committed on 2026-10-07 as a HOT FIX with n
    script body is logged.** `send_code_to_revit` calls appear in the log with `code`/`data` as
    `"<omitted>"`, and there is no `Recipes\` dump. Checked after rebasing onto `fe06b6c` on
    2026-10-07.
-4. **Shared-secret handshake: proposed, not implemented** → [0022](0022-local-shared-secret-handshake.md).
+4. **Shared-secret handshake:** proposed here, current since 2026-11-01 → [0022](0022-local-shared-secret-handshake.md).
+   Every request now carries the listener's token, checked before `CommandExecutor`.
 
 ## Consequences
 
-- Remote hosts can no longer connect. Local processes still can (see 0022 for the residual risk).
+- Remote hosts can no longer connect. Local processes still can, but since
+  [0022](0022-local-shared-secret-handshake.md) a request without the listener's token is refused.
 - The old npm/upstream TS server using `localhost` still works on Node 20+ (its happy-eyeballs
   fallback reaches 127.0.0.1), but don't rely on it.
 - Tests: `server/tests/utils/connection.test.ts` asserts the pinned host and port, and drives

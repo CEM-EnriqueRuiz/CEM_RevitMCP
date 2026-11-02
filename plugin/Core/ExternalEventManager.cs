@@ -80,7 +80,7 @@ namespace CEM_IAModeler.Core
                 Handler = handler
             };
 
-            _logger.Info($"为 {key} 创建了新的外部事件\nCreated a new external event for key {key}.");
+            _logger.Info("为 {0} 创建了新的外部事件\nCreated a new external event for key {0}.", key);
 
             return externalEvent;
         }
