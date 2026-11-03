@@ -1,7 +1,7 @@
 ---
 title: CEM_RevitMCP wiki log
 type: log
-updated: 2026-11-01
+updated: 2026-11-03
 sources: []
 related: [index.md]
 tags: [log]
@@ -275,3 +275,9 @@ Both reviewers' rechecks are green (0 blocking). One commit for all of SEC-5: th
   alternatives, each finding's end state, and what changed.
 - 0022: the closing fix proved live by both reviewers (2026-11-02); SEC-5.3 (Info, CWE-940, the listener does not
   prove itself to the client) recorded as an open design question for the user.
+
+## [2026-11-03] ingest | Commits 2026-11: cem-revit-ai declared in .mcp.json (no issue, by the user's decision)
+
+`.mcp.json` gains a project-level `cem-revit-ai` entry, relative to the repo → [2026-11](sources/commits/2026-11.md).
+[Smoke test](workflows/smoke-test.md) and [build and deploy](workflows/build-and-deploy.md) corrected: the entry now
+exists, and a fresh checkout still needs `npm install` and `npm run build` in `server/`.

@@ -1,8 +1,8 @@
 ---
 title: Smoke test (full chain, live Revit)
 type: workflow
-updated: 2026-11-01
-sources: [CEM_RevitMCP.md, b04b41e, https://github.com/CEM-EnriqueRuiz/CEM_API/issues/82]
+updated: 2026-11-03
+sources: [CEM_RevitMCP.md, b04b41e, https://github.com/CEM-EnriqueRuiz/CEM_API/issues/82, .mcp.json]
 related: [build-and-deploy.md, test.md, ../modules/family-editing.md, ../concepts/audit-trails.md]
 tags: [verify, smoke-test]
 ---
@@ -21,6 +21,12 @@ Revit 2024 with a scratch **project** (and optionally an **.rfa**). `server/buil
 ## Point the MCP client at the local build
 
 The published npm package lacks the Cemengal tools.
+
+**Claude Code in this repo needs no registration.** `.mcp.json` declares `cem-revit-ai` with the path
+`${CEM_REVITMCP_SERVER:-server/build/index.js}`, relative to the repo root. `server/build/` is not tracked, so a fresh
+checkout still needs `cd server && npm install && npm run build`.
+
+**Any other client, or a session started outside this repo,** registers the build itself:
 
 ```json
 { "mcpServers": { "cem-revit-ai": {

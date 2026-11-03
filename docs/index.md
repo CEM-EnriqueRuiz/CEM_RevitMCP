@@ -1,7 +1,7 @@
 ---
 title: CEM_RevitMCP wiki index
 type: index
-updated: 2026-11-01
+updated: 2026-11-03
 sources: [command.json, CEM_RevitMCP.md, .claude/skills/cem-revitmcp-dev/SKILL.md, .claude/skills/cem-aimodeler/SKILL.md]
 related: [overview.md, log.md]
 tags: [index]
@@ -141,3 +141,4 @@ Commits without an issue:
 - [2026-06](sources/commits/2026-06.md): Cemengal: first 53 tools (`b04b41e`), CEM_IAModeler and 120 tools (`aa88b96`).
 - [2026-08](sources/commits/2026-08.md): Cemengal: CLAUDE.md and skill, gitignore, commit convention.
 - [2026-10](sources/commits/2026-10.md): Cemengal: no script persistence (`fe06b6c`); skills/agents, `.gitignore`, deploy guard (`29b3fba`); loopback-only socket (HOT FIX); `cem-aimodeler` skill moved into the repo.
+- [2026-11](sources/commits/2026-11.md): Cemengal: `cem-revit-ai` declared in `.mcp.json`, relative to the repo.

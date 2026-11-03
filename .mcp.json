@@ -1,5 +1,6 @@
 {
   "mcpServers": {
-    "qmd": { "type": "http", "url": "http://127.0.0.1:8181/mcp" }
+    "qmd": { "type": "http", "url": "http://127.0.0.1:8181/mcp" },
+    "cem-revit-ai": { "type": "stdio", "command": "node", "args": ["${CEM_REVITMCP_SERVER:-server/build/index.js}"] }
   }
 }

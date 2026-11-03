@@ -1,8 +1,8 @@
 ---
 title: Build and deploy
 type: workflow
-updated: 2026-10-07
-sources: [commandset/CEM_IAModeler_CommandSet.csproj, plugin/CEM_IAModeler.csproj, server/package.json, CEM_RevitMCP.sln]
+updated: 2026-11-03
+sources: [commandset/CEM_IAModeler_CommandSet.csproj, plugin/CEM_IAModeler.csproj, server/package.json, CEM_RevitMCP.sln, .mcp.json]
 related: [../decisions/0011-cem-ribbonui-hosts-deployment.md, ../modules/server.md, ../modules/commandset.md, smoke-test.md]
 tags: [build, deploy]
 ---
@@ -71,5 +71,6 @@ involved; it registers an add-in with **no UI**, so nothing can start the server
 ## Start it
 
 In Revit: Cemengal ribbon → **CEM_RevitAI** button (calls `MCPServiceConnection`, license-gated).
-A dialog shows "Open Server": it is listening on 8080 and has loaded the commands. Then point the
-MCP client at the local `server/build/index.js` ([smoke test](smoke-test.md)).
+A dialog shows "Open Server": it is listening on 8080 and has loaded the commands. A Claude Code session in
+this repo reaches it through the `cem-revit-ai` entry in `.mcp.json`, once `npm install` and `npm run build` have
+run in `server/`. Point any other MCP client at the local `server/build/index.js` ([smoke test](smoke-test.md)).
