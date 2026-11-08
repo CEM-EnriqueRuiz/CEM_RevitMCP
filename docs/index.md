@@ -1,7 +1,7 @@
 ---
 title: CEM_RevitMCP wiki index
 type: index
-updated: 2026-11-03
+updated: 2026-11-08
 sources: [command.json, CEM_RevitMCP.md, .claude/skills/cem-revitmcp-dev/SKILL.md, .claude/skills/cem-aimodeler/SKILL.md]
 related: [overview.md, log.md]
 tags: [index]
@@ -32,11 +32,13 @@ add-ins → [Cemengal add-ins through the MCP](concepts/cemengal-addins-via-mcp.
 10. The code wins over `CEM_RevitMCP.md`, which is legacy and partly stale → [0019](decisions/0019-single-authoritative-doc.md), [doc drift](concepts/doc-drift.md)
 11. Nothing writes under ACC or beside the DLL: logs and temp artefacts go through `CemTempFolder` to `%TEMP%\Cemengal\RevitMCP`; the guard test inventories every writer → [0026](decisions/0026-logs-and-artefacts-in-local-temp.md)
 12. Every socket request carries the listener's token (`params.auth`), checked in `SocketService` before `CommandExecutor` and never logged; the MCP server runs as the Revit user → [0022](decisions/0022-local-shared-secret-handshake.md)
+13. Any C# written or touched follows the C# procedure: the mirror structure (root 0041), old names migrated in the same change, reusable helpers down to CEM_CSharpExtended or `CEM_RevitAPI_Extended` → [C# procedure](../../../CEM_CSharpExtended/docs/workflows/csharp-procedure.md)
 
 **Before you change X, read Y**
 
 | Task / area | Read |
 |---|---|
+| Write or touch any C# (`commandset/`, `plugin/`) | [C# procedure](../../../CEM_CSharpExtended/docs/workflows/csharp-procedure.md), [`cem-csharp-mirror` skill](../../../CEM_CSharpExtended/.claude/skills/cem-csharp-mirror/SKILL.md), [commandset](modules/commandset.md) |
 | Add or change a tool | [add a tool](workflows/add-a-tool.md), [four-part pattern](concepts/four-part-tool-pattern.md), [toolset](modules/toolset.md) |
 | A `cem_*` tool, or a Cemengal add-in the MCP calls | [Cemengal add-ins](concepts/cemengal-addins-via-mcp.md), [0025](decisions/0025-cemengal-addins-as-tools-via-project-references.md) |
 | Write a handler (threads, transactions, timeouts) | [threading](concepts/threading-and-external-events.md), [AI-grade conventions](concepts/ai-grade-conventions.md) |

@@ -40,7 +40,8 @@ external-event plumbing. It holds no tool logic.
 - A **`ProjectReference` to `../../../CEM_CSharpExtended/CEM_CSharpExtended`** for `IO.CemTempFolder`, the
   self-cleaning `%TEMP%\Cemengal\RevitMCP` where the logs go
   ([0026](../decisions/0026-logs-and-artefacts-in-local-temp.md)). `CEM_CSharpExtended.dll` already shipped beside
-  `CEM_IAModeler.dll` through `CEM_RevitAuth`.
+  `CEM_IAModeler.dll` through `CEM_RevitAuth`. C# written or touched here follows the
+  [C# procedure](../../../../CEM_CSharpExtended/docs/workflows/csharp-procedure.md) (root 0041).
 - Standalone build (`CemStandaloneDeploy`: `CemRibbonHostBuild != true` **and** no sibling
   `CEM_RevitAPI/CEM_RibbonUI`, [0024](../decisions/0024-standalone-deploy-only-without-ribbon-host.md)): the `CopyFiles` target deploys
   `CEM_IAModeler.addin` and the DLLs to `%AppData%\Autodesk\Revit\Addins\<ver>` on Debug builds.

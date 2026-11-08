@@ -1,7 +1,7 @@
 ---
 title: CEM_RevitMCP wiki log
 type: log
-updated: 2026-11-03
+updated: 2026-11-08
 sources: []
 related: [index.md]
 tags: [log]
@@ -290,3 +290,11 @@ exists, and a fresh checkout still needs `npm install` and `npm run build` in `s
 security review and acceptance pending; Revit not checked live). `Hosting.CemTempFolder` → `IO.CemTempFolder` in
 [0026](decisions/0026-logs-and-artefacts-in-local-temp.md), [commandset](modules/commandset.md) and
 [plugin](modules/plugin.md); a note on the [CEM_API#82 source](sources/issues/CEM-EnriqueRuiz-CEM_API-82.md).
+
+## [2026-11-08] ingest | CEMENGAL/CEM_CSharpExtended#1 the C# procedure written into the skill and the wiki
+
+Docs and skills only. The `cem-revitmcp-dev` skill gains a hard rule before the others: any C# written or touched
+loads CEM_CSharpExtended's `cem-csharp-mirror` skill first, goes on the mirror structure, migrates old names in the
+same change and moves reusable helpers to CEM_CSharpExtended or `CEM_RevitAPI_Extended`. One line in `CLAUDE.md` and
+`AGENTS.md`; [index](index.md) hard rule 13 and a "Before you change X" row; links in [commandset](modules/commandset.md)
+and [plugin](modules/plugin.md); a section on the [source page](sources/issues/CEMENGAL-CEM_CSharpExtended-1.md).

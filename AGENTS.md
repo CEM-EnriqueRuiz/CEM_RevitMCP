@@ -12,6 +12,8 @@ C# plugin (`plugin/`) and command set (`commandset/`) over a localhost socket.
    To **use** the MCP on a live model rather than change it (modelling, replacing elements, the
    Cemengal add-ins), follow [.claude/skills/cem-aimodeler/SKILL.md](.claude/skills/cem-aimodeler/SKILL.md)
    instead.
+   Any C# you write or touch follows the C# procedure: load
+   [cem-csharp-mirror](../../CEM_CSharpExtended/.claude/skills/cem-csharp-mirror/SKILL.md) first (root decision 0041).
 3. Search the wiki with the qmd CLI when the index is not enough:
    `qmd query -c cem_revitmcp "why does the command not call the Revit API"`, then
    `qmd get qmd://cem_revitmcp/<path>`. Collection names for other repos are in

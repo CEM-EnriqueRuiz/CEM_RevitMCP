@@ -20,6 +20,17 @@ Also read [CROSS_REPO.md](../../../../../CROSS_REPO.md).
 This skill is for **changing** the server. To **use** it on a live model (modelling, the Cemengal
 add-ins), load [cem-aimodeler](../cem-aimodeler/SKILL.md) instead.
 
+## C# procedure (hard rule, before any C#)
+
+Any C# you write or touch here (`commandset/`, `plugin/`) follows the C# procedure: load
+[`cem-csharp-mirror`](../../../../../CEM_CSharpExtended/.claude/skills/cem-csharp-mirror/SKILL.md)
+(`CEM_CSharpExtended/.claude/skills/cem-csharp-mirror/SKILL.md`) before writing C#. New code goes on the mirror
+structure (root [0041](../../../../../docs/decisions/0041-csharp-libraries-mirror-the-native-one.md)). Old library
+names in a file you touch are migrated in the same change, from CEM_CSharpExtended's `docs/modules/migration.md`. A
+reusable helper goes down a layer, never stays in the command set or the plugin: host-agnostic code to
+CEM_CSharpExtended's mirrored namespaces (`XPath`, `XFile`…), Revit host code to `CEM_RevitAPI_Extended`'s X
+classes. Procedure page: [csharp-procedure](../../../../../CEM_CSharpExtended/docs/workflows/csharp-procedure.md).
+
 ## Hard rules
 
 1. A tool = `server/src/tools/<name>.ts` + `commandset/{Commands,Services,Models}/<Domain>/` + a `command.json` entry → [0001](../../../docs/decisions/0001-extend-via-four-part-pattern.md)

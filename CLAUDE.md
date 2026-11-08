@@ -8,6 +8,7 @@ names. The wiki holds the conventions, the decisions and their reasons, and the 
 `CEM_RevitMCP.md` is legacy and partly stale; the code and the wiki win.
 
 Load the `cem-revitmcp-dev` skill (`.claude/skills/cem-revitmcp-dev/SKILL.md`) before writing code.
+Any C# here follows the C# procedure: load `../../CEM_CSharpExtended/.claude/skills/cem-csharp-mirror/SKILL.md` first (root decision 0041).
 To **use** the MCP on a live model (modelling, replacing elements, running or opening the Cemengal
 add-ins through it), load the `cem-aimodeler` skill (`.claude/skills/cem-aimodeler/SKILL.md`) instead;
 it is the only copy of that skill. Cross-repo rules: [../../CROSS_REPO.md](../../CROSS_REPO.md).

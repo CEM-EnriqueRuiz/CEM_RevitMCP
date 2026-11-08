@@ -69,6 +69,9 @@ cross-cutting request/result models: `CoreEditModels`, `GetParametersModels`, `P
   files and families saved to be reloaded in `%TEMP%\Cemengal\RevitMCP\<Kind>`,
   [0026](../decisions/0026-logs-and-artefacts-in-local-temp.md)). The CEM_RibbonUI stage copies `CEM_CSharpExtended.dll`
   into `Commands\` with the rest of the output.
+- C# written or touched here follows the [C# procedure](../../../../CEM_CSharpExtended/docs/workflows/csharp-procedure.md)
+  (root 0041): mirror names, old names migrated in the same change, reusable helpers moved to CEM_CSharpExtended or
+  `CEM_RevitAPI_Extended` (already referenced), not kept here.
 - Standalone build: the `DeployCommandSet` target copies DLLs and `command.json` into
   `plugin/bin/AddIn <ver> <cfg>/CEM_IAModeler/Commands/CEM_IAModeler_CommandSet/` and, on Debug,
   into `%AppData%\Autodesk\Revit\Addins\<ver>\...`. Hosted build: skipped

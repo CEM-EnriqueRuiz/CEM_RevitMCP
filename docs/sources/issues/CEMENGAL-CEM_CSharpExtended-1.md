@@ -36,6 +36,19 @@ Behaviour is unchanged: the same folders under `%TEMP%\Cemengal\RevitMCP`, the s
 - **Committed before the reviews finish**, by the user's decision, because a teammate is starting a new project on
   this foundation.
 
+## The C# procedure (docs and skills only)
+
+The user asked for the new way to proceed to be written into the wikis and the skills, so that an agent writing C#
+here, without being told, puts new code on the mirror structure and migrates the old names in a file it touches. The
+canonical procedure has one copy, in CEM_CSharpExtended: the `cem-csharp-mirror` skill and
+[csharp-procedure](../../../../../CEM_CSharpExtended/docs/workflows/csharp-procedure.md). This repo points to it from the
+`cem-revitmcp-dev` skill (a hard rule before the others), `CLAUDE.md`, `AGENTS.md`, the index (hard rule 13 and a
+"Before you change X" row), [commandset](../../modules/commandset.md) and [plugin](../../modules/plugin.md).
+- **Pointers, not copies** (CROSS_REPO: one copy). Rejected: restating the procedure here, which would drift.
+- **No code change in this step**, by the user's decision. The later helpers below are now migrated by whoever next
+  touches those files, under the procedure.
+- The Codex entry `.agents/skills/cem-revitmcp-dev/SKILL.md` is unchanged: it only points to the canonical skill.
+
 ## Later helpers (recorded, not done)
 
 Candidates for CEM_CSharpExtended's mirrored names (root 0041 §5), for this repo's owner:
