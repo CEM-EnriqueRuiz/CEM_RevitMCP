@@ -1,7 +1,7 @@
 ---
 title: commandset/ — the Revit command set (CEM_IAModeler_CommandSet)
 type: module
-updated: 2026-10-24
+updated: 2026-11-08
 sources: [commandset/CEM_IAModeler_CommandSet.csproj, commandset/Commands, commandset/Services, commandset/Models, commandset/Utils, command.json]
 related: [../concepts/four-part-tool-pattern.md, ../concepts/domains-and-naming.md, ../concepts/ai-grade-conventions.md, toolset.md]
 tags: [commandset, csharp]
@@ -65,7 +65,7 @@ cross-cutting request/result models: `CoreEditModels`, `GetParametersModels`, `P
   `net8.0-windows10.0.19041.0`.
 - Packages: `RevitMCPSDK`, `Nice3point.Revit.*`, `Newtonsoft.Json`, `Microsoft.CodeAnalysis.CSharp`
   (Roslyn, for `send_code_to_revit`), and `System.Drawing.Common` on net8 (for `take_screenshot`).
-- `ProjectReference` to `CEM_CSharpExtended` (its `Hosting.CemTempFolder` places screenshots, shared parameter
+- `ProjectReference` to `CEM_CSharpExtended` (its `IO.CemTempFolder` places screenshots, shared parameter
   files and families saved to be reloaded in `%TEMP%\Cemengal\RevitMCP\<Kind>`,
   [0026](../decisions/0026-logs-and-artefacts-in-local-temp.md)). The CEM_RibbonUI stage copies `CEM_CSharpExtended.dll`
   into `Commands\` with the rest of the output.

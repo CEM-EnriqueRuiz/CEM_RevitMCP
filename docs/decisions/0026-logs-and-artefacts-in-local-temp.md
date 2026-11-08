@@ -2,8 +2,8 @@
 title: "0026 Logs and temporary artefacts go to %TEMP%\\Cemengal\\RevitMCP; nothing writes under ACC or beside the DLL"
 type: decision
 status: current
-updated: 2026-11-01
-sources: [https://github.com/CEM-EnriqueRuiz/CEM_API/issues/82, https://github.com/CEMENGAL/CEM_Workspace/issues/5, "root decision 0031 (the user, 2026-10-24 and 2026-10-25)", plugin/Utils/ActionLogger.cs, plugin/Utils/Logger.cs, plugin/Utils/PathManager.cs, plugin/Utils/McpLocalFiles.cs, plugin/Configuration/ConfigurationManager.cs, plugin/UI/CommandSetSettingsPage.xaml.cs, commandset/Utils/McpLocalFiles.cs, commandset/Services/AnnotationComponents/TakeScreenshotEventHandler.cs, commandset/Services/Core/CoreParamQueryEventHandlers.cs, commandset/Services/Core/CreateSharedParameterEventHandler.cs, commandset/Services/Family/FamilySessionEventHandlers.cs, server/tests/guards/no-acc-writes.test.ts]
+updated: 2026-11-08
+sources: [https://github.com/CEM-EnriqueRuiz/CEM_API/issues/82, https://github.com/CEMENGAL/CEM_Workspace/issues/5, https://github.com/CEMENGAL/CEM_CSharpExtended/issues/1, "root decision 0031 (the user, 2026-10-24 and 2026-10-25)", plugin/Utils/ActionLogger.cs, plugin/Utils/Logger.cs, plugin/Utils/PathManager.cs, plugin/Utils/McpLocalFiles.cs, plugin/Configuration/ConfigurationManager.cs, plugin/UI/CommandSetSettingsPage.xaml.cs, commandset/Utils/McpLocalFiles.cs, commandset/Services/AnnotationComponents/TakeScreenshotEventHandler.cs, commandset/Services/Core/CoreParamQueryEventHandlers.cs, commandset/Services/Core/CreateSharedParameterEventHandler.cs, commandset/Services/Family/FamilySessionEventHandlers.cs, server/tests/guards/no-acc-writes.test.ts]
 related: [../sources/issues/CEM-EnriqueRuiz-CEM_API-82.md, 0023-send-code-scripts-not-persisted.md, 0013-hardcoded-failsoft-audit-trails.md, 0011-cem-ribbonui-hosts-deployment.md, 0024-standalone-deploy-only-without-ribbon-host.md, ../concepts/audit-trails.md, ../modules/plugin.md, ../modules/commandset.md, ../workflows/test.md]
 tags: [logging, audit, acc, deploy, cem_csharpextended]
 ---
@@ -42,7 +42,7 @@ On 2026-10-25 the user kept every change. Root 0031 has no exception for the MCP
 
 ## Decision
 
-All of it goes through CEM_CSharpExtended's `Hosting.CemTempFolder` (netstandard2.0, BCL only), under the app
+All of it goes through CEM_CSharpExtended's `IO.CemTempFolder` (netstandard2.0, BCL only; `Hosting` until [CEM_CSharpExtended#1](../sources/issues/CEMENGAL-CEM_CSharpExtended-1.md)), under the app
 name `RevitMCP` (`McpLocalFiles.App`, one constant in each project):
 
 - **Logs:** `ActionLogger` writes `%TEMP%\Cemengal\RevitMCP\actions-yyyyMMdd.jsonl` with

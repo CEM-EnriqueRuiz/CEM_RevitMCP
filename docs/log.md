@@ -281,3 +281,12 @@ Both reviewers' rechecks are green (0 blocking). One commit for all of SEC-5: th
 `.mcp.json` gains a project-level `cem-revit-ai` entry, relative to the repo → [2026-11](sources/commits/2026-11.md).
 [Smoke test](workflows/smoke-test.md) and [build and deploy](workflows/build-and-deploy.md) corrected: the entry now
 exists, and a fresh checkout still needs `npm install` and `npm run build` in `server/`.
+
+## [2026-11-08] ingest | CEMENGAL/CEM_CSharpExtended#1 C# libraries mirror the native library: the compile migration
+
+`CemTempFolder` moved to `CEM_CSharpExtended.IO` (root 0041); 11 C# files change their `using`, nothing else
+→ [source page](sources/issues/CEMENGAL-CEM_CSharpExtended-1.md), which records the later helpers (the duplicated
+`McpLocalFiles` reparse checks, two hand-made safe file names → `XPath`) and the open items at push time (live check,
+security review and acceptance pending; Revit not checked live). `Hosting.CemTempFolder` → `IO.CemTempFolder` in
+[0026](decisions/0026-logs-and-artefacts-in-local-temp.md), [commandset](modules/commandset.md) and
+[plugin](modules/plugin.md); a note on the [CEM_API#82 source](sources/issues/CEM-EnriqueRuiz-CEM_API-82.md).

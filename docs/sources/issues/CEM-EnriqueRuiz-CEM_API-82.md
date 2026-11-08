@@ -1,7 +1,7 @@
 ---
 title: "CEM-EnriqueRuiz/CEM_API#82: the MCP writes nothing under ACC or beside the DLL; logs in %TEMP%\\Cemengal\\RevitMCP"
 type: source
-updated: 2026-10-25
+updated: 2026-11-08
 sources: [https://github.com/CEM-EnriqueRuiz/CEM_API/issues/82, "root decision 0031", plugin/Utils/ActionLogger.cs, plugin/Utils/Logger.cs, plugin/Utils/PathManager.cs, plugin/UI/CommandSetSettingsPage.xaml.cs, commandset/Services/AnnotationComponents/TakeScreenshotEventHandler.cs, commandset/Services/Core/CoreParamQueryEventHandlers.cs, commandset/Services/Core/CreateSharedParameterEventHandler.cs, commandset/Services/Family/FamilySessionEventHandlers.cs, server/tests/guards/no-acc-writes.test.ts]
 related: [../../decisions/0026-logs-and-artefacts-in-local-temp.md, ../../decisions/0023-send-code-scripts-not-persisted.md, ../../concepts/audit-trails.md, ../../concepts/doc-drift.md, ../../workflows/smoke-test.md, ../../../../../docs/decisions/0031-nothing-writes-under-acc-logs-in-local-temp.md, ../../../../../docs/features/CEM-EnriqueRuiz-CEM_API-82.md]
 tags: [issue, acc, logging, audit, cem_csharpextended]
@@ -58,7 +58,7 @@ decision is [0026](../../decisions/0026-logs-and-artefacts-in-local-temp.md).
 
 ## Decisions and reasons
 
-- **All writes go through CEM_CSharpExtended's `Hosting.CemTempFolder`,** with one `App` constant per project. Root 0031 makes
+- **All writes go through CEM_CSharpExtended's `Hosting.CemTempFolder` (in `IO` since [CEM_CSharpExtended#1](CEMENGAL-CEM_CSharpExtended-1.md)),** with one `App` constant per project. Root 0031 makes
   it the one C# implementation. Its pruning (7 days, 50 MB, once per process) and its thread-safe, never-throwing `AppendLog`
   replace this repo's own lock and path code.
 - **The settings page becomes read-only.** In the Cemengal layout its upstream load finds no `Commands\<set>\command.json`, and

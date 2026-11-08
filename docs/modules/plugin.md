@@ -1,7 +1,7 @@
 ---
 title: plugin/ — the Revit add-in (CEM_IAModeler)
 type: module
-updated: 2026-11-02
+updated: 2026-11-08
 sources: [plugin/CEM_IAModeler.csproj, plugin/Core/SocketService.cs, plugin/Core/CommandManager.cs, plugin/Core/CommandExecutor.cs, plugin/Core/MCPServiceConnection.cs, plugin/Core/Application.cs, plugin/Utils/ActionLogger.cs, plugin/Utils/Logger.cs, plugin/Utils/PathManager.cs, plugin/Utils/McpLocalFiles.cs, plugin/Security/McpAuthToken.cs, plugin/Configuration/ConfigurationManager.cs, plugin/UI/CommandSetSettingsPage.xaml.cs]
 related: [../decisions/0022-local-shared-secret-handshake.md, ../decisions/0026-logs-and-artefacts-in-local-temp.md, ../concepts/threading-and-external-events.md, ../decisions/0011-cem-ribbonui-hosts-deployment.md, ../decisions/0014-license-gated-listener.md, ../concepts/audit-trails.md]
 tags: [plugin, csharp]
@@ -37,7 +37,7 @@ external-event plumbing. It holds no tool logic.
 - Depends on the `RevitMCPSDK`, `Nice3point.Revit.Api.*` and `Nice3point.Revit.Toolkit` NuGet
   packages, plus a **`ProjectReference` to `../../../CEM_RevitAPI/CEM_RevitAuth`**, so the sibling
   repo must be checked out.
-- A **`ProjectReference` to `../../../CEM_CSharpExtended/CEM_CSharpExtended`** for `Hosting.CemTempFolder`, the
+- A **`ProjectReference` to `../../../CEM_CSharpExtended/CEM_CSharpExtended`** for `IO.CemTempFolder`, the
   self-cleaning `%TEMP%\Cemengal\RevitMCP` where the logs go
   ([0026](../decisions/0026-logs-and-artefacts-in-local-temp.md)). `CEM_CSharpExtended.dll` already shipped beside
   `CEM_IAModeler.dll` through `CEM_RevitAuth`.
