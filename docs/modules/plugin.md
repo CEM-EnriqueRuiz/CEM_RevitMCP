@@ -1,7 +1,7 @@
 ---
 title: plugin/ — the Revit add-in (CEM_IAModeler)
 type: module
-updated: 2026-11-08
+updated: 2026-11-09
 sources: [plugin/CEM_IAModeler.csproj, plugin/Core/SocketService.cs, plugin/Core/CommandManager.cs, plugin/Core/CommandExecutor.cs, plugin/Core/MCPServiceConnection.cs, plugin/Core/Application.cs, plugin/Utils/ActionLogger.cs, plugin/Utils/Logger.cs, plugin/Utils/PathManager.cs, plugin/Utils/McpLocalFiles.cs, plugin/Security/McpAuthToken.cs, plugin/Configuration/ConfigurationManager.cs, plugin/UI/CommandSetSettingsPage.xaml.cs]
 related: [../decisions/0022-local-shared-secret-handshake.md, ../decisions/0026-logs-and-artefacts-in-local-temp.md, ../concepts/threading-and-external-events.md, ../decisions/0011-cem-ribbonui-hosts-deployment.md, ../decisions/0014-license-gated-listener.md, ../concepts/audit-trails.md]
 tags: [plugin, csharp]
@@ -25,8 +25,7 @@ external-event plumbing. It holds no tool logic.
 | `Configuration/*` | registry/config model (`CommandConfig`: name, assemblyPath, enabled, supported versions); `ConfigurationManager` reads the shipped registry | a missing registry loads an empty config instead of being created ([0026](../decisions/0026-logs-and-artefacts-in-local-temp.md)) |
 | `UI/*` | upstream settings window / command-set page, opened by the `Core.Settings` command | **read-only** ([0026](../decisions/0026-logs-and-artefacts-in-local-temp.md)): it never rewrites the registry (its upstream load rewrote it empty in the Cemengal layout). Unreachable in the Cemengal build: no button, no `.addin` entry |
 | `Utils/ActionLogger.cs` | JSONL audit log, `%TEMP%\Cemengal\RevitMCP\actions-yyyyMMdd.jsonl` ([audit trails](../concepts/audit-trails.md)) | **new**; moved off ACC in [0026](../decisions/0026-logs-and-artefacts-in-local-temp.md); drops an `auth` param ([0022](../decisions/0022-local-shared-secret-handshake.md)) |
-| `Utils/Logger.cs` | the RevitMCPSDK `ILogger`, `%TEMP%\Cemengal\RevitMCP\mcp-yyyyMMdd.log` | used to write `<DLL>\Logs\`, i.e. the ACC menu ([0026](../decisions/0026-logs-and-artefacts-in-local-temp.md)); every format argument escaped with `LogText` ([0022](../decisions/0022-local-shared-secret-handshake.md), CWE-117) |
-| `Utils/LogText.cs` | `Escape` (control characters and line separators to `\r`, `\n`, `\t`, `\uXXXX`) and `EscapeArgs` | **new** (2026-11-02, [0022](../decisions/0022-local-shared-secret-handshake.md)) |
+| `Utils/Logger.cs` | the RevitMCPSDK `ILogger`, `%TEMP%\Cemengal\RevitMCP\mcp-yyyyMMdd.log` | used to write `<DLL>\Logs\`, i.e. the ACC menu ([0026](../decisions/0026-logs-and-artefacts-in-local-temp.md)); every format argument escaped by its private `EscapeArgs` policy (null stays null, `IFormattable` untouched, everything else through its text) on CEM_CSharpExtended's `EscapeForLog`, uncut, lower-case hex ([0022](../decisions/0022-local-shared-secret-handshake.md), CWE-117). The plugin's own `Utils/LogText.cs` (2026-11-02) was removed for CEMENGAL/CEM_AutocadAPI#4 (2026-11-09); `SocketService.Shorten` calls `EscapeForLog` too |
 | `Utils/McpLocalFiles.cs` | `App = "RevitMCP"`, the `CemTempFolder` app name shared with the command set; `IsReparsePoint`/`RefuseReparsePoint`, the command set's SEC-8 rule | **new** ([0026](../decisions/0026-logs-and-artefacts-in-local-temp.md)); the reparse helpers for the token ([0022](../decisions/0022-local-shared-secret-handshake.md)) |
 | `Utils/PathManager.cs` | the add-in folder, `Commands` and registry paths, **read only** | creates nothing, writes nothing; `GetLogsDirectoryPath` deleted ([0026](../decisions/0026-logs-and-artefacts-in-local-temp.md)) |
 

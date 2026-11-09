@@ -1,5 +1,5 @@
 # Runtime checks of two plugin classes that never touch Revit (decision 0022), for tests/plugin/runtime.test.ts:
-# LogText's escaping of caller text, and McpAuthToken's write while other handles keep reading the file. Loads the
+# the Logger's escaping of caller text, and McpAuthToken's write while other handles keep reading the file. Loads the
 # built net48 DLL into Windows PowerShell and prints one JSON object. The tokens are random and never printed.
 param(
   [Parameter(Mandatory = $true)][string]$Dll,
@@ -12,23 +12,33 @@ $asm = [Reflection.Assembly]::LoadFrom($Dll)
 $static = [Reflection.BindingFlags]'NonPublic, Public, Static'
 $result = [ordered]@{}
 
-# --- LogText: what a caller sends must not become a new line, or a terminal control sequence, in mcp-*.log.
-$logText = $asm.GetType('CEM_IAModeler.Utils.LogText')
-$result.logText = [bool]$logText
-if ($logText) {
-  $escape = $logText.GetMethod('Escape', [type[]]@([string]))
+# --- Logger's argument escaping (CEM_CSharpExtended's EscapeForLog under the Logger's own EscapeArgs policy): what a
+# caller sends must not become a new line, or a terminal control sequence, in mcp-*.log.
+$result.logTextGone = -not [bool]$asm.GetType('CEM_IAModeler.Utils.LogText')
+$logger = $asm.GetType('CEM_IAModeler.Utils.Logger')
+$escapeArgs = if ($logger) { $logger.GetMethod('EscapeArgs', $static, $null, [type[]]@([object[]]), $null) }
+$result.loggerEscape = [bool]$escapeArgs
+if ($escapeArgs) {
+  # One string argument through the Logger's policy; the result is that argument's escaped text.
+  $one = { param($value) $escapeArgs.Invoke($null, @(, [object[]]@($value)))[0] }
   $nasty = "a`r`nb`tc" + [char]0x0 + [char]0x1B + [char]0x7F + [char]0x85 + [char]0x9B + [char]0x2028 + [char]0x2029 + 'd'
-  $once = $escape.Invoke($null, @($nasty))
+  $once = & $one $nasty
   $result.escaped = [int[]][char[]]$once
-  $result.idempotent = ($once -ceq $escape.Invoke($null, @($once)))
+  $result.idempotent = ($once -ceq (& $one $once))
   # Built from char codes: Windows PowerShell reads a script without a BOM in the ANSI code page.
   $plain = 'send_code_to_revit Revisi' + [char]0xF3 + 'n ' + [char]0xF1 + ' ' + [char]0x20AC + ' \u000A'
-  $result.plain = [int[]][char[]]$escape.Invoke($null, @($plain))
+  $result.plain = [int[]][char[]](& $one $plain)
   $result.plainIn = [int[]][char[]]$plain
-  $result.nullEscaped = $escape.Invoke($null, @($null))
-  $escapeArgs = $logText.GetMethod('EscapeArgs')
-  $formatArgs = $escapeArgs.Invoke($null, @(, [object[]]@("x`ny", 1.5)))
-  $result.formatted = [string]::Format([Globalization.CultureInfo]::InvariantCulture, '{0}|{1:N1}', $formatArgs)
+  # A null argument stays null (string.Format prints it as empty); an object whose text is null escapes to "".
+  Add-Type -TypeDefinition 'public sealed class NullText { public override string ToString() { return null; } }'
+  $mixed = $escapeArgs.Invoke($null, @(, [object[]]@($null, [NullText]::new(), [char]0x1B)))
+  $result.nullArgIsNull = ($null -eq $mixed[0])
+  $result.nullTextEscaped = $mixed[1]
+  $result.charEscaped = [string]$mixed[2]
+  $result.nullArgs = ($null -eq $escapeArgs.Invoke($null, @(, $null)))
+  $formatArgs = $escapeArgs.Invoke($null, @(, [object[]]@("x`ny", 1.5, [DateTime]::new(2026, 11, 9))))
+  $result.formattable = ($formatArgs[1] -is [double]) -and ($formatArgs[2] -is [DateTime])
+  $result.formatted = [string]::Format([Globalization.CultureInfo]::InvariantCulture, '{0}|{1:N1}|{2:yyyy-MM-dd}', $formatArgs)
 }
 
 # --- McpAuthToken.Write(folder, token) under two readers:

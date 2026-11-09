@@ -1,7 +1,7 @@
 ---
 title: Test suites (server/tests and tests/commandset)
 type: module
-updated: 2026-11-02
+updated: 2026-11-09
 sources: [server/tests/TESTS.md, server/tests/guards/no-acc-writes.test.ts, server/tests/guards/modeller-pins.test.ts, server/tests/guards/socket-auth-pins.test.ts, server/tests/guards/log-format.test.ts, server/tests/utils/auth.test.ts, server/tests/tools/export_view_image.test.ts, server/tests/helpers/captureToolSchema.ts, server/vitest.config.ts, tests/commandset/CEM_IAModeler_Test.csproj, ea54485, 0556fb0]
 related: [../decisions/0016-schema-only-ts-unit-tests.md, ../workflows/test.md]
 tags: [testing]
@@ -38,13 +38,17 @@ tags: [testing]
   the CSPRNG, the path, the user-and-SYSTEM ACL, the owner check, the temp file then the move, the reparse checks,
   Revit's `ApplicationClosing` calling `Stop` (two pins, red first, added after the live check), the replace with its
   POSIX rename and bounded retry, the escaped log arguments with no interpolated logger message (three pins, red first,
-  2026-11-02), the exclusive port set before each bind (SEC-5.2, red first, 2026-11-02; 23 tests now), the
+  2026-11-02), the exclusive port set before each bind (SEC-5.2, red first, 2026-11-02), the Logger's `EscapeArgs` on
+  CEM_CSharpExtended's `EscapeForLog` and no `LogText` left (CEMENGAL/CEM_AutocadAPI#4, red first, 2026-11-09; 24 tests now), the
   check before `CommandExecutor`, the constant-time compare, the stripped param, and no token variable in any log,
   trace or exception. 14 of the first 16 were red first. The loopback pin and the no-leak scan already passed (the
   scan was mutation-checked against sample leaks), and the owner pin came with its code.
-- `plugin/runtime.test.ts` (2026-11-02, 6 tests): plugin code that never touches Revit, run for real. It loads the
+- `plugin/runtime.test.ts` (2026-11-02, 8 tests): plugin code that never touches Revit, run for real. It loads the
   built `plugin\bin\Debug\2024\CEM_IAModeler.dll` into Windows PowerShell (`tests/fixtures/plugin-runtime.ps1`).
-  - `LogText` escapes caller text (0022, CWE-117).
+  - The Logger's private `EscapeArgs`, on CEM_CSharpExtended's `EscapeForLog`, escapes caller text (0022, CWE-117):
+    lower-case hex, uncut, a null argument kept null, a null text as `""`, numbers and dates still formattable; the
+    `LogText` type is gone. Since CEMENGAL/CEM_AutocadAPI#4 (2026-11-09; it tested `LogText` before): red first, and
+    mutation-checked (without `EscapeForLog`, four tests fail).
   - 200 `McpAuthToken` writes into a scratch folder all succeed under two readers: the TS client's `readFileSync` in
     a Node loop (`tests/fixtures/token-reader.cjs`), and a scanner-like reader that does not share delete. No read is
     partial, and the file never vanishes.
@@ -85,7 +89,8 @@ tags: [testing]
   - the shared-parameter file, checked before and after the write.
   The suite was 103 tests in 11 files. With 0022's two files, and the token writer's pin in `no-acc-writes` (17
   tests now), it is 132 tests in 13 files. With the fix batch of 2026-11-02 (the runtime test, and three pins), 141 tests in 14 files. With the
-  second batch (the exclusive-port pin and `log-format`), 145 tests in 15 files.
+  second batch (the exclusive-port pin and `log-format`), 145 tests in 15 files. With CEMENGAL/CEM_AutocadAPI#4
+  (2026-11-09: one pin, two runtime tests), 148 tests in 15 files.
 - `TESTS.md`: the traceability note. Add one line per new test. (Its "Traceability" paragraph has a
   factual error; see [doc drift](../concepts/doc-drift.md).)
 

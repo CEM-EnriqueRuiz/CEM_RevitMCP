@@ -1,7 +1,8 @@
 // Runtime checks of plugin code that never touches Revit (decision 0022): the built net48 CEM_IAModeler.dll is loaded
 // into Windows PowerShell by tests/fixtures/plugin-runtime.ps1, unlike the Revit-bound C# that is only pinned in its
 // source (0016). It checks:
-// 1. LogText escapes what a caller controls (CR, LF, the other C0 and C1 controls, U+2028/U+2029) before mcp-*.log;
+// 1. the Logger escapes what a caller controls (CR, LF, the other C0 and C1 controls, U+2028/U+2029) before mcp-*.log,
+//    with CEM_CSharpExtended's EscapeForLog under its own EscapeArgs policy (CEMENGAL/CEM_AutocadAPI#4);
 // 2. McpAuthToken.Write survives readers holding the file: 200 writes while an antivirus-like .NET reader and the TS
 //    client's readFileSync loop keep opening it all succeed, and every read is a whole token.
 // The DLL must be built from the current source (plugin Debug R24); a stale one fails, a missing one skips.
@@ -15,16 +16,21 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = resolve(here, "..", "..", "..");
 const dll = join(repo, "plugin", "bin", "Debug", "2024", "CEM_IAModeler.dll");
-const sources = ["plugin/Security/McpAuthToken.cs", "plugin/Utils/LogText.cs", "plugin/Utils/Logger.cs", "plugin/Utils/McpLocalFiles.cs"];
+const sources = ["plugin/Security/McpAuthToken.cs", "plugin/Utils/Logger.cs", "plugin/Utils/McpLocalFiles.cs"];
 const available = process.platform === "win32" && existsSync(dll);
 
 type Runtime = {
-  logText: boolean;
+  logTextGone: boolean;
+  loggerEscape: boolean;
   escaped?: number[];
   idempotent?: boolean;
   plain?: number[];
   plainIn?: number[];
-  nullEscaped?: string | null;
+  nullArgIsNull?: boolean;
+  nullTextEscaped?: string | null;
+  charEscaped?: string;
+  nullArgs?: boolean;
+  formattable?: boolean;
   formatted?: string;
   writeSeam: boolean;
   issues: number;
@@ -76,23 +82,36 @@ describe.skipIf(!available)("plugin runtime (built CEM_IAModeler.dll, no Revit)"
     expect(stale).toEqual([]);
   });
 
-  it("LogText leaves no line break or control character in caller text, and is idempotent", () => {
-    expect(runtime.logText).toBe(true);
+  it("the plugin keeps no escaper of its own: LogText is gone, the Logger's EscapeArgs is there", () => {
+    expect(runtime.logTextGone).toBe(true);
+    expect(runtime.loggerEscape).toBe(true);
+  });
+
+  it("the Logger leaves no line break or control character in caller text, in lower-case hex, and is idempotent", () => {
     const out = String.fromCharCode(...(runtime.escaped ?? []));
     // Built from char codes: U+2028/U+2029 are line terminators, so they cannot appear raw in a regex literal.
     const controls = new RegExp(`[\\x00-\\x1f\\x7f-\\x9f${String.fromCharCode(0x2028, 0x2029)}]`);
     expect(out).not.toMatch(controls);
-    expect(out).toBe(String.raw`a\r\nb\tc\u0000\u001B\u007F\u0085\u009B\u2028\u2029d`);
+    // Lower-case hex since CEMENGAL/CEM_AutocadAPI#4 (was \u001B): the user's accepted change.
+    expect(out).toBe(String.raw`a\r\nb\tc\u0000\u001b\u007f\u0085\u009b\u2028\u2029d`);
     expect(runtime.idempotent).toBe(true);
   });
 
-  it("LogText keeps ordinary text, accents included, and null as (null)", () => {
+  it("the Logger keeps ordinary text whole, accents included, and never cuts it", () => {
     expect(runtime.plain).toEqual(runtime.plainIn);
-    expect(runtime.nullEscaped).toBe("(null)");
   });
 
-  it("LogText.EscapeArgs escapes strings and keeps numbers formattable", () => {
-    expect(runtime.formatted).toBe("x\\ny|1.5");
+  it("a null argument stays null, and an argument whose text is null escapes to an empty string", () => {
+    expect(runtime.nullArgIsNull).toBe(true);
+    // Was "(null)" before CEMENGAL/CEM_AutocadAPI#4: the user's accepted change.
+    expect(runtime.nullTextEscaped).toBe("");
+    expect(runtime.nullArgs).toBe(true);
+  });
+
+  it("the Logger escapes a char argument through its text and keeps numbers and dates formattable", () => {
+    expect(runtime.charEscaped).toBe(String.raw`\u001b`);
+    expect(runtime.formattable).toBe(true);
+    expect(runtime.formatted).toBe("x\\ny|1.5|2026-11-09");
   });
 
   it("200 token writes all succeed while readers keep opening the file", () => {

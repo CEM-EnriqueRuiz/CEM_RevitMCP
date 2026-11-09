@@ -1,7 +1,7 @@
 ---
 title: Audit trails and local files (Screenshots, action log, plugin log)
 type: concept
-updated: 2026-11-01
+updated: 2026-11-09
 sources: [https://github.com/CEM-EnriqueRuiz/CEM_API/issues/82, plugin/Utils/ActionLogger.cs, plugin/Security/McpAuthToken.cs, plugin/Utils/Logger.cs, plugin/Utils/McpLocalFiles.cs, plugin/Core/CommandExecutor.cs, commandset/Commands/ExecuteDynamicCode/ExecuteCodeEventHandler.cs, commandset/Commands/ExecuteDynamicCode/ExecuteCodeCommand.cs, commandset/Services/Views/ExportViewImageEventHandler.cs, commandset/Services/AnnotationComponents/TakeScreenshotEventHandler.cs, commandset/Utils/McpLocalFiles.cs, server/tests/guards/no-acc-writes.test.ts]
 related: [../decisions/0022-local-shared-secret-handshake.md, ../decisions/0027-send-code-scripts-traced-to-local-temp.md, ../decisions/0026-logs-and-artefacts-in-local-temp.md, ../decisions/0023-send-code-scripts-not-persisted.md, ../decisions/0013-hardcoded-failsoft-audit-trails.md, ../decisions/0008-parent-tools-from-recipe-corpus.md]
 tags: [logging, audit, acc]
@@ -70,8 +70,10 @@ It is readable only by the user and SYSTEM, replaced at each start and deleted a
   `ActionLogger` drops it too. No log, trace or exception names it: a refused request is logged by its method only, and
   the socket traces a request's size, not its text.
 - **Caller text cannot forge a log line (0022, CWE-117).** `Logger` escapes every format argument of every
-  `mcp-*.log` line with `LogText`: CR, LF and tab become `\r`, `\n` and `\t`; the other C0 and C1 controls, DEL and
-  U+2028/U+2029 become `\uXXXX`. So a refused method, a command name or an exception message stays on its own line.
+  `mcp-*.log` line with CEM_CSharpExtended's `EscapeForLog`, under its own private `EscapeArgs` (CEMENGAL/CEM_AutocadAPI#4
+  replaced the plugin's `LogText` copy): CR, LF and tab become `\r`, `\n` and `\t`; the other C0 and C1 controls, DEL
+  and U+2028/U+2029 become `\u` plus lower-case hex (`\u001b`); nothing is cut, and a null text becomes `""`. So a
+  refused method, a command name or an exception message stays on its own line.
   Don't build a logger message by interpolation: pass the values as arguments (`socket-auth-pins` fails otherwise).
   `actions-*.jsonl` is JSON, which already escapes them. The pins in `server/tests/guards/socket-auth-pins.test.ts` fail
   otherwise.

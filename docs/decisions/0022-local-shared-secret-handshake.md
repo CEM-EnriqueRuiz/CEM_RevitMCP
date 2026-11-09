@@ -2,8 +2,8 @@
 title: "0022 Local shared-secret handshake for the Revit socket"
 type: decision
 status: current
-updated: 2026-11-02
-sources: ["the user, 2026-11-01 («Con la SEG5 hacemos lo que recomiendas»)", "the security review of CEMENGAL/CEM_Workspace#5 (SEC-5)", plugin/Security/McpAuthToken.cs, plugin/Core/SocketService.cs, plugin/Utils/ActionLogger.cs, plugin/Utils/McpLocalFiles.cs, server/src/utils/SocketClient.ts, plugin/Utils/LogText.cs, plugin/Utils/Logger.cs, "the SEC-5 fix batch, 2026-11-02 (the user: «respecto a SEC-5 hacemos lo que propones»)", server/tests/plugin/runtime.test.ts, server/tests/utils/auth.test.ts, server/tests/guards/socket-auth-pins.test.ts, server/tests/guards/no-acc-writes.test.ts, "the second SEC-5 batch, 2026-11-02 (the user: «2. sí»)", plugin/Core/CommandManager.cs, server/tests/guards/log-format.test.ts]
+updated: 2026-11-09
+sources: ["the user, 2026-11-01 («Con la SEG5 hacemos lo que recomiendas»)", "the security review of CEMENGAL/CEM_Workspace#5 (SEC-5)", plugin/Security/McpAuthToken.cs, plugin/Core/SocketService.cs, plugin/Utils/ActionLogger.cs, plugin/Utils/McpLocalFiles.cs, server/src/utils/SocketClient.ts, plugin/Utils/Logger.cs, "CEMENGAL/CEM_AutocadAPI#4 part 2 (the user, 2026-11-09: «Sigue con la parte 2»): LogText replaced by CEM_CSharpExtended's XStringExtensions.EscapeForLog", "the SEC-5 fix batch, 2026-11-02 (the user: «respecto a SEC-5 hacemos lo que propones»)", server/tests/plugin/runtime.test.ts, server/tests/utils/auth.test.ts, server/tests/guards/socket-auth-pins.test.ts, server/tests/guards/no-acc-writes.test.ts, "the second SEC-5 batch, 2026-11-02 (the user: «2. sí»)", plugin/Core/CommandManager.cs, server/tests/guards/log-format.test.ts]
 related: [0021-loopback-only-socket.md, 0014-license-gated-listener.md, 0027-send-code-scripts-traced-to-local-temp.md, ../concepts/audit-trails.md, ../modules/plugin.md, ../modules/server.md]
 tags: [security, socket, divergence]
 ---
@@ -74,10 +74,14 @@ Anything that reaches `127.0.0.1:8080` can run `send_code_to_revit`, that is any
      `ActionLogger` also drops an `auth` key itself, as a second line of defence.
    - The socket no longer traces the raw request (it used to `Trace.WriteLine` the whole message); only its size.
    - **Caller text cannot forge `mcp-*.log` lines (CWE-117, the fix batch of 2026-11-02).** `Logger` passes every format
-     argument through `LogText.EscapeArgs`: CR, LF and tab become `\r`, `\n` and `\t`; the other C0 and C1 controls,
-     DEL and U+2028/U+2029 become `\uXXXX`. Numbers, dates and enums keep their formatting, and the escaping is
-     idempotent. The format strings are the plugin's own, and no logger call builds its message by interpolation, so
-     every caller-supplied value (a refused method, a command name, an exception message) goes through it.
+     argument through its own private `EscapeArgs` policy, built on CEM_CSharpExtended's `EscapeForLog` (the plugin's
+     own `LogText` copy was removed for CEMENGAL/CEM_AutocadAPI#4, 2026-11-09): CR, LF and tab become `\r`, `\n` and
+     `\t`; the other C0 and C1 controls, DEL and U+2028/U+2029 become `\u` plus four lower-case hex digits (`\u001b`).
+     Nothing is cut. A null argument stays null; an argument whose text is null becomes `""`. Numbers, dates and enums
+     (any `IFormattable`) keep their formatting, and the escaping is idempotent. The format strings are the plugin's
+     own, and no logger call builds its message by interpolation, so every caller-supplied value (a refused method, a
+     command name, an exception message) goes through it. Since #4, the two accepted changes: a null text escapes to
+     `""` (was `(null)`) and the hex is lower-case (was upper-case).
      `actions-*.jsonl` needed nothing: its JSON serialisation already escapes the C0 controls, U+0085 and U+2028/U+2029.
 6. **The TS server reads the token and recovers from a restart.**
    - `RevitClientConnection` reads the file (trimmed) and sends it with every request.
@@ -106,14 +110,17 @@ Anything that reaches `127.0.0.1:8080` can run `send_code_to_revit`, that is any
   - `server/tests/utils/auth.test.ts` (9) runs the real client against a fake plugin: the token is sent, a restart is
     re-read and retried once, a wrong token is refused after one retry, a missing file sends nothing, the token is
     never in an error or on the console, and the 120 s timeout is not retried.
-  - `server/tests/guards/socket-auth-pins.test.ts` (23) pins the C#: the CSPRNG, the path, the ACL, the owner check,
+  - `server/tests/guards/socket-auth-pins.test.ts` (24) pins the C#: the CSPRNG, the path, the ACL, the owner check,
     the closing subscription and its removal on `Stop`, the exclusive port set before each bind,
     the temp file then the move, the reparse checks, the check before `CommandExecutor`, the constant-time compare, the
-    stripped param, and no token variable in any log, trace or exception in `plugin/` or `commandset/`.
+    stripped param, no token variable in any log, trace or exception in `plugin/` or `commandset/`, the Logger's
+    `EscapeArgs` on `EscapeForLog`, and no `LogText` left in `plugin/` or `commandset/` (#4).
   - `no-acc-writes` lists `McpAuthToken.cs` as the one writer outside `CemTempFolder`.
-  - `server/tests/plugin/runtime.test.ts` (6, since 2026-11-02) loads the built plugin DLL in Windows PowerShell, with no
+  - `server/tests/plugin/runtime.test.ts` (8, since 2026-11-02) loads the built plugin DLL in Windows PowerShell, with no
     Revit:
-    - `LogText` leaves no control character or line separator in caller text;
+    - the Logger's `EscapeArgs` leaves no control character or line separator in caller text, in lower-case hex, never
+      cuts it, keeps a null argument null, turns a null text into `""` and keeps numbers and dates formattable; the
+      `LogText` type is gone (#4, red first, and mutation-checked: without `EscapeForLog`, four tests fail);
     - 200 token writes into a scratch folder all succeed while the TS client's `readFileSync` loops in a Node process
       and a scanner-like reader that does not share delete keeps opening the file;
     - every read is a whole token, the file never vanishes once written, and the ACL and folder stay clean.

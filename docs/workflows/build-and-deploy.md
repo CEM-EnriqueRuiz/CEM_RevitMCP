@@ -1,7 +1,7 @@
 ---
 title: Build and deploy
 type: workflow
-updated: 2026-11-03
+updated: 2026-11-09
 sources: [commandset/CEM_IAModeler_CommandSet.csproj, plugin/CEM_IAModeler.csproj, server/package.json, CEM_RevitMCP.sln, .mcp.json]
 related: [../decisions/0011-cem-ribbonui-hosts-deployment.md, ../modules/server.md, ../modules/commandset.md, smoke-test.md]
 tags: [build, deploy]
@@ -30,11 +30,16 @@ that flag, so without it a Debug build still copies the output (since 2026-10-07
 ProjectReferences drop the flag (`GlobalPropertiesToRemove`) but keep `DeployRevitAddin=false`, so they do not
 deploy their own manifests either.
 
-**Use a modern .NET SDK.** On this machine the default `dotnet` on PATH is SDK 5.0.103 (C# 9), which fails
-on `CEM_RevitAuth`'s file-scoped namespaces ("Se esperaba }" / CS1513). Use the Cemengal-provisioned
-SDK: `%LOCALAPPDATA%\Cemengal\dotnet\dotnet.exe` (SDK 10.0.401 at 2026-10-06). Machines differ: on 2026-10-07 a
-workstation without that SDK built R24 and R25 with SDK 9.0.203 from PATH (nothing pins the SDK; the repo's
-`global.json` only sets the test runner). The plugin builds with
+**Use a modern .NET SDK** (C# 10 or later). An old `dotnet` on PATH, such as SDK 5.0.103 (C# 9), fails on
+`CEM_RevitAuth`'s file-scoped namespaces ("Se esperaba }" / CS1513). Which SDK is where depends on the machine;
+nothing pins it (the repo's `global.json` only sets the test runner):
+- on 2026-10-06 one machine had only SDK 5.0.103 on PATH and built with the Cemengal-provisioned
+  `%LOCALAPPDATA%\Cemengal\dotnet\dotnet.exe` (SDK 10.0.401);
+- on 2026-10-07 a workstation without that SDK built R24 and R25 with SDK 9.0.203 from PATH;
+- on 2026-11-09 a machine without the provisioned SDK built the plugin with SDK 10.0.301 from PATH
+  (CEMENGAL/CEM_AutocadAPI#4).
+So run `dotnet --version` first: if it is 8.0 or later (R25+ target `net8.0-windows`), PATH's `dotnet` works; if not,
+use the provisioned one. The plugin builds with
 `... build plugin\CEM_IAModeler.csproj -c "Debug R24" -p:Platform=x64 -p:CemRibbonHostBuild=true`
 (no deploy).
 

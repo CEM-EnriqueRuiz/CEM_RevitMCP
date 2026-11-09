@@ -6,7 +6,7 @@
 // 2. a request without the token is refused before CommandExecutor, in constant time, with no detail;
 // 3. the token never reaches a log, a trace or the commands. The client side is tests/utils/auth.test.ts.
 import { describe, expect, it } from "vitest";
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -224,9 +224,11 @@ describe("0022: the token never reaches a log or a trace", () => {
 
   it("caller text cannot forge mcp-*.log lines: every format argument is escaped (CWE-117)", () => {
     // The format strings are the plugin's own; the arguments (a refused method, a command name, an exception message)
-    // can carry CR/LF from a caller. LogText's own behaviour is checked at runtime in tests/plugin/runtime.test.ts.
+    // can carry CR/LF from a caller. The escaping itself is checked at runtime in tests/plugin/runtime.test.ts.
     const logger = code(read("plugin/Utils/Logger.cs"));
-    expect(logger).toMatch(/string\.Format\(message, LogText\.EscapeArgs\(args\)\)/);
+    expect(logger).toMatch(/string\.Format\(message, EscapeArgs\(args\)\)/);
+    // EscapeArgs is the Logger's own policy, on CEM_CSharpExtended's EscapeForLog (CEMENGAL/CEM_AutocadAPI#4).
+    expect(logger).toMatch(/private static object\[\] EscapeArgs\(object\[\] args\)[\s\S]*?\.EscapeForLog\(\)/);
     // So no logger call may build its message by interpolation, which would bypass the escaping.
     const interpolated = csharp(join(repo, "plugin"))
       .filter((f) => /(_logger|Logger)\.\w+\(\s*\$"/.test(code(readFileSync(f, "utf8"))))
@@ -236,7 +238,15 @@ describe("0022: the token never reaches a log or a trace", () => {
 
   it("the refused method is escaped before it is shortened, and its refusal line names nothing else", () => {
     const socket = code(read(SOCKET));
-    expect(socket).toMatch(/private static string Shorten\(string method\)[\s\S]*?LogText\.Escape\(method\)/);
+    expect(socket).toMatch(/private static string Shorten\(string method\)[\s\S]*?method\.EscapeForLog\(\)/);
+  });
+
+  it("the plugin keeps no escaper of its own: LogText is gone, replaced by CEM_CSharpExtended's EscapeForLog", () => {
+    expect(existsSync(join(repo, "plugin/Utils/LogText.cs"))).toBe(false);
+    const users = [...csharp(join(repo, "plugin")), ...csharp(join(repo, "commandset"))]
+      .filter((f) => /\bLogText\b/.test(code(readFileSync(f, "utf8"))))
+      .map((f) => f.slice(repo.length + 1).split("\\").join("/"));
+    expect(users).toEqual([]);
   });
 
   it("the action log drops an auth param, whatever reaches it", () => {

@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RevitMCPSDK.API.Models.JsonRPC;
 using RevitMCPSDK.API.Interfaces;
+using CEM_CSharpExtended;
 using CEM_IAModeler.Configuration;
 using CEM_IAModeler.Security;
 using CEM_IAModeler.Utils;
@@ -355,7 +356,7 @@ namespace CEM_IAModeler.Core
         private static string Shorten(string method)
         {
             if (method == null) return "(none)";
-            string escaped = LogText.Escape(method);
+            string escaped = method.EscapeForLog();
             return escaped.Length <= 80 ? escaped : escaped.Substring(0, 80) + "…";
         }
 

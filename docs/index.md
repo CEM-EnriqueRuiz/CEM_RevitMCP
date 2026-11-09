@@ -1,7 +1,7 @@
 ---
 title: CEM_RevitMCP wiki index
 type: index
-updated: 2026-11-08
+updated: 2026-11-09
 sources: [command.json, CEM_RevitMCP.md, .claude/skills/cem-revitmcp-dev/SKILL.md, .claude/skills/cem-aimodeler/SKILL.md]
 related: [overview.md, log.md]
 tags: [index]
@@ -135,6 +135,7 @@ Issues:
 - [CEM-EnriqueRuiz/CEM_API#82](sources/issues/CEM-EnriqueRuiz-CEM_API-82.md): nothing writes under ACC or beside the DLL; logs and temp artefacts in `%TEMP%\Cemengal\RevitMCP` ([0026](decisions/0026-logs-and-artefacts-in-local-temp.md)).
 - [CEMENGAL/CEM_Workspace#5](sources/issues/CEMENGAL-CEM_Workspace-5.md): the MCP made ready for the modelling agent. It covers family activation and `hostDocument`, the `send_code_to_revit` code trace and late lines ([0027](decisions/0027-send-code-scripts-traced-to-local-temp.md)), `export_view_image`, and the review fixes, including the SEC-8 reparse guards.
 - [CEMENGAL/CEM_CSharpExtended#1](sources/issues/CEMENGAL-CEM_CSharpExtended-1.md): C# libraries mirror the native library (root 0041); here only the compile migration, `CemTempFolder` from `CEM_CSharpExtended.IO`, and the helpers left for later.
+- [CEMENGAL/CEM_AutocadAPI#4](sources/issues/CEMENGAL-CEM_AutocadAPI-4.md): the log escaper moves to CEM_CSharpExtended; the plugin's `LogText` gives way to `EscapeForLog`, with `EscapeArgs` as the Logger's own policy ([0022](decisions/0022-local-shared-secret-handshake.md)).
 
 Commits without an issue:
 

@@ -1,7 +1,7 @@
 ---
 title: Run the tests
 type: workflow
-updated: 2026-10-24
+updated: 2026-11-09
 sources: [server/package.json, server/vitest.config.ts, server/tests/TESTS.md, server/tests/guards/no-acc-writes.test.ts, tests/commandset/CEM_IAModeler_Test.csproj]
 related: [../modules/tests.md, ../decisions/0016-schema-only-ts-unit-tests.md, smoke-test.md]
 tags: [testing, tdd]
@@ -25,7 +25,7 @@ From the Cemengal root, the same suite runs with `.\.claude\run-tests.ps1 -Repos
   Say so in your report rather than skipping silently. The coordinator accepted it again on 2026-10-24 for
   the [0026](../decisions/0026-logs-and-artefacts-in-local-temp.md) handlers.
 - **Plugin code that never touches Revit runs for real:** `tests/plugin/runtime.test.ts` loads the built
-  `plugin\bin\Debug\2024\CEM_IAModeler.dll` into Windows PowerShell (`LogText`, the token write under readers,
+  `plugin\bin\Debug\2024\CEM_IAModeler.dll` into Windows PowerShell (the Logger's argument escaping on CEM_CSharpExtended's `EscapeForLog`, the token write under readers,
   [0022](../decisions/0022-local-shared-secret-handshake.md)). Build plugin Debug R24 before `npx vitest run`: the test
   skips without the DLL and fails when it is older than its sources.
 - **Where C# writes is pinned from the TS side:** `tests/guards/no-acc-writes.test.ts` reads the plugin and

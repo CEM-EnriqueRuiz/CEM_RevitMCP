@@ -1,4 +1,5 @@
-﻿using CEM_CSharpExtended.IO;
+﻿using CEM_CSharpExtended;
+using CEM_CSharpExtended.IO;
 using RevitMCPSDK.API.Interfaces;
 using System;
 
@@ -15,7 +16,7 @@ namespace CEM_IAModeler.Utils
 
             // CEM (decision 0022, CWE-117): the format strings are ours, the arguments may be caller text (a refused
             // method, an exception message), so each is escaped and cannot start a forged line.
-            string formattedMessage = args.Length > 0 ? string.Format(message, LogText.EscapeArgs(args)) : message;
+            string formattedMessage = args.Length > 0 ? string.Format(message, EscapeArgs(args)) : message;
             string logEntry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} [{level}] {formattedMessage}";
 
             // 输出到 Debug 窗口
@@ -26,6 +27,19 @@ namespace CEM_IAModeler.Utils
             // Write to today's mcp-yyyyMMdd.log in %TEMP%\Cemengal\RevitMCP (root decision 0031), never next to
             // this DLL, which loads from ACC on colleagues' machines. AppendLog never throws.
             CemTempFolder.AppendLog(McpLocalFiles.App, "mcp", logEntry);
+        }
+
+        // CEM (decision 0022, CWE-117): the Logger's own policy over every format argument. Strings and other objects go
+        // through their text with CEM_CSharpExtended's EscapeForLog, uncut (CR, LF, tab to \r, \n, \t; the other C0 and C1
+        // controls, DEL and U+2028/U+2029 to \u + lower-case hex; a null text to ""). Numbers, dates, enums and other
+        // IFormattable values stay as they are, so {0:N1} still formats; a null argument stays null.
+        private static object[] EscapeArgs(object[] args)
+        {
+            if (args == null) return null;
+            var escaped = new object[args.Length];
+            for (int i = 0; i < args.Length; i++)
+                escaped[i] = args[i] == null || args[i] is IFormattable ? args[i] : args[i].ToString().EscapeForLog();
+            return escaped;
         }
 
         public void Debug(string message, params object[] args)

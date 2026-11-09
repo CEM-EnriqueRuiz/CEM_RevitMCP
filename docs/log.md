@@ -1,7 +1,7 @@
 ---
 title: CEM_RevitMCP wiki log
 type: log
-updated: 2026-11-08
+updated: 2026-11-09
 sources: []
 related: [index.md]
 tags: [log]
@@ -298,3 +298,14 @@ loads CEM_CSharpExtended's `cem-csharp-mirror` skill first, goes on the mirror s
 same change and moves reusable helpers to CEM_CSharpExtended or `CEM_RevitAPI_Extended`. One line in `CLAUDE.md` and
 `AGENTS.md`; [index](index.md) hard rule 13 and a "Before you change X" row; links in [commandset](modules/commandset.md)
 and [plugin](modules/plugin.md); a section on the [source page](sources/issues/CEMENGAL-CEM_CSharpExtended-1.md).
+
+## [2026-11-09] ingest | CEMENGAL/CEM_AutocadAPI#4 the log escaper in CEM_CSharpExtended: LogText onto EscapeForLog
+
+`plugin/Utils/LogText.cs` is deleted. `SocketService.Shorten` calls `EscapeForLog` (its `(none)` and 80-character cut
+kept), and `Logger` keeps `EscapeArgs` as its own private policy on `EscapeForLog`. Two behaviour changes, accepted by
+the user: a null text escapes to `""` (was `(null)`), and the hex is lower-case → [source page](sources/issues/CEMENGAL-CEM_AutocadAPI-4.md),
+with the old-behaviour table, the decisions, the tests (148 in 15 files) and the reviews (QA and security, 0 blocking).
+Updated: [0022](decisions/0022-local-shared-secret-handshake.md), [audit trails](concepts/audit-trails.md),
+[plugin](modules/plugin.md), [tests](modules/tests.md), [test](workflows/test.md), `server/tests/TESTS.md`. Doc drift fixed in
+[build and deploy](workflows/build-and-deploy.md): the provisioned SDK is machine-specific, and PATH's `dotnet` works when it
+is 8.0 or later. No deploy; pushed after CEM_CSharpExtended.
